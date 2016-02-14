@@ -1,0 +1,28 @@
+@import "../node_modules/foundation-sites/scss/foundation";
+
+@include foundation-everything;
+
+body {
+  background: #111;
+}
+
+#root {
+  height: inherit;
+}
+
+.game {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  height: inherit;
+
+  &-top {
+    align-self: flex-start;
+    max-width: 50%;
+  }
+
+  &-bottom {
+    align-self: flex-end;
+    max-width: 50%;
+  }
+}

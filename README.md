@@ -8,6 +8,7 @@ Fast-paced hot seat multiplayer game written in JavaScript.
 - [SocketIO](http://socket.io/) - Real-time communication
 - [Redux](http://redux.js.org/) - Predictable state container
 - [Immutable](https://facebook.github.io/immutable-js/) - Immutable collections
+- [React](https://facebook.github.io/react/) - User interface components
 - [Phaser](http://phaser.io/) - Game framework
 - [Mocha](https://mochajs.org/) - Testing framework
 - [Chai](http://chaijs.com/) - Assertion library

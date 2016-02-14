@@ -16,13 +16,18 @@ module.exports = {
     alias: {
       'pixi': path.join(__dirname, 'lib/pixi'),
       'phaser': path.join(__dirname, 'lib/phaser')
-    }
+    },
+    extensions: ['', '.js', '.jsx']
   },
   resolveLoader: {
     root: path.join(__dirname, 'node_modules')
   },
   module: {
     loaders: [
+      {
+        test: /\.jsx$/,
+        loaders: ['react-hot', 'babel']
+      },
       {
         test: /\.js$/,
         exclude: /node_modules/,
