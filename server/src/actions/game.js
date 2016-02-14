@@ -1,10 +1,10 @@
-export const ADD_ENTITY = 'ADD_ENTITY';
-export const REMOVE_ENTITY =  'REMOVE_ENTITY';
-export const MOVE_LEFT = 'MOVE_LEFT';
-export const MOVE_RIGHT = 'MOVE_RIGHT';
-export const MOVE_UP = 'MOVE_UP';
-export const MOVE_DOWN = 'MOVE_DOWN';
-export const ADVANCE_TIME = 'ADVANCE_TIME';
+export const ADD_ENTITY = 'game/ADD_ENTITY';
+export const REMOVE_ENTITY =  'game/REMOVE_ENTITY';
+export const MOVE_LEFT = 'game/MOVE_LEFT';
+export const MOVE_RIGHT = 'game/MOVE_RIGHT';
+export const MOVE_UP = 'game/MOVE_UP';
+export const MOVE_DOWN = 'game/MOVE_DOWN';
+export const ADVANCE_TIME = 'game/ADVANCE_TIME';
 
 /**
  *

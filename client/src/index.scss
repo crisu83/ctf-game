@@ -10,19 +10,28 @@ body {
   height: inherit;
 }
 
+.app {
+  height: inherit;
+}
+
 .game {
   align-items: center;
   display: flex;
   justify-content: center;
   height: inherit;
 
-  &-top {
+  &:before {
     align-self: flex-start;
     max-width: 50%;
   }
 
-  &-bottom {
+  &:after {
     align-self: flex-end;
     max-width: 50%;
+  }
+
+  &-status-text {
+    color: #fff;
+    font-size: 18px;
   }
 }

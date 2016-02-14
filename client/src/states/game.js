@@ -10,14 +10,12 @@ const SPRITE_SIZE = 96;
 class GameState extends State {
   /**
    *
-   * @param socket
    * @param store
-   * @param playerProps
+   * @param {Object} playerProps
    */
-  constructor(socket, store, playerProps) {
+  constructor(store, playerProps) {
     super();
 
-    this._socket = socket;
     this._store = store;
     this._playerProps = playerProps;
     this._playerEntity = null;
@@ -70,20 +68,22 @@ class GameState extends State {
    *
    */
   handleInput() {
+    const player = this._playerEntity;
+
     if (this._cursorKeys.left.isDown) {
-      this._store.dispatch(moveLeft(this._playerEntity.id, MOVE_STEP));
-      this._playerEntity.sprite.animations.play(this._attackKey.isDown ? 'attackLeft' : 'runLeft');
+      this._store.dispatch(moveLeft(player.id, MOVE_STEP));
+      player.sprite.animations.play(this._attackKey.isDown ? 'attackLeft' : 'runLeft');
     } else if (this._cursorKeys.right.isDown) {
-      this._store.dispatch(moveRight(this._playerEntity.id, MOVE_STEP));
-      this._playerEntity.sprite.animations.play(this._attackKey.isDown ? 'attackRight' : 'runRight');
+      this._store.dispatch(moveRight(player.id, MOVE_STEP));
+      player.sprite.animations.play(this._attackKey.isDown ? 'attackRight' : 'runRight');
     } else if (this._cursorKeys.up.isDown) {
-      this._store.dispatch(moveUp(this._playerEntity.id, MOVE_STEP));
-      this._playerEntity.sprite.animations.play(this._attackKey.isDown ? 'attackUp' : 'runUp');
+      this._store.dispatch(moveUp(player.id, MOVE_STEP));
+      player.sprite.animations.play(this._attackKey.isDown ? 'attackUp' : 'runUp');
     } else if (this._cursorKeys.down.isDown) {
-      this._store.dispatch(moveDown(this._playerEntity.id, MOVE_STEP));
-      this._playerEntity.sprite.animations.play(this._attackKey.isDown ? 'attackDown' : 'runDown');
+      this._store.dispatch(moveDown(player.id, MOVE_STEP));
+      player.sprite.animations.play(this._attackKey.isDown ? 'attackDown' : 'runDown');
     } else {
-      this._playerEntity.sprite.animations.play('idle');
+      player.sprite.animations.play('idle');
     }
   }
 
@@ -100,23 +100,22 @@ class GameState extends State {
       removedEntityIds.push(entity.id);
     });
 
-    let currentEntityState, entity, shouldBeDestroyed;
+    let props, entity, shouldBeDestroyed;
 
-    forEach(gameState.entities, entityProps => {
-      currentEntityState = findEntityById(gameState.entities, entityProps.id);
-      entity = find(this._entities, entity => entity.id == entityProps.id);
+    forEach(gameState.entities, nextProps => {
+      props = findEntityById(gameState.entities, nextProps.id);
+      entity = find(this._entities, entity => entity.id == nextProps.id);
 
       // Create the entity if it does not exist.
       if (!entity) {
-        entity = createEntity(game, entityProps);
+        entity = createEntity(game, nextProps);
         this._entities.push(entity);
       }
 
-      entity.sprite.x = entityProps.x;
-      entity.sprite.y = entityProps.y;
+      entity.update(nextProps);
 
       // Remove updated entities from the list of entities to be removed.
-      removedEntityIds = removedEntityIds.filter(id => id !== entityProps.id);
+      removedEntityIds = removedEntityIds.filter(id => id !== nextProps.id);
     });
 
     // Destroy entities that have been removed.

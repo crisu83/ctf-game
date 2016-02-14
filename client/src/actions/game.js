@@ -1,8 +1,8 @@
-export const SET_STATE = 'SET_STATE';
-export const MOVE_LEFT = 'MOVE_LEFT';
-export const MOVE_RIGHT = 'MOVE_RIGHT';
-export const MOVE_UP = 'MOVE_UP';
-export const MOVE_DOWN = 'MOVE_DOWN';
+export const SET_STATE = 'game/SET_STATE';
+export const MOVE_LEFT = 'game/MOVE_LEFT';
+export const MOVE_RIGHT = 'game/MOVE_RIGHT';
+export const MOVE_UP = 'game/MOVE_UP';
+export const MOVE_DOWN = 'game/MOVE_DOWN';
 
 /**
  *

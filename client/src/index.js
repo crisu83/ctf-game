@@ -2,6 +2,7 @@ import io from 'socket.io-client';
 import React from 'react';
 import { render } from 'react-dom';
 import { Provider } from 'react-redux';
+import { App } from './components/app';
 import { GameContainer } from './components/game';
 import createStore from './store';
 
@@ -12,7 +13,10 @@ const store = createStore(socket);
 
 render(
   <Provider store={store}>
-    <GameContainer socket={socket} store={store}/>
+    <App>
+      <GameContainer socket={socket} store={store}/>
+    </App>
   </Provider>,
   document.getElementById('root')
 );
+
