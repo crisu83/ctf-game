@@ -9,13 +9,17 @@ module.exports = {
   output: {
     path: 'dist',
     filename: 'bundle.js',
-    publicPath: 'static'
+    publicPath: 'static/'
   },
   resolve: {
+    root: path.join(__dirname, 'node_modules'),
     alias: {
-      'pixi': path.join(__dirname, 'lib/pixi.js'),
-      'phaser': path.join(__dirname, 'lib/phaser.js')
+      'pixi': path.join(__dirname, 'lib/pixi'),
+      'phaser': path.join(__dirname, 'lib/phaser')
     }
+  },
+  resolveLoader: {
+    root: path.join(__dirname, 'node_modules')
   },
   module: {
     loaders: [
@@ -26,28 +30,23 @@ module.exports = {
       },
       {
         test: /phaser\.js$/,
-        include: path.join(__dirname, 'lib'),
         loader: 'imports?PIXI=pixi'
       },
       {
         test: /\.scss$/,
-        loader: ExtractTextPlugin.extract('style', 'css!sass'),
-        include: path.join(__dirname, 'src')
+        loader: ExtractTextPlugin.extract('style', 'css!sass')
       },
       {
         test: /\.(png|jpg)$/,
-        loader: 'url?limit=8192',
-        include: path.join(__dirname, 'src')
+        loader: 'url?limit=8192'
       },
       {
         test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-        loader: 'url?limit=10000&mimetype=application/font-woff',
-        include: path.join(__dirname, 'src')
+        loader: 'url?limit=10000&mimetype=application/font-woff'
       },
       {
         test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-        loader: 'file',
-        include: path.join(__dirname, 'src')
+        loader: 'file'
       },
       {
         test: /\.json$/,

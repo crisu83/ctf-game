@@ -1,72 +1,63 @@
 import shortid from 'shortid';
-import _ from 'lodash';
-import GameSession from './game-session';
+import { Map } from 'immutable';
+import { logger } from './helpers';
+import GameInstance from './game-instance';
 import GameClient from './game-client';
-import {GAME_TICK_RATE} from './constants';
+import { SET_STATE } from './events';
+import createStore from './store';
+
+function mapStateToClient(state) {
+
+}
 
 class GameRoom {
   /**
-   * @constructor
-   * @param {object} io
-   * @param {GameServer} server
+   * @param io
    */
-  constructor(io, server) {
+  constructor(io) {
     this._io = io;
-    this._server = server;
     this._id = shortid.generate();
+    this._store = createStore();
     this._clients = [];
     this._lastTickAt = null;
     this._isRunning = true;
 
-    console.log('room.create (room_id: %s)', this._id);
+    this.close = this.close.bind(this);
 
-    this._session = new GameSession();
+    logger.info(`room.create (room_id: ${this._id})`);
 
-    setInterval(this.loop.bind(this), 1000 / GAME_TICK_RATE);
+    // Handle each new client connecting to this room.
+    this._io.on('connection', this.handleConnection.bind(this));
 
-    this._io.on('connection', this.onConnect.bind(this));
+    // Notify each client every time the state is changed.
+    this._unsubscribeFromStore = this._store.subscribe(this.handleChange.bind(this));
+
+    this._gameInstance = new GameInstance(this._store);
+  }
+
+  handleChange() {
+    this._io.emit(SET_STATE, this.state);
   }
 
   /**
-   * @param {object} socket
+   * @param socket
    */
-  onConnect(socket) {
-    console.log('room.connect (room_id: %s)', this._id);
+  handleConnection(socket) {
+    logger.info(`room.connect (room_id: ${this._id})`);
 
-    this._clients.push(new GameClient(socket, this));
+    this._clients.push(new GameClient(socket, this._store));
   }
 
   /**
-   * Game loop
+   *
+   * @returns {Map}
    */
-  loop() {
-    let timeNow, timeElapsed;
-
-    if (this._isRunning) {
-      timeNow     = _.now();
-      timeElapsed = timeNow - this._lastTickAt;
-
-      this.update(timeElapsed);
-
-      this._lastTickAt = timeNow;
-    }
+  get state() {
+    return this._store.getState().game.toJS();
   }
 
-  /**
-   * Called every time the game state should update.
-   * @param {Number} timeElapsed
-   */
-  update(timeElapsed) {
-    this.updateClients();
-  }
-
-  /**
-   * Updates the clients connected to this room.
-   */
-  updateClients() {
-    for (let client of this._clients) {
-      client.update(this._session.gameState);
-    }
+  close() {
+    this._unsubscribeFromStore();
   }
 }
 

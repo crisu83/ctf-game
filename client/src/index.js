@@ -1,14 +1,22 @@
-import Phaser from 'phaser';
 import io from 'socket.io-client';
+import createStore from './store';
+import createGame from './factories/game';
+import { setState } from './actions/game';
 
-let socket = io('http://localhost:3000');
+const socket = io('http://localhost:3000');
+const store = createStore(socket);
 
-socket.on('client.connected', id => {
-  console.log('client.connected (client_id: %s)', id);
+const READY = 'ready';
+const SET_STATE = 'set_state';
 
-  socket.emit('client.ready');
+socket.on(READY, (clientId, playerProps, state) => {
+  console.log('CONNECTED (client_id: %s, player_id)', clientId, playerProps, state);
+
+  store.dispatch(setState(state));
+
+  createGame(socket, store, playerProps, {width: 800, height: 600});
 });
 
-socket.on('client.update', (id, gameState) => {
-  // console.log('client.update (id: %s)', id, gameState);
+socket.on(SET_STATE, (state) => {
+  store.dispatch(setState(state));
 });

@@ -18313,8 +18313,8 @@ Phaser.Gamepad.prototype = {
 
         if (typeof callbacks !== 'undefined')
         {
-            this.onConnectCallback = (typeof callbacks.onConnect === 'function') ? callbacks.onConnect : this.onConnectCallback;
-            this.onDisconnectCallback = (typeof callbacks.onDisconnect === 'function') ? callbacks.onDisconnect : this.onDisconnectCallback;
+            this.onConnectCallback = (typeof callbacks.handleConnection === 'function') ? callbacks.handleConnection : this.onConnectCallback;
+            this.onDisconnectCallback = (typeof callbacks.handleDisconnect === 'function') ? callbacks.handleDisconnect : this.onDisconnectCallback;
             this.onDownCallback = (typeof callbacks.onDown === 'function') ? callbacks.onDown : this.onDownCallback;
             this.onUpCallback = (typeof callbacks.onUp === 'function') ? callbacks.onUp : this.onUpCallback;
             this.onAxisCallback = (typeof callbacks.onAxis === 'function') ? callbacks.onAxis : this.onAxisCallback;
@@ -18957,8 +18957,8 @@ Phaser.SinglePad.prototype = {
 
         if (typeof callbacks !== 'undefined')
         {
-            this.onConnectCallback = (typeof callbacks.onConnect === 'function') ? callbacks.onConnect : this.onConnectCallback;
-            this.onDisconnectCallback = (typeof callbacks.onDisconnect === 'function') ? callbacks.onDisconnect : this.onDisconnectCallback;
+            this.onConnectCallback = (typeof callbacks.handleConnection === 'function') ? callbacks.handleConnection : this.onConnectCallback;
+            this.onDisconnectCallback = (typeof callbacks.handleDisconnect === 'function') ? callbacks.handleDisconnect : this.onDisconnectCallback;
             this.onDownCallback = (typeof callbacks.onDown === 'function') ? callbacks.onDown : this.onDownCallback;
             this.onUpCallback = (typeof callbacks.onUp === 'function') ? callbacks.onUp : this.onUpCallback;
             this.onAxisCallback = (typeof callbacks.onAxis === 'function') ? callbacks.onAxis : this.onAxisCallback;

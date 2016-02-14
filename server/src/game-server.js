@@ -1,13 +1,15 @@
 import GameRoom from './game-room';
 
 class GameServer {
+  /**
+   * @param io
+   */
   constructor(io) {
     this._io = io;
-    this._rooms = [];
   }
 
   boot() {
-    this._rooms.push(new GameRoom(this._io, this));
+    new GameRoom(this._io);
   }
 }
 
