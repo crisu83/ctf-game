@@ -4,8 +4,9 @@ import { now } from 'lodash';
 import { beginConnection, endConnection, startLoading, stopLoading } from '../actions/client';
 import { setState } from '../actions/game';
 import createGame from '../factories/game';
+import Loader from './loader';
 
-const LOADING_DELAY = 1000;
+const CONNECT_DELAY = 850;
 
 function mapStateToProps(state) {
   return {
@@ -67,7 +68,7 @@ export class Game extends Component {
     // Set the initial state when the client is ready.
     this.props.onSetState(state);
 
-    const delay = LOADING_DELAY - (now() - this._createdAt);
+    const delay = CONNECT_DELAY - (now() - this._createdAt);
 
     setTimeout(() => {
       this._game = createGame(this.props.store, playerProps, {width: 800, height: 600});
@@ -88,7 +89,7 @@ export class Game extends Component {
 
     return (
       <div className="game">
-        {!isConnected ? <div className="game-status-text">Connecting to server ...</div> : null}
+        {!isConnected ? <Loader/> : null}
         <div id="phaser" style={{display: isConnected && !isLoading ? 'block' : 'none'}}></div>
       </div>
     );
