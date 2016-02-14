@@ -1,0 +1,45 @@
+{
+  "spritesheets": {
+    "knight-blue": {
+      "url": "images/sprites/knight-blue.png",
+      "frameWidth": 96,
+      "frameHeight": 96
+    },
+    "knight-green": {
+      "url": "images/sprites/knight-green.png",
+      "frameWidth": 96,
+      "frameHeight": 96
+    },
+    "knight-orange": {
+      "url": "images/sprites/knight-orange.png",
+      "frameWidth": 96,
+      "frameHeight": 96
+    },
+    "knight-purple": {
+      "url": "images/sprites/knight-purple.png",
+      "frameWidth": 96,
+      "frameHeight": 96
+    },
+    "flag": {
+      "url": "images/sprites/flag.png",
+      "frameWidth": 96,
+      "frameHeight": 96
+    }
+  },
+  "images": {
+    "castle": {
+      "url": "images/tilesets/castle.png"
+    }
+  },
+  "audio": {
+    "8-bit-rebel": {
+      "files": ["audio/music/8-bit-rebel.mp3", "audio/music/8-bit-rebel.ogg", "audio/music/8-bit-rebel.wav"]
+    },
+    "knight-hit": {
+      "files": ["audio/sounds/knight-hit.mp3", "audio/sounds/knight-hit.ogg", "audio/sounds/knight-hit.wav"]
+    },
+    "knight-die": {
+      "files": ["audio/sounds/knight-die.mp3", "audio/sounds/knight-die.ogg", "audio/sounds/knight-die.wav"]
+    }
+  }
+}

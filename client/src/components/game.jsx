@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { now } from 'lodash';
 import { beginConnection, endConnection, startLoading, stopLoading } from '../actions/client';
 import { setState } from '../actions/game';
-import createGame from '../factories/game';
+import { createGame } from '../factories/game';
 import Loader from './loader';
 
 const CONNECT_DELAY = 850;
@@ -62,16 +62,16 @@ export class Game extends Component {
     console.log('CONNECTED');
   }
 
-  handleReady(clientId, playerProps, state) {
-    console.log('READY (client_id: %s)', clientId, playerProps, state);
+  handleReady(clientId, assetData, gameState, playerProps) {
+    console.log('READY (client_id: %s)', clientId, assetData, gameState, playerProps);
 
-    // Set the initial state when the client is ready.
-    this.props.onSetState(state);
+    // Set the initial game state when the client is ready.
+    this.props.onSetState(gameState);
 
     const delay = CONNECT_DELAY - (now() - this._createdAt);
 
     setTimeout(() => {
-      this._game = createGame(this.props.store, playerProps, {width: 800, height: 600});
+      this._game = createGame(this.props.store, assetData, playerProps, {width: 800, height: 600});
 
       this.props.onConnect();
       this.props.onStopLoading();

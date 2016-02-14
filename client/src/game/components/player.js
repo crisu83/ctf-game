@@ -25,7 +25,7 @@ class Player extends Component {
     knight.y = newProps.y;
 
     const name = this.getComponent('text').get('name');
-    name.x = newProps.x + (knight.width / 2);
+    name.x = newProps.x + (newProps.width / 2);
     name.y = newProps.y;
   }
 }

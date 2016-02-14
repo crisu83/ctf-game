@@ -8,6 +8,12 @@ import createStore from './store';
 
 import './index.scss';
 
+function requireAll(requireContext) {
+  return requireContext.keys().map(requireContext);
+}
+
+requireAll(require.context('assets/', true, /\.(png|jpg|mp3|ogg|wav)$/));
+
 const socket = io('http://localhost:3000');
 const store = createStore(socket);
 

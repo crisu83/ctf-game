@@ -12,6 +12,8 @@ export function createPlayer() {
     name: chance.first(),
     x: 0,
     y: 20,
+    width: 96,
+    height: 96,
     color: chance.pick(['blue', 'green', 'orange', 'purple'])
   };
 }

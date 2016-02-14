@@ -15,7 +15,8 @@ module.exports = {
     root: path.join(__dirname, 'node_modules'),
     alias: {
       'pixi': path.join(__dirname, 'lib/pixi'),
-      'phaser': path.join(__dirname, 'lib/phaser')
+      'phaser': path.join(__dirname, 'lib/phaser'),
+      'assets': path.join(__dirname, 'assets')
     },
     extensions: ['', '.js', '.jsx']
   },
@@ -42,7 +43,7 @@ module.exports = {
         loader: ExtractTextPlugin.extract('style', 'css!sass')
       },
       {
-        test: /\.(png|jpg)$/,
+        test: /\.(png|jpg|mp3|ogg|wav)$/,
         loader: 'url?limit=8192'
       },
       {

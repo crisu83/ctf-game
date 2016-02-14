@@ -1,14 +1,15 @@
 import Phaser, { Game } from 'phaser';
-import GameState from '../states/game';
+import GameState from '../game/states/game';
 
 /**
  *
  * @param store
+ * @param {Object} assetData
  * @param {Object} playerProps
  * @param {Object} config
  * @returns {Phaser.Game}
  */
-function createGame(store, playerProps, config) {
+export function createGame(store, assetData, playerProps, config) {
   const game = new Game(
     config.width,
     config.height,
@@ -19,9 +20,7 @@ function createGame(store, playerProps, config) {
     false/* antialias */
   );
 
-  game.state.add('game', new GameState(store, playerProps), true/* auto-start */);
+  game.state.add('game', new GameState(store, assetData, playerProps), true/* auto-start */);
 
   return game;
 }
-
-export default createGame;
