@@ -93,18 +93,10 @@ class GameState extends State {
    * @param {Object} gameState
    */
   updateEntities(game, gameState) {
-    let removedEntityIds = [];
-
-    // Assume that entities have been removed.
-    forEach(this._entities, entity => {
-      removedEntityIds.push(entity.id);
-    });
-
-    let props, entity, shouldBeDestroyed;
+    let removedEntityIds = this.getEntityIds();
 
     forEach(gameState.entities, nextProps => {
-      props = findEntityById(gameState.entities, nextProps.id);
-      entity = find(this._entities, entity => entity.id == nextProps.id);
+      let entity = find(this._entities, entity => entity.id == nextProps.id);
 
       // Create the entity if it does not exist.
       if (!entity) {
@@ -119,8 +111,31 @@ class GameState extends State {
     });
 
     // Destroy entities that have been removed.
+    this.destroyEntities(removedEntityIds);
+  }
+
+  /**
+   *
+   * @returns {Array}
+   */
+  getEntityIds() {
+    let ids = [];
+
+    // Assume that entities have been removed.
+    forEach(this._entities, entity => {
+      ids.push(entity.id);
+    });
+
+    return ids;
+  }
+
+  /**
+   *
+   * @param {Array} ids
+   */
+  destroyEntities(ids) {
     this._entities = this._entities.filter(entity => {
-      shouldBeDestroyed = removedEntityIds.indexOf(entity.id) !== -1;
+      let shouldBeDestroyed = ids.indexOf(entity.id) !== -1;
 
       if (shouldBeDestroyed) {
         entity.destroy();
