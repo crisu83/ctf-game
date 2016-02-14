@@ -37,7 +37,7 @@ function createPlayer(game, x, y, key) {
  * @param {string} key
  * @returns {Phaser.Sprite}
  */
-export default function createSprite(game, type, x, y, key) {
+export function createSprite(game, type, x, y, key) {
   switch (type) {
     case PLAYER:
       return createPlayer(game, x, y, key);

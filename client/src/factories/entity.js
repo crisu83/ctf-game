@@ -1,5 +1,11 @@
-import Entity from '../entity';
-import createSprite from './sprite';
+import { Keyboard } from 'phaser';
+import Entity from '../game/entity';
+import Player from '../game/components/player';
+import Input from '../game/components/input';
+import Sprite from '../game/components/sprite';
+import Text from '../game/components/text';
+import { createSprite } from './sprite';
+import { createName } from './text';
 
 /**
  *
@@ -8,18 +14,33 @@ import createSprite from './sprite';
  * @returns {Entity}
  */
 function createPlayer(game, props) {
-  const sprite = createSprite(game, props.type, props.x, props.y, `knight-${props.color}`);
+  const entity = new Entity(props);
 
-  const text = game.add.text(
-    props.x + (sprite.width / 2),
-    props.y,
-    props.name,
-    {font: "14px Courier", stroke: "#000", strokeThickness: 5, fill: '#FFF'}
-  );
+  entity.addComponent(new Player(entity));
 
-  text.anchor.set(0.5, 0.5);
+  const knightSprite = createSprite(game, props.type, props.x, props.y, `knight-${props.color}`);
+  entity.addComponent(new Sprite(entity, {knight: knightSprite}));
 
-  return new Entity(props.id, sprite, text);
+  const nameText = createName(game, props);
+  entity.addComponent(new Text(entity, {name: nameText}));
+
+  return entity;
+}
+
+/**
+ *
+ * @param {Phaser.Game} game
+ * @param {Object} props
+ * @returns {Entity}
+ */
+export function createControllablePlayer(game, props) {
+  const entity = createPlayer(game, props);
+
+  const cursors = game.input.keyboard.createCursorKeys();
+  const attack = game.input.keyboard.addKey(Keyboard.SPACEBAR);
+  entity.addComponent(new Input(entity, cursors, attack));
+
+  return entity;
 }
 
 /**
@@ -27,7 +48,7 @@ function createPlayer(game, props) {
  * @param {Object} props
  * @returns {Entity}
  */
-export default function createEntity(game, props) {
+export function createEntity(game, props) {
   switch (props.type) {
     case 'player':
       return createPlayer(game, props);

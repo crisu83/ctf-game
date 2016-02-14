@@ -1,10 +1,7 @@
 import { forEach, find } from 'lodash';
 import { Game, State, Keyboard } from 'phaser';
-import { moveLeft, moveRight, moveUp, moveDown } from '../actions/game';
-import { findEntityById } from '../helpers/game';
-import createEntity from '../factories/entity';
+import { createControllablePlayer, createEntity } from '../factories/entity';
 
-const MOVE_STEP = 5;
 const SPRITE_SIZE = 96;
 
 class GameState extends State {
@@ -21,7 +18,6 @@ class GameState extends State {
     this._playerEntity = null;
     this._entities = [];
 
-    this.handleInput = this.handleInput.bind(this);
     this.updateEntities = this.updateEntities.bind(this);
   }
 
@@ -30,6 +26,8 @@ class GameState extends State {
    * @param {Phaser.Game} game
    */
   preload(game) {
+    // TODO: Receive this data from the server instead of hard-coding it
+
     const knightColors = ['blue', 'green', 'orange', 'purple'];
 
     forEach(knightColors, color => {
@@ -47,10 +45,8 @@ class GameState extends State {
    * @param {Phaser.Game} game
    */
   create(game) {
-    this._cursorKeys = game.input.keyboard.createCursorKeys();
-    this._attackKey = game.input.keyboard.addKey(Keyboard.SPACEBAR);
-    this._playerEntity = createEntity(game, this._playerProps);
-    this._entities.push(this._playerEntity);
+    this._playerEntity = createControllablePlayer(game, this._playerProps);
+    this.addEntity(this._playerEntity);
   }
 
   /**
@@ -60,31 +56,7 @@ class GameState extends State {
   update(game) {
     const gameState = this.gameState;
 
-    this.handleInput();
     this.updateEntities(game, gameState);
-  }
-
-  /**
-   *
-   */
-  handleInput() {
-    const player = this._playerEntity;
-
-    if (this._cursorKeys.left.isDown) {
-      this._store.dispatch(moveLeft(player.id, MOVE_STEP));
-      player.sprite.animations.play(this._attackKey.isDown ? 'attackLeft' : 'runLeft');
-    } else if (this._cursorKeys.right.isDown) {
-      this._store.dispatch(moveRight(player.id, MOVE_STEP));
-      player.sprite.animations.play(this._attackKey.isDown ? 'attackRight' : 'runRight');
-    } else if (this._cursorKeys.up.isDown) {
-      this._store.dispatch(moveUp(player.id, MOVE_STEP));
-      player.sprite.animations.play(this._attackKey.isDown ? 'attackUp' : 'runUp');
-    } else if (this._cursorKeys.down.isDown) {
-      this._store.dispatch(moveDown(player.id, MOVE_STEP));
-      player.sprite.animations.play(this._attackKey.isDown ? 'attackDown' : 'runDown');
-    } else {
-      player.sprite.animations.play('idle');
-    }
   }
 
   /**
@@ -101,10 +73,10 @@ class GameState extends State {
       // Create the entity if it does not exist.
       if (!entity) {
         entity = createEntity(game, nextProps);
-        this._entities.push(entity);
+        this.addEntity(entity);
       }
 
-      entity.update(nextProps);
+      entity.update(nextProps, game.time.elapsed, this._store.dispatch);
 
       // Remove updated entities from the list of entities to be removed.
       removedEntityIds = removedEntityIds.filter(id => id !== nextProps.id);
@@ -112,6 +84,14 @@ class GameState extends State {
 
     // Destroy entities that have been removed.
     this.destroyEntities(removedEntityIds);
+  }
+
+  /**
+   *
+   * @param {Entity} entity
+   */
+  addEntity(entity) {
+    this._entities.push(entity);
   }
 
   /**
@@ -135,13 +115,13 @@ class GameState extends State {
    */
   destroyEntities(ids) {
     this._entities = this._entities.filter(entity => {
-      let shouldBeDestroyed = ids.indexOf(entity.id) !== -1;
+      let isRemoved = ids.indexOf(entity.id) !== -1;
 
-      if (shouldBeDestroyed) {
+      if (isRemoved) {
         entity.destroy();
       }
 
-      return !shouldBeDestroyed;
+      return !isRemoved;
     });
   }
 
