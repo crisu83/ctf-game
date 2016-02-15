@@ -2,6 +2,8 @@
 
 Fast-paced hot seat multiplayer game written in JavaScript.
 
+![Screenshot](resources/screenshot.png)
+
 ## Built with
 
 - [Express](http://expressjs.com/) - Web server
