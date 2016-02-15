@@ -14,3 +14,23 @@ Fast-paced hot seat multiplayer game written in JavaScript.
 - [Chai](http://chaijs.com/) - Assertion library
 - [Babel](https://babeljs.io/) - EcmaScript6 transpiler
 - [Webpack](https://webpack.github.io/) - Module bundler
+
+## Checklist
+
+- [x] Game server
+- [x] Game client
+- [x] Client to server communication
+- [x] Create player on the server
+- [x] Send game state to clients
+- [x] Create entities from state
+- [x] Load spritesheets in clients
+- [x] Update game logic from state
+- [x] Send player actions to server
+- [x] Read assets and tilemap on the server
+- [x] Send game data to clients
+- [x] Load assets and tilemap in clients
+- [x] Render tilemap
+- [ ] Collision detection
+- [ ] Basic physics
+- [ ] Teams and points
+- [ ] Game logic
