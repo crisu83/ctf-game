@@ -4,23 +4,26 @@ export const PHASE_LOGIC = 1;
 class Component {
   /**
    *
-   * @param {Entity} owner
+   * @param {string} key
    * @param {number} phase
+   * @param {Entity} owner
+   * @param {function} onUpdate
    */
-  constructor(owner, phase) {
-    this._key = 'component';
-    this._owner = owner;
+  constructor(key, phase, owner, onUpdate) {
+    this._key = key;
     this._phase = phase;
+    this._owner = owner;
+    this._onUpdate = onUpdate ? onUpdate.bind(this) : () => {};
   }
 
   /**
    *
    * @param {Object} newProps
-   * @param {Object} props
    * @param {number} elapsed
    * @param {function} dispatch
    */
-  update(newProps, props, elapsed, dispatch) {
+  update(newProps, elapsed, dispatch) {
+    this._onUpdate(newProps, elapsed, dispatch);
   }
 
   destroy() {

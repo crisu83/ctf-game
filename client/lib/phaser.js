@@ -34895,7 +34895,7 @@ Phaser.Device._initialize = function () {
     */
     function _checkAudio () {
 
-        device.audioData = !!(window['Audio']);
+        device.audioData = !!(window['Sound']);
         device.webAudio = !!(window['AudioContext'] || window['webkitAudioContext']);
         var audioElement = document.createElement('audio');
         var result = false;
@@ -50399,7 +50399,7 @@ Phaser.SoundManager.prototype = {
         if (this.context === null)
         {
             //  No Web Audio support - how about legacy Audio?
-            if (window['Audio'] === undefined)
+            if (window['Sound'] === undefined)
             {
                 this.noAudio = true;
                 return;

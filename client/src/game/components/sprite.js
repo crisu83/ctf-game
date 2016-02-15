@@ -1,3 +1,4 @@
+import { forEach } from 'lodash';
 import Component, { PHASE_LOGIC } from '../component';
 
 class Sprite extends Component {
@@ -5,12 +6,21 @@ class Sprite extends Component {
    *
    * @param {Entity} owner
    * @param {Array<Phaser.Sprite>} sprites
+   * @param {function} onUpdate
    */
-  constructor(owner, sprites) {
-    super(owner, PHASE_LOGIC);
+  constructor(owner, sprites, onUpdate) {
+    super('sprite', PHASE_LOGIC, owner, onUpdate);
 
-    this._key = 'sprite';
     this._sprites = sprites;
+  }
+
+  /**
+   *
+   */
+  destroy() {
+    forEach(this._sprites, sprite => {
+      sprite.destroy();
+    });
   }
 
   /**
@@ -18,7 +28,7 @@ class Sprite extends Component {
    * @param {string} key
    * @returns {Phaser.Sprite}
    */
-  get(key) {
+  getSprite(key) {
     return this._sprites[key];
   }
 }

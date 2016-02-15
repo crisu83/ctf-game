@@ -20,7 +20,7 @@ class Entity {
     this._components.sort((a, b) => a.phase - b.phase);
 
     forEach(this._components, component => {
-      component.update(newProps, this._props, elapsed, dispatch);
+      component.update(newProps, elapsed, dispatch);
     });
 
     this._props = newProps;

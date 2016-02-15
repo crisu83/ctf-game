@@ -1,3 +1,4 @@
+import { forEach } from 'lodash';
 import Component, { PHASE_LOGIC } from '../component';
 
 class Text extends Component {
@@ -5,12 +6,21 @@ class Text extends Component {
    *
    * @param {Entity} owner
    * @param {Array<Phaser.Text>} texts
+   * @param {function} onUpdate
    */
-  constructor(owner, texts) {
-    super(owner, PHASE_LOGIC);
+  constructor(owner, texts, onUpdate) {
+    super('text', PHASE_LOGIC, owner, onUpdate);
 
-    this._key = 'text';
     this._texts = texts;
+  }
+
+  /**
+   *
+   */
+  destroy() {
+    forEach(this._texts, text => {
+      text.destroy();
+    });
   }
 
   /**
@@ -18,7 +28,7 @@ class Text extends Component {
    * @param {string} key
    * @returns {Phaser.Text}
    */
-  get(key) {
+  getText(key) {
     return this._texts[key];
   }
 }
