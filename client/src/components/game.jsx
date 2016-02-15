@@ -62,8 +62,8 @@ export class Game extends Component {
     console.log('CONNECTED');
   }
 
-  handleReady(clientId, assetData, gameState, playerProps) {
-    console.log('READY (client_id: %s)', clientId, assetData, gameState, playerProps);
+  handleReady(clientId, gameData, gameState, playerProps) {
+    console.log('READY (client_id: %s)', clientId, gameData, gameState, playerProps);
 
     // Set the initial game state when the client is ready.
     this.props.onSetState(gameState);
@@ -71,7 +71,7 @@ export class Game extends Component {
     const delay = CONNECT_DELAY - (now() - this._createdAt);
 
     setTimeout(() => {
-      this._game = createGame(this.props.store, assetData, playerProps, {width: 800, height: 600});
+      this._game = createGame(this.props.store, gameData, playerProps, {width: 800, height: 600});
 
       this.props.onConnect();
       this.props.onStopLoading();

@@ -1,15 +1,15 @@
-const FRAME_RATE = 10;
-const PLAYER = 'player';
+const FRAME_RATE = 15;
 
 /**
  *
  * @param {Phaser.Game} game
+ * @param {Phaser.Group} group
  * @param {number} x
  * @param {number} y
  * @param {string} key
  * @returns {Phaser.Sprite}
  */
-function createPlayer(game, x, y, key) {
+function createPlayer(game, group, x, y, key) {
   const sprite = game.add.sprite(x, y, key);
 
   sprite.animations.add('idle', [0], FRAME_RATE);
@@ -21,29 +21,46 @@ function createPlayer(game, x, y, key) {
   sprite.animations.add('attackLeft', [20, 21, 22, 23], FRAME_RATE);
   sprite.animations.add('attackUp', [24, 25, 26, 27], FRAME_RATE);
   sprite.animations.add('attackRight', [28, 29, 30, 31], FRAME_RATE);
-
   sprite.animations.play('idle', FRAME_RATE, true);
 
   return sprite;
 }
 
+/**
+ *
+ * @param {Phaser.Game} game
+ * @param {Phaser.Group} group
+ * @param {number} x
+ * @param {number} y
+ * @param {string} key
+ * @returns {Phaser.Sprite}
+ */
+function createFlag(game, group, x, y, key) {
+  const sprite = game.add.sprite(x, y, key);
+
+  return sprite;
+}
 
 /**
  *
  * @param {Phaser.Game} game
+ * @param {Phaser.Group} group
  * @param {string} type
  * @param {number} x
  * @param {number} y
  * @param {string} key
  * @returns {Phaser.Sprite}
  */
-export function createSprite(game, type, x, y, key) {
+export function createSprite(game, group, type, x, y, key) {
   switch (type) {
-    case PLAYER:
-      return createPlayer(game, x, y, key);
+    case 'player':
+      return createPlayer(game, group, x, y, key);
+
+    case 'flag':
+      return createFlag(game, group, x, y, key);
 
     default:
-      console.warn(`unrecognized sprite ${key}`);
+      console.warn(`trying to create unknown sprite ${key}`);
       return null;
   }
 }

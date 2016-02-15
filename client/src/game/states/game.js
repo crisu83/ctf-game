@@ -1,5 +1,5 @@
 import { forEach, find } from 'lodash';
-import { Game, State, Keyboard } from 'phaser';
+import { Game, State, Keyboard, Tilemap, Group } from 'phaser';
 import { createControllablePlayer, createEntity } from '../../factories/entity';
 
 const MUSIC_VOLUME = 0.01;
@@ -9,17 +9,18 @@ class GameState extends State {
   /**
    *
    * @param store
-   * @param {Object} assetData
+   * @param {Object} gameData
    * @param {Object} playerProps
    */
-  constructor(store, assetData, playerProps) {
+  constructor(store, gameData, playerProps) {
     super();
 
     this._store = store;
     this._playerProps = playerProps;
-    this._assetData = assetData;
+    this._gameData = gameData;
     this._playerEntity = null;
     this._entities = [];
+    this._group = null;
     this._music = null;
   }
 
@@ -28,17 +29,19 @@ class GameState extends State {
    * @param {Phaser.Game} game
    */
   preload(game) {
-    this.loadSpritesheets(game, this._assetData.spritesheets);
-    this.loadImages(game, this._assetData.images);
-    this.loadAudio(game, this._assetData.audio);
+    this.loadSpritesheets(game);
+    this.loadImages(game);
+    this.loadAudio(game);
+    this.loadMap(game);
   }
 
   /**
    *
    * @param {Phaser.Game} game
-   * @param {Object} spritesheets
    */
-  loadSpritesheets(game, spritesheets) {
+  loadSpritesheets(game) {
+    const { spritesheets } = this._gameData.assets;
+
     forEach(spritesheets, (data, key) => {
       if (data.url && data.frameWidth && data.frameHeight) {
         game.load.spritesheet(
@@ -59,9 +62,10 @@ class GameState extends State {
   /**
    *
    * @param {Phaser.Game} game
-   * @param {Object} images
    */
-  loadImages(game, images) {
+  loadImages(game) {
+    const { images } = this._gameData.assets;
+
     forEach(images, (data, key) => {
       if (data.url) {
         game.load.image(key, req(`./${data.url}`));
@@ -74,9 +78,10 @@ class GameState extends State {
   /**
    *
    * @param {Phaser.Game} game
-   * @param {Object} audio
    */
-  loadAudio(game, audio) {
+  loadAudio(game) {
+    const { audio } = this._gameData.assets;
+
     forEach(audio, (data, key) => {
       const files = [];
 
@@ -92,8 +97,20 @@ class GameState extends State {
    *
    * @param {Phaser.Game} game
    */
+  loadMap(game) {
+    const { map } = this._gameData;
+    game.load.tilemap(map.key, null, map.data, Tilemap.TILED_JSON);
+  }
+
+  /**
+   *
+   * @param {Phaser.Game} game
+   */
   create(game) {
+    this._group = game.add.group();
+
     this.createMusic(game);
+    this.createMap(game);
     this.createPlayer(game);
   }
 
@@ -101,22 +118,43 @@ class GameState extends State {
    *
    * @param {Phaser.Game} game
    */
-  createPlayer(game) {
-    this._playerEntity = createControllablePlayer(game, this._playerProps);
-    this.addEntity(this._playerEntity);
+  createMusic(game) {
+    const { music } = this._gameData.map;
+
+    this._music = game.add.audio(music, MUSIC_VOLUME, true/* loop */);
+    this._music.mute = true; // for development purposes
+    this._music.play();
+
+    const muteKey = game.input.keyboard.addKey(Keyboard.M);
+    muteKey.onDown.add(this.onMutePressed.bind(this));
   }
 
   /**
    *
    * @param {Phaser.Game} game
    */
-  createMusic(game) {
-    this._music = game.add.audio('8-bit-rebel', MUSIC_VOLUME, true/* loop */);
-    this._music.mute = true; // for development purposes
-    this._music.play();
+  createMap(game) {
+    const { map } = this._gameData;
+    const tilemap = game.add.tilemap(map.key, map.image);
 
-    const muteKey = game.input.keyboard.addKey(Keyboard.M);
-    muteKey.onDown.add(this.onMutePressed.bind(this));
+    tilemap.addTilesetImage(map.key, map.image);
+
+    forEach(map.layers, l => {
+      let layer = tilemap.createLayer(l.name);
+
+      if (layer) {
+        layer.resizeWorld();
+      }
+    });
+  }
+
+  /**
+   *
+   * @param {Phaser.Game} game
+   */
+  createPlayer(game) {
+    this._playerEntity = createControllablePlayer(game, this._group, this._playerProps);
+    this.addEntity(this._playerEntity);
   }
 
   /**
@@ -147,7 +185,7 @@ class GameState extends State {
 
       // Create the entity if it does not exist.
       if (!entity) {
-        entity = createEntity(game, nextProps);
+        entity = createEntity(game, this._group, nextProps);
         this.addEntity(entity);
       }
 
@@ -159,6 +197,9 @@ class GameState extends State {
 
     // Destroy entities that have been removed.
     this.destroyEntities(removedEntityIds);
+
+    // Sort sprites according to their y-value.
+    this._group.sort('y', Group.SORT_ASCENDING);
   }
 
   /**

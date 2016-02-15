@@ -1,6 +1,6 @@
 import shortid from 'shortid';
 import { logger } from './helpers';
-import { createPlayer } from './factories/entity';
+import { createEntity } from './factories/entity';
 import { addEntity, removeEntity } from './actions/game';
 import { READY, ACTION, DISCONNECT } from './events';
 
@@ -8,15 +8,15 @@ class GameClient {
   /**
    * @param socket
    * @param store
-   * @param {Object} assetData
+   * @param {Object} gameData
    * @param {Object} gameState
    */
-  constructor(socket, store, assetData, gameState) {
+  constructor(socket, store, gameData, gameState) {
     this._socket = socket;
     this._store = store;
     this._id = shortid.generate();
 
-    const playerProps = createPlayer();
+    const playerProps = createEntity({type: 'player'});
 
     this._playerId = playerProps.id;
 
@@ -28,7 +28,7 @@ class GameClient {
     this._store.dispatch(addEntity(playerProps));
 
     // Send the initial state to the client.
-    this._socket.emit(READY, this._id, assetData, gameState, playerProps);
+    this._socket.emit(READY, this._id, gameData, gameState, playerProps);
   }
 
   /**

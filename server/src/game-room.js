@@ -1,14 +1,10 @@
 import shortid from 'shortid';
-import { Map } from 'immutable';
 import { logger } from './helpers';
 import GameInstance from './game-instance';
 import GameClient from './game-client';
 import { SET_STATE } from './events';
 import createStore from './store';
-
-function mapStateToClient(state) {
-
-}
+import { createMap } from './factories/map';
 
 class GameRoom {
   /**
@@ -21,7 +17,7 @@ class GameRoom {
     this._clients = [];
     this._lastTickAt = null;
     this._isRunning = true;
-    this._assetData = require('../data/assets.json');
+    this._gameData = this.loadGameData();
 
     this.close = this.close.bind(this);
 
@@ -38,6 +34,18 @@ class GameRoom {
 
   /**
    *
+   * @returns {Object}
+   */
+  loadGameData() {
+    return {
+      assets: require('../data/assets.json'),
+      config: require('../data/config.json'),
+      map: createMap('castle', this._store.dispatch)
+    };
+  }
+
+  /**
+   *
    */
   handleChange() {
     this._io.emit(SET_STATE, this.gameState);
@@ -49,15 +57,23 @@ class GameRoom {
   handleConnection(socket) {
     logger.info(`room.connect (room_id: ${this._id})`);
 
-    this._clients.push(new GameClient(socket, this._store, this._assetData, this.gameState));
+    this._clients.push(new GameClient(socket, this._store, this.gameData, this.gameState));
   }
 
   /**
    *
-   * @returns {Map}
+   * @returns {Object}
    */
   get gameState() {
     return this._store.getState().game.toJS();
+  }
+
+  /**
+   *
+   * @returns {Object}
+   */
+  get gameData() {
+    return this._gameData;
   }
 
   /**

@@ -3,10 +3,12 @@ import { chance } from '../helpers';
 
 /**
  *
- * @returns {{id: string, type: string, name: string, x: number, y: number, color: string}}
+ * @param {Object} props
+ * @returns {Object}
  */
-export function createPlayer() {
+function createPlayer(props) {
   return {
+    ...props,
     id: shortid.generate(),
     type: 'player',
     name: chance.first(),
@@ -14,6 +16,38 @@ export function createPlayer() {
     y: 20,
     width: 96,
     height: 96,
+    // TODO: Add logic for picking the color based on the player's team.
     color: chance.pick(['blue', 'green', 'orange', 'purple'])
   };
+}
+
+/**
+ *
+ * @param {Object} props
+ * @returns {Object}
+ */
+function createFlag(props) {
+  return {
+    ...props,
+    id: shortid.generate(),
+    color: 'neutral'
+  };
+}
+
+/**
+ *
+ * @param {Object} props
+ * @returns {Object}
+ */
+export function createEntity(props) {
+  switch (props.type) {
+    case 'player':
+      return createPlayer(props);
+
+    case 'flag':
+      return createFlag(props);
+
+    default:
+      return null;
+  }
 }
