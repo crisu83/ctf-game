@@ -32,7 +32,7 @@ Fast-paced hot seat multiplayer game written in JavaScript.
 - [x] Send game data to clients
 - [x] Load assets and tilemap in clients
 - [x] Render tilemap
-- [ ] Collision detection
-- [ ] Basic physics
+- [x] Collision detection
+- [x] Basic physics
 - [ ] Teams and points
 - [ ] Game logic
