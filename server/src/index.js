@@ -1,7 +1,7 @@
 import express from 'express';
 import path from 'path';
 import socketIo from 'socket.io';
-import GameServer from './game-server';
+import GameServer from './game/server';
 
 const SERVER_PORT = 3000;
 
