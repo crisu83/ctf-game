@@ -81,7 +81,9 @@ export class Game extends Component {
   handleDisconnect() {
     console.log('DISCONNECTED');
 
-    this._game.destroy();
+    if (this._game) {
+      this._game.destroy();
+    }
   }
 
   render() {
