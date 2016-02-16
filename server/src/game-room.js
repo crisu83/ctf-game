@@ -29,7 +29,7 @@ class GameRoom {
     // Notify each client every time the state is changed.
     this._unsubscribeFromStore = this._store.subscribe(this.handleChange.bind(this));
 
-    this._gameInstance = new GameInstance(this._store);
+    this._gameInstance = new GameInstance(this._store, this._gameData);
   }
 
   /**

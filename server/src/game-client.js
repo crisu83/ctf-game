@@ -1,6 +1,6 @@
 import shortid from 'shortid';
 import { logger } from './helpers';
-import { createEntity } from './factories/entity';
+import { createProps } from './factories/props';
 import { addEntity, removeEntity } from './actions/game';
 import { READY, ACTION, DISCONNECT } from './events';
 
@@ -16,7 +16,7 @@ class GameClient {
     this._store = store;
     this._id = shortid.generate();
 
-    const playerProps = createEntity({type: 'player'});
+    const playerProps = createProps({type: 'player'});
 
     this._playerId = playerProps.id;
 

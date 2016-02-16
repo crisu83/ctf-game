@@ -1,53 +1,47 @@
-import shortid from 'shortid';
-import { chance } from '../helpers';
+import { Box, Body } from 'p2';
+import { logger } from '../helpers';
+import Entity from '../game/entity';
 
 /**
  *
+ * @param {World} world
  * @param {Object} props
- * @returns {Object}
+ * @returns {Entity}
  */
-function createPlayer(props) {
-  return {
-    ...props,
-    id: shortid.generate(),
-    type: 'player',
-    name: chance.first(),
-    x: 0,
-    y: 20,
-    width: 96,
-    height: 96,
-    // TODO: Add logic for picking the color based on the player's team.
-    color: chance.pick(['blue', 'green', 'orange', 'purple'])
-  };
+function createPlayer(world, props) {
+  const entity = new Entity(props);
+
+  return entity;
 }
 
 /**
  *
+ * @param {World} world
  * @param {Object} props
- * @returns {Object}
+ * @returns {Entity}
  */
-function createFlag(props) {
-  return {
-    ...props,
-    id: shortid.generate(),
-    color: 'neutral'
-  };
+function createFlag(world, props) {
+  const entity = new Entity(props);
+
+  return entity;
 }
 
 /**
  *
+ * @param {World} world
  * @param {Object} props
- * @returns {Object}
+ * @returns {Entity}
  */
-export function createEntity(props) {
+export function createEntity(world, props) {
   switch (props.type) {
     case 'player':
-      return createPlayer(props);
+      return createPlayer(world, props);
 
     case 'flag':
-      return createFlag(props);
+      return createFlag(world, props);
 
     default:
+      logger.warn(`trying to create entity of unknown type ${props.type}.`);
       return null;
   }
 }
