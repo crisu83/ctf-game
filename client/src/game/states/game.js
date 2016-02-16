@@ -1,9 +1,11 @@
 import { forEach, find } from 'lodash';
-import { Game, State, Keyboard, Tilemap, Group } from 'phaser';
-import { createControllablePlayer, createEntity } from '../../factories/entity';
+import { Game, State, Physics, Keyboard, Tilemap, Group } from 'phaser';
+import { createLocalPlayer, createEntity } from '../../factories/entity';
 
 const MUSIC_VOLUME = 0.01;
 const req = require.context('assets', true, /\.(png|jpg|mp3|ogg|wav)$/);
+
+const TILE_LAYER = 'tilelayer';
 
 class GameState extends State {
   /**
@@ -22,6 +24,7 @@ class GameState extends State {
     this._entities = [];
     this._group = null;
     this._music = null;
+    this._walls = null;
   }
 
   /**
@@ -107,6 +110,8 @@ class GameState extends State {
    * @param {Phaser.Game} game
    */
   create(game) {
+    game.physics.startSystem(Physics.ARCADE);
+
     this._group = game.add.group();
 
     this.createMusic(game);
@@ -139,11 +144,20 @@ class GameState extends State {
 
     tilemap.addTilesetImage(map.key, map.image);
 
-    forEach(map.layers, l => {
-      let layer = tilemap.createLayer(l.name);
+    forEach(map.layers, data => {
+      if (data.type === TILE_LAYER) {
+        let layer = tilemap.createLayer(data.name);
 
-      if (layer) {
-        layer.resizeWorld();
+        if (layer) {
+          layer.resizeWorld();
+          layer.debug = true;
+        }
+
+        if (data.name === map.collision.layer) {
+          tilemap.setCollision(map.collision.indices, true, layer);
+          layer.debug = true;
+          this._walls = layer;
+        }
       }
     });
   }
@@ -153,7 +167,7 @@ class GameState extends State {
    * @param {Phaser.Game} game
    */
   createPlayer(game) {
-    this._playerEntity = createControllablePlayer(game, this._group, this._playerProps);
+    this._playerEntity = createLocalPlayer(game, this._group, this._walls, this._playerProps);
     this.addEntity(this._playerEntity);
   }
 
@@ -189,7 +203,7 @@ class GameState extends State {
         this.addEntity(entity);
       }
 
-      entity.update(nextProps, game.time.elapsed, this._store.dispatch);
+      entity.update(nextProps, this._store.dispatch);
 
       // Remove updated entities from the list of entities to be removed.
       removedEntityIds = removedEntityIds.filter(id => id !== nextProps.id);

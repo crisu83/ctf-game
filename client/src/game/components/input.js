@@ -1,4 +1,4 @@
-import Component, { PHASE_INPUT } from '../component';
+import Component from '../component';
 
 class Input extends Component {
   /**
@@ -8,7 +8,7 @@ class Input extends Component {
    * @param {function} onUpdate
    */
   constructor(owner, keys, onUpdate) {
-    super('input', PHASE_INPUT, owner, onUpdate);
+    super('input', 0, owner, onUpdate);
 
     this._keys = keys;
   }

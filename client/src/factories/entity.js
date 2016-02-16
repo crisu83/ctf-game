@@ -1,46 +1,98 @@
 import { Keyboard } from 'phaser';
+import { has } from 'lodash';
 import Entity from '../game/entity';
 import Input from '../game/components/input';
 import Sprite from '../game/components/sprite';
 import Text from '../game/components/text';
 import Sound from '../game/components/sound';
 import { createSprite } from './sprite';
-import { createName } from './text';
-import { moveLeft, moveRight, moveUp, moveDown } from '../actions/game';
+import { createNameTag } from './text';
+import { CONTEXT_SERVER, setPosition, setVelocity, setAnimation } from '../actions/game';
+import { isEntityMoving } from '../helpers/game';
 
-// TODO: Move this to the server completely to prevent cheating.
-const MOVE_STEP = 5;
+const RUN_SPEED = 500;
 
 /**
  *
  * @param {Phaser.Game} game
  * @param {Phaser.Group} group
+ * @param {Phaser.TilemapLayer} walls
  * @param {Object} props
  * @returns {Entity}
  */
-function createPlayer(game, group, props) {
+export function createLocalPlayer(game, group, walls, props) {
   const entity = new Entity(props);
 
   const knight = createSprite(game, group, props.type, props.x, props.y, `knight-${props.color}`);
-  const spriteComponent = new Sprite(entity, {knight}, function(newProps) {
+
+  game.camera.follow(knight);
+  game.physics.enable(knight);
+
+  knight.body.collideWorldBounds = true;
+
+  const cursors = game.input.keyboard.createCursorKeys();
+  const attack = game.input.keyboard.addKey(Keyboard.SPACEBAR);
+  const onInputUpdate = function(nextProps, prevProps, dispatch) {
+    const cursors = this.getKey('cursors');
+    const attack = this.getKey('attack');
+    const knight = this.getComponent('sprite').getSprite('knight');
+    const hit = this.getComponent('sound').getSound('hit');
+
+    if (cursors.left.isDown) {
+      dispatch(setVelocity(nextProps.id, -RUN_SPEED, 0));
+      dispatch(setAnimation(nextProps.id, attack.isDown ? 'attackLeft' : 'runLeft'));
+    } else if (cursors.right.isDown) {
+      dispatch(setVelocity(nextProps.id, RUN_SPEED, 0));
+      dispatch(setAnimation(nextProps.id, attack.isDown ? 'attackRight' : 'runRight'));
+    } else if (cursors.up.isDown) {
+      dispatch(setVelocity(nextProps.id, 0, -RUN_SPEED));
+      dispatch(setAnimation(nextProps.id, attack.isDown ? 'attackUp' : 'runUp'));
+    } else if (cursors.down.isDown) {
+      dispatch(setVelocity(nextProps.id, 0, RUN_SPEED));
+      dispatch(setAnimation(nextProps.id, attack.isDown ? 'attackDown' : 'runDown'));
+    } else if (!isEntityMoving(nextProps)) {
+      dispatch(setVelocity(nextProps.id, 0, 0));
+      dispatch(setAnimation(nextProps.id, 'idle'));
+    }
+  };
+  entity.addComponent(new Input(entity, {cursors, attack}, onInputUpdate));
+
+  const onSpriteUpdate = function(nextProps, prevProps, dispatch) {
     const knight = this.getSprite('knight');
-    knight.x = newProps.x;
-    knight.y = newProps.y;
-  });
-  entity.addComponent(spriteComponent);
+
+    game.physics.arcade.collide(knight, walls);
+
+    knight.body.velocity.set(0);
+
+    if (nextProps.vx) {
+      knight.body.velocity.x = nextProps.vx;
+    } else if (nextProps.vy) {
+      knight.body.velocity.y = nextProps.vy;
+    }
+
+    if (nextProps.animation) {
+      knight.animations.play(nextProps.animation);
+    }
+
+    if (knight.x !== nextProps.x || knight.y !== nextProps.y) {
+      dispatch(setPosition(nextProps.id, knight.x, knight.y, CONTEXT_SERVER));
+    }
+  };
+  entity.addComponent(new Sprite(entity, {knight}, onSpriteUpdate));
 
   const hit = game.add.audio('knight-hit', 0.1);
   const die = game.add.audio('knight-die', 0.1);
-  const soundComponent = new Sound(entity, {hit, die});
-  entity.addComponent(soundComponent);
+  entity.addComponent(new Sound(entity, {hit, die}));
 
-  const name = createName(game, props);
-  const textComponent = new Text(entity, {name}, function(newProps) {
-    const name = this.getText('name');
-    name.x = newProps.x + (newProps.width / 2);
-    name.y = newProps.y;
-  });
-  entity.addComponent(textComponent);
+  // TODO: Fix name tag positioning
+  // const name = createNameTag(game, props);
+  // const onTextUpdate = function(nextProps, prevProps) {
+  //   const name = this.getText('name');
+  //   const knight = this.getComponent('sprite').getSprite('knight');
+  //   name.x = knight.x + (knight.width / 2);
+  //   name.y = knight.y;
+  // };
+  // entity.addComponent(new Text(entity, {name}, onTextUpdate));
 
   return entity;
 }
@@ -52,36 +104,32 @@ function createPlayer(game, group, props) {
  * @param {Object} props
  * @returns {Entity}
  */
-export function createControllablePlayer(game, group, props) {
-  const entity = createPlayer(game, group, props);
+function createRemotePlayer(game, group, props) {
+  const entity = new Entity(props);
 
-  const cursors = game.input.keyboard.createCursorKeys();
-  const attack = game.input.keyboard.addKey(Keyboard.SPACEBAR);
-  const inputComponent = new Input(entity, {cursors, attack}, function(newProps, elapsed, dispatch) {
-    const cursors = this.getKey('cursors');
-    const attack = this.getKey('attack');
-    const knight = this.getComponent('sprite').getSprite('knight');
-    const hit = this.getComponent('sound').getSound('hit');
+  const knight = createSprite(game, group, props.type, props.x, props.y, `knight-${props.color}`);
+  const onSpriteUpdate = function(nextProps, prevProps, dispatch) {
+    const knight = this.getSprite('knight');
+    knight.x = nextProps.x;
+    knight.y = nextProps.y;
 
-    if (cursors.left.isDown) {
-      dispatch(moveLeft(props.id, MOVE_STEP));
-      knight.animations.play(attack.isDown ? 'attackLeft' : 'runLeft');
-    } else if (cursors.right.isDown) {
-      dispatch(moveRight(props.id, MOVE_STEP));
-      knight.animations.play(attack.isDown ? 'attackRight' : 'runRight');
-    } else if (cursors.up.isDown) {
-      dispatch(moveUp(props.id, MOVE_STEP));
-      knight.animations.play(attack.isDown ? 'attackUp' : 'runUp');
-    } else if (cursors.down.isDown) {
-      dispatch(moveDown(props.id, MOVE_STEP));
-      knight.animations.play(attack.isDown ? 'attackDown' : 'runDown');
-    } else {
-      knight.animations.play('idle');
+    if (nextProps.animation) {
+      knight.animations.play(nextProps.animation);
     }
-  });
-  entity.addComponent(inputComponent);
+  };
+  entity.addComponent(new Sprite(entity, {knight}, onSpriteUpdate));
 
-  game.camera.follow(entity.getComponent('sprite').getSprite('knight'));
+  const hit = game.add.audio('knight-hit', 0.1);
+  const die = game.add.audio('knight-die', 0.1);
+  entity.addComponent(new Sound(entity, {hit, die}));
+
+  const name = createNameTag(game, props);
+  const onTextUpdate = function(nextProps, prevProps, dispatch) {
+    const name = this.getText('name');
+    name.x = nextProps.x + (nextProps.width / 2);
+    name.y = nextProps.y;
+  };
+  entity.addComponent(new Text(entity, {name}, onTextUpdate));
 
   return entity;
 }
@@ -97,10 +145,10 @@ function createFlag(game, group, props) {
   const entity = new Entity(props);
 
   const flagSprite = createSprite(game, group, props.type, props.x, props.y, 'flag');
-  const spriteComponent = new Sprite(entity, {flag: flagSprite}, function(newProps) {
+  const onSpriteUpdate = function(nextProps) {
 
-  });
-  entity.addComponent(spriteComponent);
+  };
+  entity.addComponent(new Sprite(entity, {flag: flagSprite}, onSpriteUpdate));
 
   return entity;
 }
@@ -114,7 +162,7 @@ function createFlag(game, group, props) {
 export function createEntity(game, group, props) {
   switch (props.type) {
     case 'player':
-      return createPlayer(game, group, props);
+      return createRemotePlayer(game, group, props);
 
     case 'flag':
       return createFlag(game, group, props);

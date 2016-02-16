@@ -1,4 +1,4 @@
-import { forEach } from 'lodash';
+import { forEach, has } from 'lodash';
 
 /**
  *
@@ -34,4 +34,13 @@ export function findEntityIndexById(entities, id) {
   });
 
   return result;
+}
+
+/**
+ *
+ * @param {Object} props
+ * @returns {boolean}
+ */
+export function isEntityMoving(props) {
+  return (has(props, 'vx') && props.vx !== 0) && (has(props, 'vy') && props.vy !== 0);
 }

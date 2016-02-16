@@ -1,6 +1,6 @@
 import { Map, List } from 'immutable';
 import { isNumber } from 'lodash';
-import { ADD_ENTITY, REMOVE_ENTITY, MOVE_LEFT, MOVE_RIGHT, MOVE_UP, MOVE_DOWN, ADVANCE_TIME } from '../actions/game';
+import { ADD_ENTITY, REMOVE_ENTITY, SET_POSITION, SET_VELOCITY, SET_ANIMATION, ADVANCE_TIME } from '../actions/game';
 import { findEntityIndexById } from '../helpers/game';
 
 const initialState = Map({
@@ -32,49 +32,40 @@ export function removeEntity(state, id) {
  *
  * @param {Map} state
  * @param {string} id
- * @param {number} step
+ * @param {number} x
+ * @param {number} y
  * @returns {Map}
  */
-export function moveLeft(state, id, step) {
+export function setPosition(state, id, x, y) {
   const entityIndex = findEntityIndexById(state.get('entities').toJS(), id);
-  return state.updateIn(['entities', entityIndex, 'x'], x => x - step);
+  return state.setIn(['entities', entityIndex, 'x'], x).setIn(['entities', entityIndex, 'y'], y);
 }
 
 /**
  *
  * @param {Map} state
  * @param {string} id
- * @param {number} step
+ * @param {string} animation
  * @returns {Map}
  */
-export function moveRight(state, id, step) {
+export function setAnimation(state, id, animation) {
   const entityIndex = findEntityIndexById(state.get('entities').toJS(), id);
-  return state.updateIn(['entities', entityIndex, 'x'], x => x + step);
+  return state.setIn(['entities', entityIndex, 'animation'], animation);
 }
 
 /**
  *
  * @param {Map} state
  * @param {string} id
- * @param {number} step
+ * @param {number} vx
+ * @param {number} vy
  * @returns {Map}
  */
-export function moveUp(state, id, step) {
+export function setVelocity(state, id, vx, vy) {
   const entityIndex = findEntityIndexById(state.get('entities').toJS(), id);
-  return state.updateIn(['entities', entityIndex, 'y'], y => y - step);
+  return state.setIn(['entities', entityIndex, 'vx'], vx).setIn(['entities', entityIndex, 'vy'], vy);
 }
 
-/**
- *
- * @param {Map} state
- * @param {string} id
- * @param {number} step
- * @returns {Map}
- */
-export function moveDown(state, id, step) {
-  const entityIndex = findEntityIndexById(state.get('entities').toJS(), id);
-  return state.updateIn(['entities', entityIndex, 'y'], y => y + step);
-}
 
 /**
  *
@@ -100,17 +91,14 @@ const reducer = (state = initialState, action) => {
     case REMOVE_ENTITY:
       return removeEntity(state, action.id);
 
-    case MOVE_LEFT:
-      return moveLeft(state, action.id, action.step);
+    case SET_POSITION:
+      return setPosition(state, action.id, action.x, action.y);
 
-    case MOVE_RIGHT:
-      return moveRight(state, action.id, action.step);
+    case SET_VELOCITY:
+      return setVelocity(state, action.id, action.vx, action.vy);
 
-    case MOVE_UP:
-      return moveUp(state, action.id, action.step);
-
-    case MOVE_DOWN:
-      return moveDown(state, action.id, action.step);
+    case SET_ANIMATION:
+      return setAnimation(state, action.id, action.animation);
 
     case ADVANCE_TIME:
       return advanceTime(state, action.elapsed);

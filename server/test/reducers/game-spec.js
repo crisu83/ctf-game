@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { Map, List } from 'immutable';
-import { addEntity, removeEntity, moveLeft, moveRight, moveUp, moveDown, advanceTime } from '../../src/reducers/game';
+import { addEntity, removeEntity, setPosition, setVelocity, setAnimation, advanceTime } from '../../src/reducers/game';
 
 describe('game reducer', () => {
 
@@ -29,79 +29,63 @@ describe('game reducer', () => {
 
   describe('player logic', () => {
 
-    it('moving left decrements players x-position', () => {
-      const state = Map({
+    it('sets player position in the state', () => {
+      const state = Map(Map({
         entities: List.of(
           Map({id: '1', name: 'John', x: 100, y: 100})
-        )
-      });
-      const nextState = moveLeft(state, '1', 1);
+        ),
+        time: Map({
+          elapsed: 123
+        })
+      }));
+      const nextState = setPosition(state, '1', 123, 87);
       expect(nextState).to.equal(Map({
         entities: List.of(
-          Map({id: '1', name: 'John', x: 99, y: 100})
-        )
+          Map({id: '1', name: 'John', x: 123, y: 87})
+        ),
+        time: Map({
+          elapsed: 123
+        })
       }));
     });
 
-    it('moving right increments players x-position', () => {
-      const state = Map({
+    it('sets player velocity in the state', () => {
+      const state = Map(Map({
         entities: List.of(
-          Map({id: '1', name: 'John', x: 100, y: 100})
-        )
-      });
-      const nextState = moveRight(state, '1', 2);
+          Map({id: '2', name: 'Jane', vx: 0, vy: 0})
+        ),
+        time: Map({
+          elapsed: 123
+        })
+      }));
+      const nextState = setVelocity(state, '2', 100, 0);
       expect(nextState).to.equal(Map({
         entities: List.of(
-          Map({id: '1', name: 'John', x: 102, y: 100})
-        )
+          Map({id: '2', name: 'Jane', vx: 100, vy: 0})
+        ),
+        time: Map({
+          elapsed: 123
+        })
       }));
     });
 
-    it('moving up decrements players y-position', () => {
-      const state = Map({
+    it('sets player animation in the state', () => {
+      const state = Map(Map({
         entities: List.of(
-          Map({id: '1', name: 'John', x: 100, y: 100})
-        )
-      });
-      const nextState = moveUp(state, '1', 3);
-      expect(nextState).to.equal(Map({
-        entities: List.of(
-          Map({id: '1', name: 'John', x: 100, y: 97})
-        )
+          Map({id: '3', name: 'Alexia'})
+        ),
+        time: Map({
+          elapsed: 123
+        })
       }));
-    });
-
-    it('moving down increments players y-position', () => {
-      const state = Map({
-        entities: List.of(
-          Map({id: '1', name: 'John', x: 100, y: 100})
-        )
-      });
-      const nextState = moveDown(state, '1', 4);
+      const nextState = setAnimation(state, '3', 'runRight');
       expect(nextState).to.equal(Map({
         entities: List.of(
-          Map({id: '1', name: 'John', x: 100, y: 104})
-        )
-      }));
-    });
-
-    it('moving twice actually moves the player', () => {
-      const state = Map({
-        entities: List.of(
-          Map({id: '1', name: 'John', x: 100, y: 100})
-        )
-      });
-      let nextState = moveDown(state, '1', 5);
-      expect(nextState).to.equal(Map({
-        entities: List.of(
-          Map({id: '1', name: 'John', x: 100, y: 105})
-        )
-      }));
-      nextState = moveDown(nextState, '1', 10);
-      expect(nextState).to.equal(Map({
-        entities: List.of(
-          Map({id: '1', name: 'John', x: 100, y: 115})
-        )
+          Map({id: '3', name: 'Alexia', animation: 'runRight'})
+        ),
+        time: Map({
+          elapsed: 123
+        })
       }));
     });
 

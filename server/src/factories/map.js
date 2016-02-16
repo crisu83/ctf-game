@@ -1,9 +1,8 @@
 import shortid from 'shortid';
 import { forEach } from 'lodash';
 import { addEntity } from '../actions/game';
-import { createEntity } from '../factories/entity';
+import { createProps } from '../factories/props';
 
-const LAYER_TILES = 'tilelayer';
 const LAYER_OBJECTS = 'objectgroup';
 
 /**
@@ -21,23 +20,22 @@ export function createMap(key, dispatch) {
 
   // TODO: Ensure that the request map was found.
 
-  const tileLayers = json.layers.filter(layer => layer.type === LAYER_TILES);
-  const objectLayers = json.layers.filter(layer => layer.type === LAYER_OBJECTS);
+  forEach(json.layers, layer => {
+    if (layer.type === LAYER_OBJECTS) {
+      forEach(layer.objects, object => {
+        let props = createProps({
+          type: object.type,
+          x: object.x,
+          y: object.y,
+          width: object.width,
+          height: object.height
+        });
 
-  forEach(objectLayers, layer => {
-    forEach(layer.objects, object => {
-      let entity = createEntity({
-        type: object.type,
-        x: object.x,
-        y: object.y,
-        width: object.width,
-        height: object.height
+        if (props) {
+          dispatch(addEntity(props));
+        }
       });
-
-      if (entity) {
-        dispatch(addEntity(entity));
-      }
-    });
+    }
   });
 
   return {
@@ -45,8 +43,9 @@ export function createMap(key, dispatch) {
     key: key,
     image: map.image,
     music: map.music,
+    collision: map.collision,
     data: json,
-    layers: tileLayers,
+    layers: json.layers,
     width: json.width * json.tilesets[0].tilewidth,
     height: json.height * json.tilesets[0].tileheight
   };

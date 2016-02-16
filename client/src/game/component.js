@@ -1,31 +1,31 @@
-export const PHASE_INPUT = 0;
-export const PHASE_LOGIC = 1;
-
 class Component {
   /**
    *
    * @param {string} key
-   * @param {number} phase
+   * @param {number} priority
    * @param {Entity} owner
    * @param {function} onUpdate
    */
-  constructor(key, phase, owner, onUpdate) {
+  constructor(key, priority, owner, onUpdate) {
     this._key = key;
-    this._phase = phase;
+    this._priority = priority;
     this._owner = owner;
     this._onUpdate = onUpdate ? onUpdate.bind(this) : () => {};
   }
 
   /**
    *
-   * @param {Object} newProps
-   * @param {number} elapsed
+   * @param {Object} nextProps
+   * @param {Object} prevProps
    * @param {function} dispatch
    */
-  update(newProps, elapsed, dispatch) {
-    this._onUpdate(newProps, elapsed, dispatch);
+  update(nextProps, prevProps, dispatch) {
+    this._onUpdate(nextProps, prevProps, dispatch);
   }
 
+  /**
+   *
+   */
   destroy() {
   }
 
@@ -50,8 +50,8 @@ class Component {
    *
    * @returns {number}
    */
-  get phase() {
-    return this._phase;
+  get priority() {
+    return this._priority;
   }
 }
 

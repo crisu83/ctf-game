@@ -1,5 +1,5 @@
 import { forEach } from 'lodash';
-import Component, { PHASE_LOGIC } from '../component';
+import Component from '../component';
 
 class Sprite extends Component {
   /**
@@ -9,7 +9,7 @@ class Sprite extends Component {
    * @param {function} onUpdate
    */
   constructor(owner, sprites, onUpdate) {
-    super('sprite', PHASE_LOGIC, owner, onUpdate);
+    super('sprite', 1, owner, onUpdate);
 
     this._sprites = sprites;
   }

@@ -12,18 +12,19 @@ class Entity {
 
   /**
    *
-   * @param {Object} newProps
-   * @param {number} elapsed
+   * @param {Object} nextProps
    * @param {function} dispatch
    */
-  update(newProps, elapsed, dispatch) {
-    this._components.sort((a, b) => a.phase - b.phase);
+  update(nextProps, dispatch) {
+    const prevProps = this._props;
+
+    this._components.sort((a, b) => a.priority - b.priority);
 
     forEach(this._components, component => {
-      component.update(newProps, elapsed, dispatch);
+      component.update(nextProps, prevProps, dispatch);
     });
 
-    this._props = newProps;
+    this._props = nextProps;
   }
 
   /**
