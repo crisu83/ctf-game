@@ -8,7 +8,7 @@ import createStore from './store';
 
 import './index.scss';
 
-const socket = io('http://localhost:3000');
+const socket = io();
 const store = createStore(socket);
 
 render(
