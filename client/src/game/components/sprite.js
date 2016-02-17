@@ -4,12 +4,11 @@ import Component from '../component';
 class Sprite extends Component {
   /**
    *
-   * @param {Entity} owner
    * @param {Array<Phaser.Sprite>} sprites
    * @param {function} onUpdate
    */
-  constructor(owner, sprites, onUpdate) {
-    super('sprite', 1, owner, onUpdate);
+  constructor(sprites, onUpdate) {
+    super('sprite', 1, onUpdate);
 
     this._sprites = sprites;
   }

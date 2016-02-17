@@ -4,11 +4,11 @@ import Entity from '../game/entity';
 
 /**
  *
- * @param {World} world
+ * @param {Session} session
  * @param {Object} props
  * @returns {Entity}
  */
-function createPlayer(world, props) {
+function createPlayer(session, props) {
   const entity = new Entity(props);
 
   return entity;
@@ -16,11 +16,11 @@ function createPlayer(world, props) {
 
 /**
  *
- * @param {World} world
+ * @param {Session} session
  * @param {Object} props
  * @returns {Entity}
  */
-function createFlag(world, props) {
+function createFlag(session, props) {
   const entity = new Entity(props);
 
   return entity;
@@ -28,17 +28,17 @@ function createFlag(world, props) {
 
 /**
  *
- * @param {World} world
+ * @param {Session} session
  * @param {Object} props
  * @returns {Entity}
  */
-export function createEntity(world, props) {
+export function createEntity(session, props) {
   switch (props.type) {
     case 'player':
-      return createPlayer(world, props);
+      return createPlayer(session, props);
 
     case 'flag':
-      return createFlag(world, props);
+      return createFlag(session, props);
 
     default:
       logger.warn(`trying to create entity of unknown type ${props.type}.`);

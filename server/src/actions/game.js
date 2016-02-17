@@ -3,6 +3,10 @@ export const REMOVE_ENTITY =  'game/REMOVE_ENTITY';
 export const SET_POSITION = 'game/SET_POSITION';
 export const SET_VELOCITY = 'game/SET_VELOCITY';
 export const SET_ANIMATION = 'game/SET_ANIMATION';
+export const SET_FACING = 'game/SET_FACING';
+export const START_ATTACKING = 'game/START_ATTACK';
+export const STOP_ATTACKING = 'game/STOP_ATTACKING';
+export const CAPTURE_FLAG = 'game/CAPTURE_FLAG';
 export const ADVANCE_TIME = 'game/ADVANCE_TIME';
 
 /**
@@ -21,6 +25,15 @@ export function addEntity(entity) {
  */
 export function removeEntity(id) {
   return {type: REMOVE_ENTITY, id};
+}
+
+/**
+ *
+ * @param {string} id
+ * @returns {{type: string, id: string}}
+ */
+export function stopAttacking(id) {
+  return {type: STOP_ATTACKING, id};
 }
 
 /**

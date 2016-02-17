@@ -4,12 +4,11 @@ import Component from '../component';
 class Sound extends Component {
   /**
    *
-   * @param {Entity} owner
    * @param {Array<Phaser.Sound>} sounds
    * @param {function} onUpdate
    */
-  constructor(owner, sounds, onUpdate) {
-    super('sound', 0, owner, onUpdate);
+  constructor(sounds, onUpdate) {
+    super('sound', 0, onUpdate);
 
     this._sounds = sounds;
   }

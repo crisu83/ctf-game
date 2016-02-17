@@ -2,15 +2,17 @@ const FRAME_RATE = 15;
 
 /**
  *
- * @param {Phaser.Game} game
+ * @param {Phaser.State} state
  * @param {Phaser.Group} group
- * @param {number} x
- * @param {number} y
- * @param {string} key
+ * @param {Object} props
  * @returns {Phaser.Sprite}
  */
-function createPlayer(game, group, x, y, key) {
-  const sprite = game.add.sprite(x, y, key);
+function createKnight(state, group, props) {
+  const sprite = group.create(props.x, props.y, `knight-${props.color}`);
+
+  state.physics.enable(sprite);
+
+  sprite.body.collideWorldBounds = true;
 
   sprite.animations.add('idle', [0], FRAME_RATE);
   sprite.animations.add('runDown', [0, 1, 2, 3], FRAME_RATE);
@@ -28,15 +30,22 @@ function createPlayer(game, group, x, y, key) {
 
 /**
  *
- * @param {Phaser.Game} game
+ * @param {Phaser.Game} state
  * @param {Phaser.Group} group
- * @param {number} x
- * @param {number} y
- * @param {string} key
+ * @param {Object} props
  * @returns {Phaser.Sprite}
  */
-function createFlag(game, group, x, y, key) {
-  const sprite = game.add.sprite(x, y, key);
+function createFlag(state, group, props) {
+  const sprite = group.create(props.x, props.y, props.type);
+
+  state.physics.enable(sprite);
+
+  sprite.animations.add('neutral', [0], FRAME_RATE);
+  sprite.animations.add('green', [1], FRAME_RATE);
+  sprite.animations.add('blue', [2], FRAME_RATE);
+  sprite.animations.add('orange', [3], FRAME_RATE);
+  sprite.animations.add('purple', [4], FRAME_RATE);
+  sprite.animations.play('neutral', FRAME_RATE, true);
 
   return sprite;
 }
@@ -45,22 +54,28 @@ function createFlag(game, group, x, y, key) {
  *
  * @param {Phaser.Game} game
  * @param {Phaser.Group} group
- * @param {string} type
- * @param {number} x
- * @param {number} y
- * @param {string} key
+ * @param {Object} props
  * @returns {Phaser.Sprite}
  */
-export function createSprite(game, group, type, x, y, key) {
-  switch (type) {
+export function createSprite(game, group, props) {
+  let sprite = null;
+
+  switch (props.type) {
     case 'player':
-      return createPlayer(game, group, x, y, key);
+      sprite = createKnight(game, group, props);
+      break;
 
     case 'flag':
-      return createFlag(game, group, x, y, key);
+      sprite = createFlag(game, group, props);
+      break;
 
     default:
-      console.warn(`trying to create unknown sprite ${key}`);
-      return null;
+      console.warn(`trying to create unknown sprite ${props.type}`);
   }
+
+  if (sprite) {
+    sprite.name = props.id;
+  }
+
+  return sprite;
 }

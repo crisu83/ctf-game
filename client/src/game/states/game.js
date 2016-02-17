@@ -1,15 +1,17 @@
-import { forEach, find } from 'lodash';
+import { forEach, find, get } from 'lodash';
 import { Game, State, Physics, Keyboard, Tilemap, Group } from 'phaser';
 import { createLocalPlayer, createEntity } from '../../factories/entity';
+import Render from '../groups/render';
 
 const MUSIC_VOLUME = 0.01;
-const req = require.context('assets', true, /\.(png|jpg|mp3|ogg|wav)$/);
-
 const TILE_LAYER = 'tilelayer';
+
+// Require for dynamic loading of assets provided by the server.
+const req = require.context('assets', true, /\.(png|jpg|mp3|ogg|wav)$/);
 
 class GameState extends State {
   /**
-   *
+   * Creates the actual game state.
    * @param store
    * @param {Object} gameData
    * @param {Object} playerProps
@@ -21,33 +23,32 @@ class GameState extends State {
     this._playerProps = playerProps;
     this._gameData = gameData;
     this._playerEntity = null;
-    this._entities = [];
-    this._group = null;
     this._music = null;
-    this._walls = null;
+    this._entities = [];
+    this._root = null;
+    this._groups = {};
+    this._layers = {};
   }
 
   /**
-   *
-   * @param {Phaser.Game} game
+   * Loads game data such as spritesheets, images, audio and the map.
    */
-  preload(game) {
-    this.loadSpritesheets(game);
-    this.loadImages(game);
-    this.loadAudio(game);
-    this.loadMap(game);
+  preload() {
+    this.loadSpritesheets();
+    this.loadImages();
+    this.loadAudio();
+    this.loadMap();
   }
 
   /**
-   *
-   * @param {Phaser.Game} game
+   * Loads spritesheets from the game data.
    */
-  loadSpritesheets(game) {
-    const { spritesheets } = this._gameData.assets;
+  loadSpritesheets() {
+    const spritesheets = this.getGameData('assets.spritesheets');
 
     forEach(spritesheets, (data, key) => {
       if (data.url && data.frameWidth && data.frameHeight) {
-        game.load.spritesheet(
+        this.load.spritesheet(
           key,
           req(`./${data.url}`),
           data.frameWidth,
@@ -57,33 +58,31 @@ class GameState extends State {
           data.spacing || 0
         );
       } else {
-        console.warn(`Failed not load sprite ${key}.`);
+        console.warn(`Failed to load sprite ${key}.`);
       }
     });
   }
 
   /**
-   *
-   * @param {Phaser.Game} game
+   * Loads images assets from the game data.
    */
-  loadImages(game) {
-    const { images } = this._gameData.assets;
+  loadImages() {
+    const images = this.getGameData('assets.images');
 
     forEach(images, (data, key) => {
       if (data.url) {
-        game.load.image(key, req(`./${data.url}`));
+        this.load.image(key, req(`./${data.url}`));
       } else {
-        console.warn(`Failed not load image ${key}.`);
+        console.warn(`Failed to load image ${key}.`);
       }
     });
   }
 
   /**
-   *
-   * @param {Phaser.Game} game
+   * Loads audio assets from the game data.
    */
-  loadAudio(game) {
-    const { audio } = this._gameData.assets;
+  loadAudio() {
+    const audio = this.getGameData('assets.audio');
 
     forEach(audio, (data, key) => {
       const files = [];
@@ -92,132 +91,136 @@ class GameState extends State {
         files.push(req(`./${url}`));
       });
 
-      game.load.audio(key, files);
+      this.load.audio(key, files);
     });
   }
 
   /**
-   *
-   * @param {Phaser.Game} game
+   * Loads the tilemap from the game data.
    */
-  loadMap(game) {
-    const { map } = this._gameData;
-    game.load.tilemap(map.key, null, map.data, Tilemap.TILED_JSON);
+  loadMap() {
+    const map = this.getGameData('map');
+    this.load.tilemap(map.key, null, map.data, Tilemap.TILED_JSON);
   }
 
   /**
-   *
-   * @param {Phaser.Game} game
+   * Called when the game is created to set up the initial state of the game.
    */
-  create(game) {
-    game.physics.startSystem(Physics.ARCADE);
+  create() {
+    this.physics.startSystem(Physics.ARCADE);
 
-    this._group = game.add.group();
-
-    this.createMusic(game);
-    this.createMap(game);
-    this.createPlayer(game);
+    // Note: the order of these are IMPORTANT as it will determine the order that objects are rendered in.
+    this.createMusic();
+    this.createMap();
+    this.createGroups();
+    this.createPlayer();
   }
 
   /**
-   *
-   * @param {Phaser.Game} game
+   * Creates the background music for the game.
    */
-  createMusic(game) {
-    const { music } = this._gameData.map;
+  createMusic() {
+    const music = this.getGameData('map.music');
 
-    this._music = game.add.audio(music, MUSIC_VOLUME, true/* loop */);
+    this._music = this.add.audio(music, MUSIC_VOLUME, true/* loop */);
     this._music.mute = true; // for development purposes
     this._music.play();
 
-    const muteKey = game.input.keyboard.addKey(Keyboard.M);
-    muteKey.onDown.add(this.onMutePressed.bind(this));
+    const muteKey = this.input.keyboard.addKey(Keyboard.M);
+    muteKey.onDown.add(this.handleMutePressed.bind(this));
   }
 
   /**
-   *
-   * @param {Phaser.Game} game
+   * Creates the map for the game.
    */
-  createMap(game) {
-    const { map } = this._gameData;
-    const tilemap = game.add.tilemap(map.key, map.image);
+  createMap() {
+    const mapData = this.getGameData('map');
+    const map = this.add.tilemap(mapData.key, mapData.image);
 
-    tilemap.addTilesetImage(map.key, map.image);
+    map.addTilesetImage(mapData.key, mapData.image);
 
-    forEach(map.layers, data => {
+    forEach(mapData.layers, data => {
       if (data.type === TILE_LAYER) {
-        let layer = tilemap.createLayer(data.name);
+        let layer = map.createLayer(data.name);
 
-        if (layer) {
-          layer.resizeWorld();
-          layer.debug = true;
+        layer.resizeWorld();
+
+        // TODO: Check that the collision data actually exists.
+
+        if (data.name === mapData.collision.layer) {
+          map.setCollision(mapData.collision.indices, true, layer);
         }
 
-        if (data.name === map.collision.layer) {
-          tilemap.setCollision(map.collision.indices, true, layer);
-          layer.debug = true;
-          this._walls = layer;
-        }
+        this.addLayer(data.name, layer);
       }
     });
   }
 
   /**
-   *
-   * @param {Phaser.Game} game
+   * Creates the groups for the game.
    */
-  createPlayer(game) {
-    this._playerEntity = createLocalPlayer(game, this._group, this._walls, this._playerProps);
+  createGroups() {
+    this._root = new Render(this);
+
+    this.addGroup('knights', this.add.group(this._root));
+    this.addGroup('flags', this.add.group(this._root));
+  }
+
+  /**
+   * Creates the local player entity.
+   */
+  createPlayer() {
+    this._playerEntity = createLocalPlayer(this, this._playerProps);
     this.addEntity(this._playerEntity);
   }
 
   /**
-   *
+   * Called when the mute button (M) is pressed.
    */
-  onMutePressed() {
+  handleMutePressed() {
     this._music.mute = !this._music.mute;
   }
 
   /**
-   *
-   * @param {Phaser.Game} game
+   * Called when the game is updated to update the logic for the game.
    */
-  update(game) {
-    this.updateEntities(game, this.gameState);
+  update() {
+    const gameState = this.gameState;
+
+    this.updateEntities(gameState);
   }
 
   /**
-   *
-   * @param {Phaser.Game} game
+   * Updates the state for each entity in the game, as well as creates new entities and destroys expired entities.
    * @param {Object} gameState
    */
-  updateEntities(game, gameState) {
+  updateEntities(gameState) {
     let removedEntityIds = this.getEntityIds();
 
-    forEach(gameState.entities, nextProps => {
-      let entity = find(this._entities, entity => entity.id == nextProps.id);
+    forEach(gameState.entities, props => {
+      let entity = find(this._entities, entity => entity.id == props.id);
 
       // Create the entity if it does not exist.
       if (!entity) {
-        entity = createEntity(game, this._group, nextProps);
+        entity = createEntity(this, props);
         this.addEntity(entity);
       }
 
-      entity.update(nextProps, this._store.dispatch);
+      entity.update(props, this._store.dispatch);
 
       // Remove updated entities from the list of entities to be removed.
-      removedEntityIds = removedEntityIds.filter(id => id !== nextProps.id);
+      removedEntityIds = removedEntityIds.filter(id => id !== props.id);
     });
 
     // Destroy entities that have been removed.
     this.destroyEntities(removedEntityIds);
 
-    // Sort sprites according to their y-value.
-    this._group.sort('y', Group.SORT_ASCENDING);
+    // Sort all the entities according to their y position so that those with a higher y position is rendered on top.
+    this._root.sort('y', Group.SORT_ASCENDING);
   }
 
   /**
-   *
+   * Adds an entity to the game's entity pool.
    * @param {Entity} entity
    */
   addEntity(entity) {
@@ -225,7 +228,7 @@ class GameState extends State {
   }
 
   /**
-   *
+   * Returns a list containing the id of every entity in this game.
    * @returns {Array}
    */
   getEntityIds() {
@@ -240,7 +243,7 @@ class GameState extends State {
   }
 
   /**
-   *
+   * Destroys a set of entities from the games entity pool.
    * @param {Array} ids
    */
   destroyEntities(ids) {
@@ -256,7 +259,52 @@ class GameState extends State {
   }
 
   /**
-   *
+   * Returns data for this game.
+   * @param {string} key
+   * @returns {Object}
+   */
+  getGameData(key) {
+    return get(this._gameData, key);
+  }
+
+  /**
+   * Adds a layer to this game's layer pool.
+   * @param {string} key
+   * @param {Phaser.TilemapLayer} layer
+   */
+  addLayer(key, layer) {
+    this._layers[key] = layer;
+  }
+
+  /**
+   * Returns a layer from this game's layer pool.
+   * @param {string} key
+   * @returns {Phaser.TilemapLayer}
+   */
+  getLayer(key) {
+    return this._layers[key];
+  }
+
+  /**
+   * Adds a group to this game's group pool.
+   * @param {string} key
+   * @param {Phaser.Group} group
+   */
+  addGroup(key, group) {
+    this._groups[key] = group;
+  }
+
+  /**
+   * Returns a group from this game's group pool.
+   * @param {string} key
+   * @returns {Phaser.Group} group
+   */
+  getGroup(key) {
+    return this._groups[key];
+  }
+
+  /**
+   * Returns the current state of this game.
    * @returns {Object}
    */
   get gameState() {

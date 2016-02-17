@@ -1,7 +1,18 @@
 import { Map, List } from 'immutable';
 import { isNumber } from 'lodash';
-import { ADD_ENTITY, REMOVE_ENTITY, SET_POSITION, SET_VELOCITY, SET_ANIMATION, ADVANCE_TIME } from '../actions/game';
 import { findEntityIndexById } from '../helpers/game';
+import {
+  ADD_ENTITY,
+  REMOVE_ENTITY,
+  SET_POSITION,
+  SET_VELOCITY,
+  SET_ANIMATION,
+  SET_FACING,
+  START_ATTACKING,
+  STOP_ATTACKING,
+  CAPTURE_FLAG,
+  ADVANCE_TIME
+} from '../actions/game';
 
 const initialState = Map({
   entities: List(),
@@ -41,6 +52,19 @@ export function setPosition(state, id, x, y) {
   return state.setIn(['entities', entityIndex, 'x'], x).setIn(['entities', entityIndex, 'y'], y);
 }
 
+
+/**
+ *
+ * @param {Map} state
+ * @param {string} id
+ * @param {number} vx
+ * @param {number} vy
+ * @returns {Map}
+ */
+export function setVelocity(state, id, vx, vy) {
+  const entityIndex = findEntityIndexById(state.get('entities').toJS(), id);
+  return state.setIn(['entities', entityIndex, 'vx'], vx).setIn(['entities', entityIndex, 'vy'], vy);
+}
 /**
  *
  * @param {Map} state
@@ -57,15 +81,38 @@ export function setAnimation(state, id, animation) {
  *
  * @param {Map} state
  * @param {string} id
- * @param {number} vx
- * @param {number} vy
+ * @param {string} facing
  * @returns {Map}
  */
-export function setVelocity(state, id, vx, vy) {
+export function setFacing(state, id, facing) {
   const entityIndex = findEntityIndexById(state.get('entities').toJS(), id);
-  return state.setIn(['entities', entityIndex, 'vx'], vx).setIn(['entities', entityIndex, 'vy'], vy);
+  return state.setIn(['entities', entityIndex, 'facing'], facing);
 }
 
+/**
+ *
+ * @param {Map} state
+ * @param {string} id
+ * @param {boolean} value
+ * @returns {Map}
+ */
+export function setIsAttacking(state, id, value) {
+  const entityIndex = findEntityIndexById(state.get('entities').toJS(), id);
+  return state.setIn(['entities', entityIndex, 'isAttacking'], value);
+}
+
+/**
+ *
+ * @param {Map} state
+ * @param {string} flagId
+ * @param {string} playerId
+ * @returns {Map}
+ */
+export function captureFlag(state, flagId, playerId) {
+  const playerIndex = findEntityIndexById(state.get('entities').toJS(), playerId);
+  const flagIndex = findEntityIndexById(state.get('entities').toJS(), flagId);
+  return state.setIn(['entities', flagIndex, 'color'], state.getIn(['entities', playerIndex, 'color']));
+}
 
 /**
  *
@@ -99,6 +146,18 @@ const reducer = (state = initialState, action) => {
 
     case SET_ANIMATION:
       return setAnimation(state, action.id, action.animation);
+
+    case SET_FACING:
+      return setFacing(state, action.id, action.facing);
+
+    case START_ATTACKING:
+      return setIsAttacking(state, action.id, true);
+
+    case STOP_ATTACKING:
+      return setIsAttacking(state, action.id, false);
+
+    case CAPTURE_FLAG:
+      return captureFlag(state, action.flagId, action.playerId);
 
     case ADVANCE_TIME:
       return advanceTime(state, action.elapsed);

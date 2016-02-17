@@ -3,24 +3,23 @@ class Component {
    *
    * @param {string} key
    * @param {number} priority
-   * @param {Entity} owner
    * @param {function} onUpdate
    */
-  constructor(key, priority, owner, onUpdate) {
+  constructor(key, priority, onUpdate) {
     this._key = key;
     this._priority = priority;
-    this._owner = owner;
     this._onUpdate = onUpdate ? onUpdate.bind(this) : () => {};
+    this._entity = null;
+    this._props = {};
   }
 
   /**
    *
-   * @param {Object} nextProps
-   * @param {Object} prevProps
+   * @param {Object} props
    * @param {function} dispatch
    */
-  update(nextProps, prevProps, dispatch) {
-    this._onUpdate(nextProps, prevProps, dispatch);
+  update(props, dispatch) {
+    this._onUpdate(props, dispatch);
   }
 
   /**
@@ -35,7 +34,33 @@ class Component {
    * @returns {Component}
    */
   getComponent(key) {
-    return this._owner.getComponent(key);
+    return this._entity.getComponent(key);
+  }
+
+  /**
+   *
+   * @param {string} key
+   * @param {*} value
+   */
+  setProp(key, value) {
+    this._props[key] = value;
+  }
+
+  /**
+   *
+   * @param {string} key
+   * @returns {*}
+   */
+  getProp(key) {
+    return this._props[key];
+  }
+
+  /**
+   *
+   * @param {Entity} entity
+   */
+  set entity(entity) {
+     this._entity = entity;
   }
 
   /**

@@ -94,19 +94,19 @@ class Session {
   updateEntities(gameState) {
     let removedEntityIds = this.getEntityIds();
 
-    forEach(gameState.entities, nextProps => {
-      let entity = find(this._entities, entity => entity.id == nextProps.id);
+    forEach(gameState.entities, props => {
+      let entity = find(this._entities, entity => entity.id == props.id);
 
       // Create the entity if it does not exist.
       if (!entity) {
-        entity = createEntity(this._world, nextProps);
+        entity = createEntity(this, props);
         this.addEntity(entity);
       }
 
-      entity.update(nextProps, this._store.dispatch);
+      entity.update(props, this._store.dispatch);
 
       // Remove updated entities from the list of entities to be removed.
-      removedEntityIds = removedEntityIds.filter(id => id !== nextProps.id);
+      removedEntityIds = removedEntityIds.filter(id => id !== props.id);
     });
 
     // Destroy entities that have been removed.

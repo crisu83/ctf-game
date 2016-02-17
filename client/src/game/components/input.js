@@ -3,12 +3,11 @@ import Component from '../component';
 class Input extends Component {
   /**
    *
-   * @param {Entity} owner
    * @param {Object} keys
    * @param {function} onUpdate
    */
-  constructor(owner, keys, onUpdate) {
-    super('input', 0, owner, onUpdate);
+  constructor(keys, onUpdate) {
+    super('input', 0, onUpdate);
 
     this._keys = keys;
   }

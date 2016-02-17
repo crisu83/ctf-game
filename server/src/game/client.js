@@ -62,6 +62,8 @@ class Client {
    */
   handleAction(action) {
     if (this._session) {
+      // TODO: Add a white-list for client actions and check against that.
+      // TODO: Consider adding a limit for how often actions will be dispatched.
       this._session.handleClientAction(action);
     }
   }

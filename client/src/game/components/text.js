@@ -4,12 +4,11 @@ import Component from '../component';
 class Text extends Component {
   /**
    *
-   * @param {Entity} owner
    * @param {Array<Phaser.Text>} texts
    * @param {function} onUpdate
    */
-  constructor(owner, texts, onUpdate) {
-    super('text', 2, owner, onUpdate);
+  constructor(texts, onUpdate) {
+    super('text', 2, onUpdate);
 
     this._texts = texts;
   }

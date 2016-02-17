@@ -18,9 +18,11 @@ function createPlayer(props) {
     vy: 0,
     width: 96,
     height: 96,
+    group: 'knights',
+    attackRange: 20,
+    attackCooldownMsec: 500,
     // TODO: Add logic for picking the color based on the player's team.
     color: chance.pick(['blue', 'green', 'orange', 'purple'])
-    // animation: 'idle'
   };
 }
 
@@ -33,7 +35,8 @@ function createFlag(props) {
   return {
     ...props,
     id: shortid.generate(),
-    color: 'neutral'
+    color: 'neutral',
+    group: 'flags'
   };
 }
 

@@ -1,6 +1,6 @@
 import { expect } from 'chai';
-import { Map, List } from 'immutable';
-import { setState, setPosition, setVelocity, setAnimation } from '../../src/reducers/game';
+import { Map, List, fromJS } from 'immutable';
+import { setState, setPosition, setVelocity, setAnimation, captureFlag } from '../../src/reducers/game';
 
 describe('game reducer', () => {
 
