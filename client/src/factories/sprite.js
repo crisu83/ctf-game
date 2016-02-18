@@ -46,12 +46,38 @@ function createFlag(state, group, props) {
   return sprite;
 }
 
+/**
+ *
+ * @param {Phaser.Game} state
+ * @param {Phaser.Group} group
+ * @param {Object} props
+ * @returns {Phaser.Sprite}
+ */
 function createAttack(state, group, props) {
   const sprite = group.create(0, 0, 'attack');
+
+  sprite.exists = false;
+  sprite.visibile = false;
 
   sprite.animations.add('idle', [6], FRAME_RATE);
   sprite.animations.add('hit', [0, 1, 2, 3, 4, 5, 6], FRAME_RATE);
   sprite.animations.play('idle', FRAME_RATE);
+
+  return sprite;
+}
+
+/**
+ *
+ * @param {Phaser.Game} state
+ * @param {Phaser.Group} group
+ * @param {Object} props
+ * @returns {Phaser.Sprite}
+ */
+function createGrave(state, group, props) {
+  const sprite = group.create(0, 0, 'grave');
+
+  sprite.exists = false;
+  sprite.visibile = false;
 
   return sprite;
 }
@@ -77,6 +103,10 @@ export function createSprite(state, group, props) {
 
     case 'attack':
       sprite = createAttack(state, group, props);
+      break;
+
+    case 'grave':
+      sprite = createGrave(state, group, props);
       break;
 
     default:

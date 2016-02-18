@@ -6,6 +6,7 @@ import Sprite from '../game/components/sprite';
 import Text from '../game/components/text';
 import Sound from '../game/components/sound';
 import Attack from '../game/components/attack';
+import Health from '../game/components/health';
 import { createSprite } from './sprite';
 import { createNameTag } from './text';
 import { isEntityMoving, resolveActionAnimation } from '../helpers/game';
@@ -30,19 +31,70 @@ export function createLocalPlayer(state, props) {
   const entity = new Entity(props);
 
   const wallLayer = state.getLayer('Walls');
+  const rootGroup = state.getGroup('root');
   const knightGroup = state.getGroup('knights');
   const flagGroup = state.getGroup('flags');
   const attackGroup = state.getGroup('attacks');
 
   const knightSprite = createSprite(state, null, props);
+  const graveSprite = createSprite(state, rootGroup, {type: 'grave'});
+
 
   // Add the player to the root group so that it's rendered in the correct order.
-  state.getGroup('root').add(knightSprite);
+  rootGroup.add(knightSprite);
 
   state.physics.arcade.enable(knightSprite);
   state.camera.follow(knightSprite);
 
   knightSprite.body.collideWorldBounds = true;
+
+  const onSpriteUpdate = function(props, dispatch) {
+    const knightSprite = this.getSprite('knight');
+    const graveSprite = this.getSprite('grave');
+
+    state.physics.arcade.collide(knightSprite, wallLayer);
+
+    state.physics.arcade.collide(knightSprite, flagGroup, null/* collideCallback */, (knight, flag) => {
+      dispatch(captureFlag(props.id, flag.name));
+      return false; // allows passing through flags
+    }/* processCallback */);
+
+    knightSprite.body.velocity.set(0);
+
+    if (props.vx) {
+      knightSprite.body.velocity.x = props.vx;
+    } else if (props.vy) {
+      knightSprite.body.velocity.y = props.vy;
+    }
+
+    const animation = props.facing
+      ? resolveActionAnimation(props.isAttacking ? 'attack' : 'run', props.facing)
+      : 'idle';
+    knightSprite.animations.play(animation);
+    dispatch(setAnimation(props.id, animation));
+
+    if (knightSprite.x !== props.x || knightSprite.y !== props.y) {
+      dispatch(setPosition(props.id, knightSprite.x, knightSprite.y, CONTEXT_SERVER));
+    }
+
+    if (!props.isAlive && knightSprite.alive) {
+      knightSprite.kill();
+      const { x, y } = props;
+      graveSprite.reset(x, y);
+    } else if (props.isAlive && !knightSprite.alive) {
+      graveSprite.kill();
+      knightSprite.revive();
+    }
+
+    // const nameText = this.getComponent('text').getText('name');
+    //
+    // nameText.x = knightSprite.x + (knightSprite.width / 2);
+    // nameText.y = knightSprite.y;
+
+    // state.game.debug.body(knight);
+  };
+
+  entity.addComponent(new Sprite({knight: knightSprite, grave: graveSprite}, onSpriteUpdate));
 
   const cursorKeys = state.input.keyboard.createCursorKeys();
   const attackKey = state.input.keyboard.addKey(Keyboard.SPACEBAR);
@@ -76,49 +128,13 @@ export function createLocalPlayer(state, props) {
 
   entity.addComponent(new Input({cursors: cursorKeys, attack: attackKey}, onInputUpdate));
 
-  const onSpriteUpdate = function(props, dispatch) {
-    const knightSprite = this.getSprite('knight');
-
-    state.physics.arcade.collide(knightSprite, wallLayer);
-
-    state.physics.arcade.collide(knightSprite, flagGroup, null/* collideCallback */, (knight, flag) => {
-      dispatch(captureFlag(props.id, flag.name));
-      return false; // allows passing through flags
-    }/* processCallback */);
-
-    knightSprite.body.velocity.set(0);
-
-    if (props.vx) {
-      knightSprite.body.velocity.x = props.vx;
-    } else if (props.vy) {
-      knightSprite.body.velocity.y = props.vy;
-    }
-
-    const animation = props.facing
-      ? resolveActionAnimation(props.isAttacking ? 'attack' : 'run', props.facing)
-      : 'idle';
-    knightSprite.animations.play(animation);
-    dispatch(setAnimation(props.id, animation));
-
-    if (knightSprite.x !== props.x || knightSprite.y !== props.y) {
-      dispatch(setPosition(props.id, knightSprite.x, knightSprite.y, CONTEXT_SERVER));
-    }
-
-    // state.game.debug.body(knight);
-  };
-
-  entity.addComponent(new Sprite({knight: knightSprite}, onSpriteUpdate));
-
   const hitSound = state.add.audio('knight-hit', 0.1);
   const dieSound = state.add.audio('knight-die', 0.1);
 
   entity.addComponent(new Sound({hit: hitSound, die: dieSound}));
 
   for(let i = 0; i < 20; i++) {
-    let a = createSprite(state, attackGroup, {type: 'attack'});
-    a.name = `attack${i}`;
-    a.exists = false;
-    a.visibile = false;
+    createSprite(state, attackGroup, {type: 'attack'});
   }
 
   const onAttackUpdate = function(props, dispatch) {
@@ -146,15 +162,15 @@ export function createLocalPlayer(state, props) {
 
   entity.addComponent(new Attack(attackGroup, onAttackUpdate));
 
+  const onHealthUpdate = function(props, dispatch) {
+    
+  };
+
+  entity.addComponent(new Health(onHealthUpdate));
+
   // TODO: Fix name tag positioning
-  // const name = createNameTag(game, props);
-  // const onTextUpdate = function(props, dispatch) {
-  //   const name = this.getText('name');
-  //   const knight = this.getComponent('sprite').getSprite('knight');
-  //   name.x = knight.x + (knight.width / 2);
-  //   name.y = knight.y;
-  // };
-  // entity.addComponent(new Text({name}, onTextUpdate));
+  // const nameText = createNameTag(state, props);
+  // entity.addComponent(new Text({name: nameText}));
 
   return entity;
 }
@@ -168,12 +184,15 @@ export function createLocalPlayer(state, props) {
 function createRemotePlayer(state, props) {
   const entity = new Entity(props);
 
+  const rootGroup = state.getGroup('root');
   const knightGroup = state.getGroup('knights');
 
   const knightSprite = createSprite(state, knightGroup, props);
+  const graveSprite = createSprite(state, rootGroup, {type: 'grave'});
 
   const onSpriteUpdate = function(props, dispatch) {
     const knightSprite = this.getSprite('knight');
+    const graveSprite = this.getSprite('grave');
 
     knightSprite.x = props.x;
     knightSprite.y = props.y;
@@ -182,23 +201,32 @@ function createRemotePlayer(state, props) {
       knightSprite.animations.play(props.animation);
     }
 
-    // const name = this.getComponent('text').getText('name');
+    if (!props.isAlive && knightSprite.alive) {
+      knightSprite.kill();
+      const { x, y } = props;
+      graveSprite.reset(x, y);
+    } else if (props.isAlive && !knightSprite.alive) {
+      graveSprite.kill();
+      knightSprite.revive();
+    }
 
-    // name.x = props.x + (props.width / 2);
-    // name.y = props.y;
+    const nameText = this.getComponent('text').getText('name');
+
+    nameText.x = knightSprite.x + (knightSprite.width / 2);
+    nameText.y = knightSprite.y;
 
     // state.game.debug.body(knight);
   };
 
-  entity.addComponent(new Sprite({knight: knightSprite}, onSpriteUpdate));
+  entity.addComponent(new Sprite({knight: knightSprite, grave: graveSprite}, onSpriteUpdate));
 
   const hitSound = state.add.audio('knight-hit', 0.1);
   const dieSound = state.add.audio('knight-die', 0.1);
 
   entity.addComponent(new Sound({hit: hitSound, die: dieSound}));
 
-  // const name = createNameTag(game, props);
-  // entity.addComponent(new Text({name}));
+  const nameText = createNameTag(state, props);
+  entity.addComponent(new Text({name: nameText}));
 
   return entity;
 }

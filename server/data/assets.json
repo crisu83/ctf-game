@@ -29,6 +29,11 @@
       "url": "images/sprites/attack.png",
       "frameWidth": 96,
       "frameHeight": 96
+    },
+    "grave": {
+      "url": "images/sprites/grave.png",
+      "frameWidth": 96,
+      "frameHeight": 96
     }
   },
   "images": {
