@@ -1,6 +1,20 @@
 import { expect } from 'chai';
 import { Map, List } from 'immutable';
-import { addEntity, removeEntity, setPosition, setVelocity, setAnimation, setFacing, setIsAttacking, captureFlag, advanceTime } from '../../src/reducers/game';
+import {
+  addEntity,
+  removeEntity,
+  setPosition,
+  setVelocity,
+  setAnimation,
+  setFacing,
+  setIsAttacking,
+  damageEntity,
+  killEntity,
+  reviveEntity,
+  setIsAlive,
+  captureFlag,
+  advanceTime
+} from '../../src/reducers/game';
 
 describe('game reducer', () => {
 
@@ -23,6 +37,105 @@ describe('game reducer', () => {
         Map({id: '1', name: 'John'}),
         Map({id: '3', name: 'Alex'})
       )}));
+    });
+
+
+    it('damaging an entity reduces its health in the state', () => {
+      const state = Map(Map({
+        entities: List.of(
+          Map({id: '1', name: 'John', x: 100, y: 100}),
+          Map({id: '2', name: 'Jane', vx: 100, vy: 0}),
+          Map({id: '3', name: 'Alexia'}),
+          Map({id: '4', name: 'Juliette', facing: 'down'}),
+          Map({id: '5', name: 'Abe'}),
+          Map({id: '6', name: 'Jo', damage: 50}),
+          Map({id: '7', name: 'Mary-Ann', health: 100})
+        ),
+        time: Map({
+          elapsed: 123
+        })
+      }));
+      const nextState = damageEntity(state, '6', '7');
+      expect(nextState).to.equal(Map({
+        entities: List.of(
+          Map({id: '1', name: 'John', x: 100, y: 100}),
+          Map({id: '2', name: 'Jane', vx: 100, vy: 0}),
+          Map({id: '3', name: 'Alexia'}),
+          Map({id: '4', name: 'Juliette', facing: 'down'}),
+          Map({id: '5', name: 'Abe'}),
+          Map({id: '6', name: 'Jo', damage: 50}),
+          Map({id: '7', name: 'Mary-Ann', health: 50})
+        ),
+        time: Map({
+          elapsed: 123
+        })
+      }));
+    });
+
+    it('killing an entity marks it as dead and sets its health to zero in the state', () => {
+      const state = Map(Map({
+        entities: List.of(
+          Map({id: '1', name: 'John', x: 100, y: 100, health: 9999}),
+          Map({id: '2', name: 'Jane', vx: 100, vy: 0}),
+          Map({id: '3', name: 'Alexia'}),
+          Map({id: '4', name: 'Juliette', facing: 'down'}),
+          Map({id: '5', name: 'Abe'}),
+          Map({id: '6', name: 'Jo', damage: 50}),
+          Map({id: '7', name: 'Mary-Ann', health: 100})
+
+        ),
+        time: Map({
+          elapsed: 123
+        })
+      }));
+      const nextState = killEntity(state, '1', false);
+      expect(nextState).to.equal(Map({
+        entities: List.of(
+          Map({id: '1', name: 'John', x: 100, y: 100, health: 0, isAlive: false}),
+          Map({id: '2', name: 'Jane', vx: 100, vy: 0}),
+          Map({id: '3', name: 'Alexia'}),
+          Map({id: '4', name: 'Juliette', facing: 'down'}),
+          Map({id: '5', name: 'Abe'}),
+          Map({id: '6', name: 'Jo', damage: 50}),
+          Map({id: '7', name: 'Mary-Ann', health: 100})
+        ),
+        time: Map({
+          elapsed: 123
+        })
+      }));
+    });
+
+    it('reviving an entity marks it as alive and restores its health in the state', () => {
+      const state = Map(Map({
+        entities: List.of(
+          Map({id: '1', name: 'John', x: 100, y: 100}),
+          Map({id: '2', name: 'Jane', vx: 100, vy: 0}),
+          Map({id: '3', name: 'Alexia'}),
+          Map({id: '4', name: 'Juliette', facing: 'down'}),
+          Map({id: '5', name: 'Abe'}),
+          Map({id: '6', name: 'Jo', health: -20, maxHealth: 100, isAlive: false}),
+          Map({id: '7', name: 'Mary-Ann', health: 100})
+
+        ),
+        time: Map({
+          elapsed: 123
+        })
+      }));
+      const nextState = reviveEntity(state, '6');
+      expect(nextState).to.equal(Map({
+        entities: List.of(
+          Map({id: '1', name: 'John', x: 100, y: 100}),
+          Map({id: '2', name: 'Jane', vx: 100, vy: 0}),
+          Map({id: '3', name: 'Alexia'}),
+          Map({id: '4', name: 'Juliette', facing: 'down'}),
+          Map({id: '5', name: 'Abe'}),
+          Map({id: '6', name: 'Jo', health: 100, maxHealth: 100, isAlive: true}),
+          Map({id: '7', name: 'Mary-Ann', health: 100})
+        ),
+        time: Map({
+          elapsed: 123
+        })
+      }));
     });
 
   });
@@ -178,36 +291,36 @@ describe('game reducer', () => {
         })
       }));
 
-      it('sets player as not attacking in the state', () => {
-        const state = Map(Map({
-          entities: List.of(
-            Map({id: '1', name: 'John', x: 100, y: 100}),
-            Map({id: '2', name: 'Jane', vx: 100, vy: 0}),
-            Map({id: '3', name: 'Alexia'}),
-            Map({id: '4', name: 'Juliette', facing: 'down'}),
-            Map({id: '5', name: 'Abe'}),
-            Map({id: '6', name: 'Jo', isAttacking: true})
-          ),
-          time: Map({
-            elapsed: 123
-          })
-        }));
-        const nextState = setIsAttacking(state, '6', false);
-        expect(nextState).to.equal(Map({
-          entities: List.of(
-            Map({id: '1', name: 'John', x: 100, y: 100}),
-            Map({id: '2', name: 'Jane', vx: 100, vy: 0}),
-            Map({id: '3', name: 'Alexia'}),
-            Map({id: '4', name: 'Juliette', facing: 'down'}),
-            Map({id: '5', name: 'Abe'}),
-            Map({id: '6', name: 'Jo', isAttacking: false})
-          ),
-          time: Map({
-            elapsed: 123
-          })
-        }));
-      });
+    });
 
+    it('sets player as not attacking in the state', () => {
+      const state = Map(Map({
+        entities: List.of(
+          Map({id: '1', name: 'John', x: 100, y: 100}),
+          Map({id: '2', name: 'Jane', vx: 100, vy: 0}),
+          Map({id: '3', name: 'Alexia'}),
+          Map({id: '4', name: 'Juliette', facing: 'down'}),
+          Map({id: '5', name: 'Abe'}),
+          Map({id: '6', name: 'Jo', isAttacking: true})
+        ),
+        time: Map({
+          elapsed: 123
+        })
+      }));
+      const nextState = setIsAttacking(state, '6', false);
+      expect(nextState).to.equal(Map({
+        entities: List.of(
+          Map({id: '1', name: 'John', x: 100, y: 100}),
+          Map({id: '2', name: 'Jane', vx: 100, vy: 0}),
+          Map({id: '3', name: 'Alexia'}),
+          Map({id: '4', name: 'Juliette', facing: 'down'}),
+          Map({id: '5', name: 'Abe'}),
+          Map({id: '6', name: 'Jo', isAttacking: false})
+        ),
+        time: Map({
+          elapsed: 123
+        })
+      }));
     });
 
   });

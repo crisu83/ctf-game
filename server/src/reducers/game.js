@@ -10,6 +10,9 @@ import {
   SET_FACING,
   START_ATTACKING,
   STOP_ATTACKING,
+  DAMAGE_ENTITY,
+  KILL_ENTITY,
+  REVIVE_ENTITY,
   CAPTURE_FLAG,
   ADVANCE_TIME
 } from '../actions/game';
@@ -104,6 +107,56 @@ export function setIsAttacking(state, id, value) {
 /**
  *
  * @param {Map} state
+ * @param {string} id
+ * @param {string} victimId
+ * @returns {Map}
+ */
+export function damageEntity(state, id, victimId) {
+  const attackerIndex = findEntityIndexById(state.get('entities').toJS(), id);
+  const victimIndex = findEntityIndexById(state.get('entities').toJS(), victimId);
+  const damage = state.getIn(['entities', attackerIndex, 'damage']);
+  return state.updateIn(['entities', victimIndex, 'health'], health => health - damage);
+}
+
+/**
+ *
+ * @param {Map} state
+ * @param {string} id
+ * @returns {Map}
+ */
+export function killEntity(state, id) {
+  const nextState = setIsAlive(state, id, false);
+  const entityIndex = findEntityIndexById(state.get('entities').toJS(), id);
+  return nextState.setIn(['entities', entityIndex, 'health'], 0);
+}
+
+/**
+ *
+ * @param {Map} state
+ * @param {string} id
+ * @returns {Map}
+ */
+export function reviveEntity(state, id) {
+  const nextState = setIsAlive(state, id, true);
+  const entityIndex = findEntityIndexById(state.get('entities').toJS(), id);
+  return nextState.setIn(['entities', entityIndex, 'health'], nextState.getIn(['entities', entityIndex, 'maxHealth']));
+}
+
+/**
+ *
+ * @param {Map} state
+ * @param {string} id
+ * @param {boolean} value
+ * @returns {Map}
+ */
+export function setIsAlive(state, id, value) {
+  const entityIndex = findEntityIndexById(state.get('entities').toJS(), id);
+  return state.setIn(['entities', entityIndex, 'isAlive'], value);
+}
+
+/**
+ *
+ * @param {Map} state
  * @param {string} flagId
  * @param {string} playerId
  * @returns {Map}
@@ -155,6 +208,15 @@ const reducer = (state = initialState, action) => {
 
     case STOP_ATTACKING:
       return setIsAttacking(state, action.id, false);
+
+    case DAMAGE_ENTITY:
+      return damageEntity(state, action.id, action.victimId);
+
+    case KILL_ENTITY:
+      return killEntity(state, action.id);
+
+    case REVIVE_ENTITY:
+      return reviveEntity(state, action.id);
 
     case CAPTURE_FLAG:
       return captureFlag(state, action.flagId, action.playerId);

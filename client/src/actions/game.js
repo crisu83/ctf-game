@@ -4,6 +4,7 @@ export const SET_VELOCITY = 'game/SET_VELOCITY';
 export const SET_ANIMATION = 'game/SET_ANIMATION';
 export const SET_FACING = 'game/SET_FACING';
 export const START_ATTACKING = 'game/START_ATTACK';
+export const DAMAGE_ENTITY = 'game/DAMAGE_ENTITY';
 export const CAPTURE_FLAG = 'game/CAPTURE_FLAG';
 
 export const CONTEXT_CLIENT = 'client';
@@ -68,6 +69,16 @@ export function setFacing(id, facing) {
  */
 export function startAttacking(id) {
   return {type: START_ATTACKING, id};
+}
+
+/**
+ *
+ * @param {string} id
+ * @param {string} victimId
+ * @returns {{type: string, id: string, targetId: string}}
+ */
+export function damageEntity(id, victimId) {
+  return {type: DAMAGE_ENTITY, id, victimId};
 }
 
 /**

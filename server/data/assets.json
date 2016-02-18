@@ -24,6 +24,11 @@
       "url": "images/sprites/flag.png",
       "frameWidth": 96,
       "frameHeight": 96
+    },
+    "attack": {
+      "url": "images/sprites/attack.png",
+      "frameWidth": 96,
+      "frameHeight": 96
     }
   },
   "images": {

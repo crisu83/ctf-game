@@ -6,6 +6,9 @@ export const SET_ANIMATION = 'game/SET_ANIMATION';
 export const SET_FACING = 'game/SET_FACING';
 export const START_ATTACKING = 'game/START_ATTACK';
 export const STOP_ATTACKING = 'game/STOP_ATTACKING';
+export const DAMAGE_ENTITY = 'game/DAMAGE_ENTITY';
+export const KILL_ENTITY = 'game/KILL_ENTITY';
+export const REVIVE_ENTITY = 'game/REVIVE_ENTITY';
 export const CAPTURE_FLAG = 'game/CAPTURE_FLAG';
 export const ADVANCE_TIME = 'game/ADVANCE_TIME';
 
@@ -34,6 +37,24 @@ export function removeEntity(id) {
  */
 export function stopAttacking(id) {
   return {type: STOP_ATTACKING, id};
+}
+
+/**
+ *
+ * @param {string} id
+ * @returns {{type: string, id: string}}
+ */
+export function killEntity(id) {
+  return {type: KILL_ENTITY, id};
+}
+
+/**
+ *
+ * @param {string} id
+ * @returns {{type: string, id: string}}
+ */
+export function reviveEntity(id) {
+  return {type: REVIVE_ENTITY, id};
 }
 
 /**

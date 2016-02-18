@@ -162,8 +162,9 @@ class GameState extends State {
   createGroups() {
     this._root = new Render(this);
 
-    this.addGroup('knights', this.add.group(this._root));
-    this.addGroup('flags', this.add.group(this._root));
+    this.addGroup('knights', this.add.group(this._root, 'knights', false, true));
+    this.addGroup('flags', this.add.group(this._root, 'flags', false, true));
+    this.addGroup('attacks', this.add.group(this._root, 'attacks', false, true));
   }
 
   /**
