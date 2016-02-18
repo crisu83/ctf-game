@@ -95,9 +95,11 @@ class Render extends Group {
     if (this.children.length < 2) {
       return;
     }
+
     if (typeof index === 'undefined') {
       index = 'z';
     }
+
     if (typeof order === 'undefined') {
       order = Group.SORT_ASCENDING;
     }

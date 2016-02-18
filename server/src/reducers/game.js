@@ -8,8 +8,8 @@ import {
   SET_VELOCITY,
   SET_ANIMATION,
   SET_FACING,
-  START_ATTACKING,
-  STOP_ATTACKING,
+  PERFORM_ATTACK,
+  RESET_ATTACK,
   DAMAGE_ENTITY,
   KILL_ENTITY,
   REVIVE_ENTITY,
@@ -203,10 +203,10 @@ const reducer = (state = initialState, action) => {
     case SET_FACING:
       return setFacing(state, action.id, action.facing);
 
-    case START_ATTACKING:
+    case PERFORM_ATTACK:
       return setIsAttacking(state, action.id, true);
 
-    case STOP_ATTACKING:
+    case RESET_ATTACK:
       return setIsAttacking(state, action.id, false);
 
     case DAMAGE_ENTITY:

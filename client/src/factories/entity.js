@@ -8,19 +8,17 @@ import Sound from '../game/components/sound';
 import Attack from '../game/components/attack';
 import { createSprite } from './sprite';
 import { createNameTag } from './text';
-import { isEntityMoving } from '../helpers/game';
+import { isEntityMoving, resolveActionAnimation } from '../helpers/game';
 import {
   CONTEXT_SERVER,
   setPosition,
   setVelocity,
   setAnimation,
   setFacing,
-  startAttacking,
+  performAttack,
   damageEntity,
   captureFlag
 } from '../actions/game';
-
-const RUN_SPEED = 500;
 
 /**
  *
@@ -31,123 +29,122 @@ const RUN_SPEED = 500;
 export function createLocalPlayer(state, props) {
   const entity = new Entity(props);
 
-  const walls = state.getLayer('Walls');
-  const knights = state.getGroup('knights');
-  const flags = state.getGroup('flags');
-  const attacks = state.getGroup('attacks');
+  const wallLayer = state.getLayer('Walls');
+  const knightGroup = state.getGroup('knights');
+  const flagGroup = state.getGroup('flags');
+  const attackGroup = state.getGroup('attacks');
 
-  const knight = createSprite(state, null, props);
+  const knightSprite = createSprite(state, null, props);
 
-  state.physics.arcade.enable(knight);
-  state.camera.follow(knight);
+  // Add the player to the root group so that it's rendered in the correct order.
+  state.getGroup('root').add(knightSprite);
 
-  knight.body.collideWorldBounds = true;
+  state.physics.arcade.enable(knightSprite);
+  state.camera.follow(knightSprite);
 
-  const cursors = state.input.keyboard.createCursorKeys();
-  const attack = state.input.keyboard.addKey(Keyboard.SPACEBAR);
+  knightSprite.body.collideWorldBounds = true;
+
+  const cursorKeys = state.input.keyboard.createCursorKeys();
+  const attackKey = state.input.keyboard.addKey(Keyboard.SPACEBAR);
 
   const onInputUpdate = function(props, dispatch) {
-    const cursors = this.getKey('cursors');
-    const attack = this.getKey('attack');
-    const knight = this.getComponent('sprite').getSprite('knight');
-    const hit = this.getComponent('sound').getSound('hit');
-    const isAttacking = attack.isDown;
+    const cursorKeys = this.getKey('cursors');
+    const attackKey = this.getKey('attack');
+    const attackComponent = this.getComponent('attack');
 
-    if (isAttacking) {
-      dispatch(startAttacking(props.id));
+    if (attackKey.isDown && attackComponent.canAttack()) {
+      dispatch(performAttack(props.id));
     }
 
-    if (cursors.left.isDown) {
-      dispatch(setVelocity(props.id, -RUN_SPEED, 0));
-      dispatch(setAnimation(props.id, isAttacking ? 'attackLeft' : 'runLeft'));
+    if (cursorKeys.left.isDown) {
+      dispatch(setVelocity(props.id, -props.runSpeed, 0));
       dispatch(setFacing(props.id, 'left'));
-    } else if (cursors.right.isDown) {
-      dispatch(setVelocity(props.id, RUN_SPEED, 0));
-      dispatch(setAnimation(props.id, isAttacking ? 'attackRight' : 'runRight'));
+    } else if (cursorKeys.right.isDown) {
+      dispatch(setVelocity(props.id, props.runSpeed, 0));
       dispatch(setFacing(props.id, 'right'));
-    } else if (cursors.up.isDown) {
-      dispatch(setVelocity(props.id, 0, -RUN_SPEED));
-      dispatch(setAnimation(props.id, isAttacking ? 'attackUp' : 'runUp'));
+    } else if (cursorKeys.up.isDown) {
+      dispatch(setVelocity(props.id, 0, -props.runSpeed));
       dispatch(setFacing(props.id, 'up'));
-    } else if (cursors.down.isDown) {
-      dispatch(setVelocity(props.id, 0, RUN_SPEED));
-      dispatch(setAnimation(props.id, isAttacking ? 'attackDown' : 'runDown'));
+    } else if (cursorKeys.down.isDown) {
+      dispatch(setVelocity(props.id, 0, props.runSpeed));
       dispatch(setFacing(props.id, 'down'));
     } else if (!isEntityMoving(props)) {
       dispatch(setVelocity(props.id, 0, 0));
-      dispatch(setAnimation(props.id, 'idle'));
-      dispatch(setFacing(props.id, 'none'));
+      dispatch(setFacing(props.id, null));
     }
   };
 
-  entity.addComponent(new Input({cursors, attack}, onInputUpdate));
+  entity.addComponent(new Input({cursors: cursorKeys, attack: attackKey}, onInputUpdate));
 
   const onSpriteUpdate = function(props, dispatch) {
-    const knight = this.getSprite('knight');
+    const knightSprite = this.getSprite('knight');
 
-    state.physics.arcade.collide(knight, walls);
+    state.physics.arcade.collide(knightSprite, wallLayer);
 
-    state.physics.arcade.collide(knight, flags, null/* collideCallback */, (knight, flag) => {
+    state.physics.arcade.collide(knightSprite, flagGroup, null/* collideCallback */, (knight, flag) => {
       dispatch(captureFlag(props.id, flag.name));
       return false; // allows passing through flags
     }/* processCallback */);
 
-    knight.body.velocity.set(0);
+    knightSprite.body.velocity.set(0);
 
     if (props.vx) {
-      knight.body.velocity.x = props.vx;
+      knightSprite.body.velocity.x = props.vx;
     } else if (props.vy) {
-      knight.body.velocity.y = props.vy;
+      knightSprite.body.velocity.y = props.vy;
     }
 
-    if (props.animation) {
-      knight.animations.play(props.animation);
-    }
+    const animation = props.facing
+      ? resolveActionAnimation(props.isAttacking ? 'attack' : 'run', props.facing)
+      : 'idle';
+    knightSprite.animations.play(animation);
+    dispatch(setAnimation(props.id, animation));
 
-    if (knight.x !== props.x || knight.y !== props.y) {
-      dispatch(setPosition(props.id, knight.x, knight.y, CONTEXT_SERVER));
+    if (knightSprite.x !== props.x || knightSprite.y !== props.y) {
+      dispatch(setPosition(props.id, knightSprite.x, knightSprite.y, CONTEXT_SERVER));
     }
 
     // state.game.debug.body(knight);
   };
 
-  entity.addComponent(new Sprite({knight}, onSpriteUpdate));
+  entity.addComponent(new Sprite({knight: knightSprite}, onSpriteUpdate));
 
-  const hit = state.add.audio('knight-hit', 0.1);
-  const die = state.add.audio('knight-die', 0.1);
+  const hitSound = state.add.audio('knight-hit', 0.1);
+  const dieSound = state.add.audio('knight-die', 0.1);
 
-  entity.addComponent(new Sound({hit, die}));
+  entity.addComponent(new Sound({hit: hitSound, die: dieSound}));
 
   for(let i = 0; i < 20; i++) {
-    let a = createSprite(state, attacks, {type: 'attack'});
+    let a = createSprite(state, attackGroup, {type: 'attack'});
     a.name = `attack${i}`;
     a.exists = false;
     a.visibile = false;
   }
 
   const onAttackUpdate = function(props, dispatch) {
-    if (props.isAttacking) {
-      const attack = this.getAttack();
-      const knight = this.getComponent('sprite').getSprite('knight');
+    if (props.isAttacking && this.canAttack()) {
+      const attackSprite = this.getAttackSprite();
 
-      if (attack) {
-        const target = this.calculateAttackTarget(attack, props);
+      if (attackSprite) {
+        const { x, y } = this.calculateAttackTarget(attackSprite, props);
 
-        attack.reset(target.x, target.y);
+        attackSprite.reset(x, y);
 
-        state.physics.arcade.collide(attack, knights, null/* collideCallback */, (attack, knight) => {
+        state.physics.arcade.collide(attackSprite, knightGroup, null/* collideCallback */, (attack, knight) => {
           dispatch(damageEntity(props.id, knight.name));
           return false; // allows passing through attacks
         });
 
-        state.game.debug.body(attack);
+        setTimeout(() => {
+          attackSprite.kill();
+        }, 100);
 
-        setTimeout(() => { attack.kill(); }, 100);
+        // state.game.debug.body(attack);
       }
     }
   };
 
-  entity.addComponent(new Attack(attacks, onAttackUpdate));
+  entity.addComponent(new Attack(attackGroup, onAttackUpdate));
 
   // TODO: Fix name tag positioning
   // const name = createNameTag(game, props);
@@ -171,18 +168,18 @@ export function createLocalPlayer(state, props) {
 function createRemotePlayer(state, props) {
   const entity = new Entity(props);
 
-  const knights = state.getGroup('knights');
+  const knightGroup = state.getGroup('knights');
 
-  const knight = createSprite(state, knights, props);
+  const knightSprite = createSprite(state, knightGroup, props);
 
   const onSpriteUpdate = function(props, dispatch) {
-    const knight = this.getSprite('knight');
+    const knightSprite = this.getSprite('knight');
 
-    knight.x = props.x;
-    knight.y = props.y;
+    knightSprite.x = props.x;
+    knightSprite.y = props.y;
 
     if (props.animation) {
-      knight.animations.play(props.animation);
+      knightSprite.animations.play(props.animation);
     }
 
     // const name = this.getComponent('text').getText('name');
@@ -193,12 +190,12 @@ function createRemotePlayer(state, props) {
     // state.game.debug.body(knight);
   };
 
-  entity.addComponent(new Sprite({knight}, onSpriteUpdate));
+  entity.addComponent(new Sprite({knight: knightSprite}, onSpriteUpdate));
 
-  const hit = state.add.audio('knight-hit', 0.1);
-  const die = state.add.audio('knight-die', 0.1);
+  const hitSound = state.add.audio('knight-hit', 0.1);
+  const dieSound = state.add.audio('knight-die', 0.1);
 
-  entity.addComponent(new Sound({hit, die}));
+  entity.addComponent(new Sound({hit: hitSound, die: dieSound}));
 
   // const name = createNameTag(game, props);
   // entity.addComponent(new Text({name}));
@@ -215,21 +212,20 @@ function createRemotePlayer(state, props) {
 function createFlag(state, props) {
   const entity = new Entity(props);
 
-  const flags = state.getGroup('flags');
-  const knights = state.getGroup('knights');
+  const flagGroup = state.getGroup('flags');
 
-  const flag = createSprite(state, flags, props);
+  const flagSprite = createSprite(state, flagGroup, props);
 
   const onSpriteUpdate = function(props, dispatch) {
-    const flag = this.getSprite('flag');
+    const flagSprite = this.getSprite('flag');
 
     if (props.color !== this.getProp('color')) {
-      flag.animations.play(props.color);
+      flagSprite.animations.play(props.color);
       this.setProp('color', props.color);
     }
   };
 
-  entity.addComponent(new Sprite({flag: flag}, onSpriteUpdate));
+  entity.addComponent(new Sprite({flag: flagSprite}, onSpriteUpdate));
 
   return entity;
 }

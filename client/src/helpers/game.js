@@ -44,3 +44,14 @@ export function findEntityIndexById(entities, id) {
 export function isEntityMoving(props) {
   return (has(props, 'vx') && props.vx !== 0) && (has(props, 'vy') && props.vy !== 0);
 }
+
+/**
+ *
+ * @param {string} action
+ * @param {string} facing
+ * @returns {string}
+ */
+export function resolveActionAnimation(action, facing) {
+  facing = facing || 'none';
+  return action + facing.charAt(0).toUpperCase() + facing.slice(1);
+}

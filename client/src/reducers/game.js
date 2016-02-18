@@ -1,6 +1,6 @@
 import { Map, fromJS } from 'immutable';
 import { forEach } from 'lodash';
-import { SET_STATE, SET_POSITION, SET_VELOCITY, SET_ANIMATION, CONTEXT_CLIENT } from '../actions/game';
+import { SET_STATE, SET_POSITION, SET_VELOCITY, SET_ANIMATION, PERFORM_ATTACK } from '../actions/game';
 import { findEntityIndexById } from '../helpers/game';
 
 const initialState = Map();
@@ -54,6 +54,18 @@ export function setAnimation(state, id, animation) {
   return state.setIn(['entities', entityIndex, 'animation'], animation);
 }
 
+/**
+ *
+ * @param {Map} state
+ * @param {string} id
+ * @param {boolean} value
+ * @returns {Map}
+ */
+export function setIsAttacking(state, id, value) {
+  const entityIndex = findEntityIndexById(state.get('entities').toJS(), id);
+  return state.setIn(['entities', entityIndex, 'isAttacking'], value);
+}
+
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case SET_STATE:
@@ -67,6 +79,9 @@ const reducer = (state = initialState, action) => {
 
     case SET_ANIMATION:
       return setAnimation(state, action.id, action.animation);
+
+    case PERFORM_ATTACK:
+      return setIsAttacking(state, action.id, true);
 
     default:
       return state;

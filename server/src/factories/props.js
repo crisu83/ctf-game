@@ -19,11 +19,14 @@ function createPlayer(props) {
     width: 96,
     height: 96,
     group: 'knights',
+    maxHealth: 100,
     health: 100,
-    maxHealth: 500,
     damage: 20,
+    runSpeed: 800,
+    attackCooldown: 500,
+    attackRange: 20,
+    reviveDuration: 5000,
     isAlive: true,
-    attackCooldownMsec: 500,
     // TODO: Add logic for picking the color based on the player's team.
     color: chance.pick(['blue', 'green', 'orange', 'purple'])
   };

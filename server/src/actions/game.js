@@ -4,8 +4,8 @@ export const SET_POSITION = 'game/SET_POSITION';
 export const SET_VELOCITY = 'game/SET_VELOCITY';
 export const SET_ANIMATION = 'game/SET_ANIMATION';
 export const SET_FACING = 'game/SET_FACING';
-export const START_ATTACKING = 'game/START_ATTACK';
-export const STOP_ATTACKING = 'game/STOP_ATTACKING';
+export const PERFORM_ATTACK = 'game/PERFORM_ATTACK';
+export const RESET_ATTACK = 'game/RESET_ATTACK';
 export const DAMAGE_ENTITY = 'game/DAMAGE_ENTITY';
 export const KILL_ENTITY = 'game/KILL_ENTITY';
 export const REVIVE_ENTITY = 'game/REVIVE_ENTITY';
@@ -35,8 +35,8 @@ export function removeEntity(id) {
  * @param {string} id
  * @returns {{type: string, id: string}}
  */
-export function stopAttacking(id) {
-  return {type: STOP_ATTACKING, id};
+export function resetAttack(id) {
+  return {type: RESET_ATTACK, id};
 }
 
 /**

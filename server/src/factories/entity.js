@@ -3,7 +3,7 @@ import { logger } from '../helpers';
 import Entity from '../game/entity';
 import Attack from '../game/components/attack';
 import Health from '../game/components/health';
-import { killEntity, reviveEntity, stopAttacking } from '../actions/game';
+import { killEntity, reviveEntity, resetAttack } from '../actions/game';
 
 /**
  *
@@ -23,15 +23,18 @@ function createPlayer(session, props) {
       setTimeout(() => {
         console.log('entity revived', props.id);
         dispatch(reviveEntity(props.id));
-      }, 10000);
+      }, props.reviveDuration);
     }
   };
 
   entity.addComponent(new Health(onHealthUpdate));
 
+  // TODO: Consider moving this logic to the client.
   const onAttackUpdate = function(props, dispatch) {
     if (props.isAttacking) {
-      dispatch(stopAttacking(props.id));
+      setTimeout(() => {
+        dispatch(resetAttack(props.id));
+      }, 100);
     }
   };
 

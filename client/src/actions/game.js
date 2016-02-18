@@ -3,7 +3,7 @@ export const SET_POSITION = 'game/SET_POSITION';
 export const SET_VELOCITY = 'game/SET_VELOCITY';
 export const SET_ANIMATION = 'game/SET_ANIMATION';
 export const SET_FACING = 'game/SET_FACING';
-export const START_ATTACKING = 'game/START_ATTACK';
+export const PERFORM_ATTACK = 'game/PERFORM_ATTACK';
 export const DAMAGE_ENTITY = 'game/DAMAGE_ENTITY';
 export const CAPTURE_FLAG = 'game/CAPTURE_FLAG';
 
@@ -67,8 +67,8 @@ export function setFacing(id, facing) {
  * @param {string} id
  * @returns {{type: string, id: string}}
  */
-export function startAttacking(id) {
-  return {type: START_ATTACKING, id};
+export function performAttack(id) {
+  return {type: PERFORM_ATTACK, id};
 }
 
 /**
