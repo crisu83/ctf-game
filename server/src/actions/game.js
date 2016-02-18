@@ -1,5 +1,7 @@
 export const ADD_ENTITY = 'game/ADD_ENTITY';
 export const REMOVE_ENTITY =  'game/REMOVE_ENTITY';
+export const ASSIGN_TEAM =  'game/ASSIGN_TEAM';
+export const LEAVE_TEAM =  'game/LEAVE_TEAM';
 export const SET_POSITION = 'game/SET_POSITION';
 export const SET_VELOCITY = 'game/SET_VELOCITY';
 export const SET_ANIMATION = 'game/SET_ANIMATION';
@@ -28,6 +30,24 @@ export function addEntity(entity) {
  */
 export function removeEntity(id) {
   return {type: REMOVE_ENTITY, id};
+}
+
+/**
+ *
+ * @param {string} id
+ * @returns {{type: string, id: string}}
+ */
+export function assignTeam(id) {
+  return {type: ASSIGN_TEAM, id};
+}
+
+/**
+ *
+ * @param {string} id
+ * @returns {{type: string, id: string}}
+ */
+export function leaveTeam(id) {
+  return {type: LEAVE_TEAM, id};
 }
 
 /**

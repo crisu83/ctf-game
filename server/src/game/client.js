@@ -1,4 +1,5 @@
 import shortid from 'shortid';
+import { find } from 'lodash';
 import { logger } from '../helpers';
 import { createProps } from '../factories/props';
 import { READY, ACTION, DISCONNECT } from '../events';
@@ -25,13 +26,15 @@ class Client {
    * @param {Session} session
    */
   joinSession(session) {
-    const playerProps = createProps({type: 'player'});
+    let playerProps = createProps({type: 'player'});
 
     session.addPlayer(playerProps);
 
     this._channel = this._socket.join(session.channel);
     this._channel.on(DISCONNECT, this.handleDisconnect.bind(this));
     this._channel.on(ACTION, this.handleAction.bind(this));
+
+    playerProps = find(session.gameState.entities, props => props.id === playerProps.id);
     this._channel.emit(READY, this._id, session.gameData, session.gameState, playerProps);
 
     this._session = session;

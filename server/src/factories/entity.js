@@ -61,6 +61,18 @@ function createFlag(session, props) {
  * @param {Object} props
  * @returns {Entity}
  */
+function createBase(session, props) {
+  const entity = new Entity(props);
+
+  return entity;
+}
+
+/**
+ *
+ * @param {Session} session
+ * @param {Object} props
+ * @returns {Entity}
+ */
 export function createEntity(session, props) {
   switch (props.type) {
     case 'player':
@@ -68,6 +80,9 @@ export function createEntity(session, props) {
 
     case 'flag':
       return createFlag(session, props);
+
+    case 'base':
+      return createBase(session, props);
 
     default:
       logger.warn(`trying to create entity of unknown type ${props.type}.`);

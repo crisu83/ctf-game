@@ -272,7 +272,6 @@ export function createEntity(state, props) {
       return createFlag(state, props);
 
     default:
-      console.warn(`trying to create unknown entity ${key}`);
       return null;
   }
 }

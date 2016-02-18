@@ -1,6 +1,8 @@
 import shortid from 'shortid';
 import { chance } from '../helpers';
 
+const colors = ['blue', 'green', 'orange', 'purple'];
+
 /**
  *
  * @param {Object} props
@@ -21,15 +23,26 @@ function createPlayer(props) {
     group: 'knights',
     maxHealth: 100,
     health: 100,
-    damage: 20,
+    damage: 100,
     runSpeed: 800,
     attackCooldown: 500,
     attackRange: 20,
     reviveDuration: 5000,
-    isAlive: true,
-    // TODO: Add logic for picking the color based on the player's team.
-    color: chance.pick(['blue', 'green', 'orange', 'purple'])
+    isAlive: true
   };
+}
+
+/**
+ *
+ * @param {Object} props
+ * @returns {Object}
+ */
+function createBase(props) {
+  return {
+    ...props,
+    color: colors.splice(0, 1)[0],
+    players: []
+  }
 }
 
 /**
@@ -58,6 +71,9 @@ export function createProps(props) {
 
     case 'flag':
       return createFlag(props);
+
+    case 'base':
+      return createBase(props);
 
     default:
       return null;

@@ -5,11 +5,13 @@ import { now } from 'lodash';
 import { logger } from '../helpers';
 import createStore from '../store';
 import { SET_STATE } from '../events';
-import { addEntity, removeEntity, advanceTime } from '../actions/game';
+import { addEntity, removeEntity, assignTeam, leaveTeam, advanceTime } from '../actions/game';
 import { createEntity } from '../factories/entity';
 import { createMap } from '../factories/map';
 
 const GAME_TICK_RATE = 30;
+
+// TODO: Separate game logic and generic game session logic into two different classes.
 
 class Session {
   /**
@@ -157,7 +159,7 @@ class Session {
    */
   addPlayer(props) {
     this._store.dispatch(addEntity(props));
-
+    this._store.dispatch(assignTeam(props.id));
   }
 
   /**
@@ -165,6 +167,7 @@ class Session {
    * @param {string} id
    */
   removePlayer(id) {
+    this._store.dispatch(leaveTeam(id));
     this._store.dispatch(removeEntity(id));
   }
 

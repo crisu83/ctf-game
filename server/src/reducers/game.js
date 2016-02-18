@@ -1,9 +1,16 @@
-import { Map, List } from 'immutable';
-import { isNumber } from 'lodash';
-import { findEntityIndexById } from '../helpers/game';
+import { Map, List, fromJS } from 'immutable';
+import { isNumber, forEach } from 'lodash';
+import {
+  findEntityIndexById,
+  findWeakestTeamIndex,
+  findTeamIndexByPlayerId,
+  calculateTeamSpawnPosition
+} from '../helpers/game';
 import {
   ADD_ENTITY,
   REMOVE_ENTITY,
+  ASSIGN_TEAM,
+  LEAVE_TEAM,
   SET_POSITION,
   SET_VELOCITY,
   SET_ANIMATION,
@@ -29,7 +36,7 @@ const initialState = Map({
  * @returns {Map}
  */
 export function addEntity(state, entity) {
-  return state.update('entities', entities => entities.push(Map(entity)));
+  return state.update('entities', entities => entities.push(fromJS(entity)));
 }
 
 /**
@@ -40,6 +47,38 @@ export function addEntity(state, entity) {
  */
 export function removeEntity(state, id) {
   return state.update('entities', entities => entities.filter(entity => entity.get('id') !== id));
+}
+
+// TODO: Write tests for assigning and leaving teams.
+
+/**
+ *
+ * @param {Map} state
+ * @param {string} id
+ * @returns {Map}
+ */
+export function assignTeam(state, id) {
+  const entityIndex = findEntityIndexById(state.get('entities').toJS(), id);
+  const teamIndex = findWeakestTeamIndex(state.get('entities').toJS());
+  const playerProps = state.getIn(['entities', entityIndex]).toJS();
+  const baseProps = state.getIn(['entities', teamIndex]).toJS();
+  const { x, y } = calculateTeamSpawnPosition(playerProps, baseProps);
+  return state.updateIn(['entities', teamIndex, 'players'], players => players.push(id))
+    .setIn(['entities', entityIndex, 'color'], baseProps.color)
+    .setIn(['entities', entityIndex, 'x'], x)
+    .setIn(['entities', entityIndex, 'y'], y);
+}
+
+
+/**
+ *
+ * @param {Map} state
+ * @param {string} id
+ * @returns {Map}
+ */
+export function leaveTeam(state, id) {
+  const teamIndex = findTeamIndexByPlayerId(state.get('entities').toJS(), id);
+  return state.updateIn(['entities', teamIndex, 'players'], players => players.filter(playerId => playerId !== id));
 }
 
 /**
@@ -190,6 +229,12 @@ const reducer = (state = initialState, action) => {
 
     case REMOVE_ENTITY:
       return removeEntity(state, action.id);
+
+    case ASSIGN_TEAM:
+      return assignTeam(state, action.id);
+
+    case LEAVE_TEAM:
+      return leaveTeam(state, action.id);
 
     case SET_POSITION:
       return setPosition(state, action.id, action.x, action.y);

@@ -204,10 +204,15 @@ class GameState extends State {
       // Create the entity if it does not exist.
       if (!entity) {
         entity = createEntity(this, props);
-        this.addEntity(entity);
+
+        if (entity) {
+          this.addEntity(entity);
+        }
       }
 
-      entity.update(props, this._store.dispatch);
+      if (entity) {
+        entity.update(props, this._store.dispatch);
+      }
 
       // Remove updated entities from the list of entities to be removed.
       removedEntityIds = removedEntityIds.filter(id => id !== props.id);
