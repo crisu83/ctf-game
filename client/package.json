@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "webpack --progress --colors --hot --watch",
+    "dist": "webpack",
     "test": "mocha --compilers js:babel-core/register --require ./test/helper.js --recursive",
     "test:watch": "npm run test -- --watch"
   },
