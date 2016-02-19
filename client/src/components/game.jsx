@@ -4,9 +4,9 @@ import { now } from 'lodash';
 import { beginConnection, endConnection, startLoading, stopLoading } from '../actions/client';
 import { setState } from '../actions/game';
 import { createGame } from '../factories/game';
-import Loader from './loader';
+import Status from './status';
 
-const CONNECT_DELAY = 850;
+const LOAD_DELAY = 750;
 
 function mapStateToProps(state) {
   return {
@@ -41,7 +41,6 @@ export class Game extends Component {
   constructor() {
     super();
 
-    this._createdAt = now();
     this._game = null;
 
     this.handleConnect = this.handleConnect.bind(this);
@@ -62,19 +61,18 @@ export class Game extends Component {
   }
 
   handleReady(clientId, gameData, gameState, playerProps) {
+    this.props.onConnect();
+
     console.log('READY (client_id: %s)', clientId, gameData, gameState, playerProps);
 
     // Set the initial game state when the client is ready.
     this.props.onSetState(gameState);
 
-    const delay = CONNECT_DELAY - (now() - this._createdAt);
-
     setTimeout(() => {
       this._game = createGame(this.props.store, this.props.socket, gameData, playerProps);
 
-      this.props.onConnect();
       this.props.onStopLoading();
-    }, delay);
+    }, LOAD_DELAY);
   }
 
   handleDisconnect() {
@@ -84,13 +82,13 @@ export class Game extends Component {
       this._game.destroy();
     }
   }
-
+  
   render() {
     const { isConnected, isLoading } = this.props;
 
     return (
       <div className="game">
-        {!isConnected ? <Loader/> : null}
+        {isLoading ? <Status isConnected={isConnected}/> : null}
         <div id="phaser" style={{display: isConnected && !isLoading ? 'block' : 'none'}}></div>
       </div>
     );

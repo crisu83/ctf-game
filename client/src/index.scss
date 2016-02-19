@@ -31,12 +31,12 @@ body {
     align-self: flex-end;
     max-width: 50%;
   }
+}
 
-  &-status-text {
-    color: #fff;
-    font-size: 18px;
-    font-weight: bold;
-  }
+.status {
+  color: #fff;
+  font-size: 14px;
+  text-align: center;
 }
 
 .loader {

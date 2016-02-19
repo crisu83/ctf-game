@@ -3,6 +3,8 @@ import { find } from 'lodash';
 import { logger } from '../helpers';
 import { createProps } from '../factories/props';
 
+const CONNECT_DELAY = 750;
+
 class Client {
   /**
    * Creates a new game client.
@@ -35,13 +37,15 @@ class Client {
     this._channel.on('disconnect', this.handleDisconnect.bind(this));
     this._channel.on('action', this.handleAction.bind(this));
 
-    playerProps = find(session.gameState.entities, props => props.id === playerProps.id);
-    this._channel.emit('ready', this._id, session.gameData, session.gameState, playerProps);
+    setTimeout(() => {
+      playerProps = find(session.gameState.entities, props => props.id === playerProps.id);
+      this._channel.emit('ready', this._id, session.gameData, session.gameState, playerProps);
 
-    this._session = session;
-    this._playerId = playerProps.id;
+      this._session = session;
+      this._playerId = playerProps.id;
 
-    logger.info(`client.join (client_id: ${this._id}, session_id: ${session.id})`);
+      logger.info(`client.join (client_id: ${this._id}, session_id: ${session.id})`);
+    }, CONNECT_DELAY);
   }
 
   /**
