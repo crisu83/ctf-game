@@ -1,4 +1,3 @@
-import { Box, Body } from 'p2';
 import { logger } from '../helpers';
 import Entity from '../game/entity';
 import Attack from '../game/components/attack';

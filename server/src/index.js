@@ -3,9 +3,7 @@ import path from 'path';
 import socketIo from 'socket.io';
 import GameServer from './game/server';
 
-const SERVER_PORT = 3000;
-
-const webRoot = path.join(__dirname, '/../../client/dist');
+const webRoot = path.join(__dirname, '/../public');
 const app = express();
 
 app.use('/static', express.static(webRoot));
@@ -14,7 +12,7 @@ app.get('/', (req, res) => {
   res.sendFile('index.html', {root: webRoot});
 });
 
-const server = app.listen(SERVER_PORT);
+const server = app.listen(process.env.PORT || 3000);
 const io = socketIo(server);
 const gameServer = new GameServer(io);
 
