@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "webpack --progress --colors --hot --watch",
-    "dist": "webpack",
+    "dist": "rm ../server/public/* && webpack",
     "test": "mocha --compilers js:babel-core/register --require ./test/helper.js --recursive",
     "test:watch": "npm run test -- --watch"
   },
@@ -14,6 +14,7 @@
   "dependencies": {
     "foundation-sites": "^6.1.2",
     "immutable": "^3.7.6",
+    "lodash": "^4.5.0",
     "react": "^0.14.7",
     "react-dom": "^0.14.7",
     "react-redux": "^4.4.0",
@@ -38,7 +39,6 @@
     "react-hot-loader": "^1.3.0",
     "sass-loader": "^3.1.2",
     "scss-loader": "0.0.1",
-    "socket.io-client": "^1.4.5",
     "style-loader": "^0.13.0",
     "url-loader": "^0.5.7",
     "webpack": "^1.12.13",
