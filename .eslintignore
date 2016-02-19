@@ -1,0 +1,4 @@
+client/lib
+client/test
+server/test
+**/*{.,-}min.js
