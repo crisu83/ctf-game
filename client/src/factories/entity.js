@@ -21,6 +21,8 @@ import {
   captureFlag
 } from '../actions/game';
 
+const SOUND_VOLUME = 0.03;
+
 /**
  *
  * @param {Phaser.State} state
@@ -38,7 +40,6 @@ export function createLocalPlayer(state, props) {
 
   const knightSprite = createSprite(state, null, props);
   const graveSprite = createSprite(state, rootGroup, {type: 'grave'});
-
 
   // Add the player to the root group so that it's rendered in the correct order.
   rootGroup.add(knightSprite);
@@ -67,9 +68,7 @@ export function createLocalPlayer(state, props) {
       knightSprite.body.velocity.y = props.vy;
     }
 
-    const animation = props.facing
-      ? resolveActionAnimation(props.isAttacking ? 'attack' : 'run', props.facing)
-      : 'idle';
+    const animation = resolveActionAnimation(props.isAttacking ? 'attack' : 'run', props.facing);
     knightSprite.animations.play(animation);
     dispatch(setAnimation(props.id, animation));
 
@@ -78,8 +77,11 @@ export function createLocalPlayer(state, props) {
     }
 
     if (props.isDead && knightSprite.alive) {
+      const dieSound = this.getComponent('sound').getSound('die');
+
       knightSprite.kill();
       graveSprite.reset(props.x, props.y);
+      dieSound.play('', 0, SOUND_VOLUME);
     } else if (!props.isDead && !knightSprite.alive) {
       graveSprite.kill();
       knightSprite.revive();
@@ -97,27 +99,32 @@ export function createLocalPlayer(state, props) {
 
   const cursorKeys = state.input.keyboard.createCursorKeys();
   const attackKey = state.input.keyboard.addKey(Keyboard.SPACEBAR);
+  const sprintKey = state.input.keyboard.addKey(Keyboard.SHIFT);
 
   const onInputUpdate = function(props, dispatch) {
     const cursorKeys = this.getKey('cursors');
     const attackKey = this.getKey('attack');
+    const sprintKey = this.getKey('sprint');
+
     const attackComponent = this.getComponent('attack');
 
     if (attackKey.isDown && attackComponent.canAttack()) {
       dispatch(performAttack(props.id));
     }
 
+    const velocity = sprintKey.isDown ? props.runSpeed * 1.5 : props.runSpeed;
+
     if (cursorKeys.left.isDown) {
-      dispatch(setVelocity(props.id, -props.runSpeed, 0));
+      dispatch(setVelocity(props.id, -velocity, 0));
       dispatch(setFacing(props.id, 'left'));
     } else if (cursorKeys.right.isDown) {
-      dispatch(setVelocity(props.id, props.runSpeed, 0));
+      dispatch(setVelocity(props.id, velocity, 0));
       dispatch(setFacing(props.id, 'right'));
     } else if (cursorKeys.up.isDown) {
-      dispatch(setVelocity(props.id, 0, -props.runSpeed));
+      dispatch(setVelocity(props.id, 0, -velocity));
       dispatch(setFacing(props.id, 'up'));
     } else if (cursorKeys.down.isDown) {
-      dispatch(setVelocity(props.id, 0, props.runSpeed));
+      dispatch(setVelocity(props.id, 0, velocity));
       dispatch(setFacing(props.id, 'down'));
     } else if (!isEntityMoving(props)) {
       dispatch(setVelocity(props.id, 0, 0));
@@ -125,7 +132,7 @@ export function createLocalPlayer(state, props) {
     }
   };
 
-  entity.addComponent(new Input({cursors: cursorKeys, attack: attackKey}, onInputUpdate));
+  entity.addComponent(new Input({cursors: cursorKeys, attack: attackKey, sprint: sprintKey}, onInputUpdate));
 
   const hitSound = state.add.audio('knight-hit', 0.1);
   const dieSound = state.add.audio('knight-die', 0.1);
@@ -141,9 +148,11 @@ export function createLocalPlayer(state, props) {
       const attackSprite = this.getAttackSprite();
 
       if (attackSprite) {
+        const hitSound = this.getComponent('sound').getSound('hit');
         const { x, y } = this.calculateAttackTarget(attackSprite, props);
 
         attackSprite.reset(x, y);
+        hitSound.play('', 0, SOUND_VOLUME);
 
         state.physics.arcade.collide(attackSprite, knightGroup, null/* collideCallback */, (attack, knight) => {
           dispatch(damageEntity(props.id, knight.name));
