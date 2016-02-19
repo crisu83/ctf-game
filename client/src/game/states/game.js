@@ -111,8 +111,8 @@ class GameState extends State {
    * Loads the tilemap from the game data.
    */
   loadMap() {
-    const map = this.getGameData('map');
-    this.load.tilemap(map.key, null, map.data, Tilemap.TILED_JSON);
+    const mapData = this.getGameData('map');
+    this.load.tilemap(mapData.key, null, mapData.data, Tilemap.TILED_JSON);
   }
 
   /**
@@ -282,8 +282,6 @@ class GameState extends State {
    * @param gameState
    */
   updateTexts(gameState) {
-    const timeNow = now();
-
     if (this.shouldUpdatePing()) {
       this.updateText('ping', {amount: `${this._ping} ms`});
     }

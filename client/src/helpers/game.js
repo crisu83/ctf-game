@@ -53,5 +53,13 @@ export function isEntityMoving(props) {
  */
 export function resolveActionAnimation(action, facing) {
   facing = facing || 'none';
-  return action + facing.charAt(0).toUpperCase() + facing.slice(1);
+
+  // TODO: Refactor this
+  if (action === 'run' && facing === 'none') {
+    return 'idle';
+  } else if (action === 'attack' && facing === 'none') {
+    return 'attackDown';
+  } else {
+    return action + facing.charAt(0).toUpperCase() + facing.slice(1);
+  }
 }

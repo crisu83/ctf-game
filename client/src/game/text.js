@@ -22,6 +22,13 @@ class Text {
     const value = this._string.replace(/\{\w+\}/, key => get(params, key.substring(1, key.length - 1), key));
     this._text.text = value;
   }
+
+  /**
+   * 
+   */
+  destroy() {
+    this._text.destroy();
+  }
 }
 
 export default Text;

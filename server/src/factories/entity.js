@@ -17,7 +17,7 @@ function createPlayer(session, props) {
     if (!props.isDead && props.health <= 0) {
       dispatch(killEntity(props.id));
 
-      // Automatically revive in 10 seconds
+      // Automatically revive
       setTimeout(() => {
         dispatch(reviveEntity(props.id));
       }, props.reviveDuration);
@@ -29,9 +29,7 @@ function createPlayer(session, props) {
   // TODO: Consider moving this logic to the client.
   const onAttackUpdate = function(props, dispatch) {
     if (props.isAttacking) {
-      setTimeout(() => {
-        dispatch(resetAttack(props.id));
-      }, 100);
+      dispatch(resetAttack(props.id));
     }
   };
 
