@@ -14,7 +14,7 @@ function createPlayer(session, props) {
   const entity = new Entity(props);
 
   const onHealthUpdate = function(props, dispatch) {
-    if (props.isAlive && props.health <= 0) {
+    if (!props.isDead && props.health <= 0) {
       dispatch(killEntity(props.id));
 
       // Automatically revive in 10 seconds

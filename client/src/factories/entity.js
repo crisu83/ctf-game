@@ -73,14 +73,13 @@ export function createLocalPlayer(state, props) {
     knightSprite.animations.play(animation);
     dispatch(setAnimation(props.id, animation));
 
-    if (knightSprite.x !== props.x || knightSprite.y !== props.y) {
+    if (!props.isDead && (knightSprite.x !== props.x || knightSprite.y !== props.y)) {
       dispatch(setPosition(props.id, knightSprite.x, knightSprite.y, CONTEXT_SERVER));
     }
 
     if (props.isDead && knightSprite.alive) {
       knightSprite.kill();
-      const { x, y } = props;
-      graveSprite.reset(x, y);
+      graveSprite.reset(props.x, props.y);
     } else if (!props.isDead && !knightSprite.alive) {
       graveSprite.kill();
       knightSprite.revive();
@@ -203,8 +202,7 @@ function createRemotePlayer(state, props) {
 
     if (props.isDead && knightSprite.alive) {
       knightSprite.kill();
-      const { x, y } = props;
-      graveSprite.reset(x, y);
+      graveSprite.reset(props.x, props.y);
     } else if (!props.isDead && !knightSprite.alive) {
       graveSprite.kill();
       knightSprite.revive();
