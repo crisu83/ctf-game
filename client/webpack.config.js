@@ -1,7 +1,7 @@
 var path = require('path');
 var webpack = require('webpack');
-var HtmlWebpackPlugin = require('html-webpack-plugin');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
+var HtmlWebpackPlugin = require('html-webpack-plugin');
 var LiveReloadPlugin = require('webpack-livereload-plugin');
 
 module.exports = {

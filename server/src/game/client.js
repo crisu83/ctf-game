@@ -2,7 +2,6 @@ import shortid from 'shortid';
 import { find } from 'lodash';
 import { logger } from '../helpers';
 import { createProps } from '../factories/props';
-import { READY, ACTION, DISCONNECT } from '../events';
 
 class Client {
   /**
@@ -18,6 +17,8 @@ class Client {
     this._session = null;
     this._playerId = null;
 
+    this._socket.on('latency', this.handleLatency.bind(this));
+
     logger.info(`client.connect (client_id: ${this._id})`);
   }
 
@@ -31,11 +32,11 @@ class Client {
     session.addPlayer(playerProps);
 
     this._channel = this._socket.join(session.channel);
-    this._channel.on(DISCONNECT, this.handleDisconnect.bind(this));
-    this._channel.on(ACTION, this.handleAction.bind(this));
+    this._channel.on('disconnect', this.handleDisconnect.bind(this));
+    this._channel.on('action', this.handleAction.bind(this));
 
     playerProps = find(session.gameState.entities, props => props.id === playerProps.id);
-    this._channel.emit(READY, this._id, session.gameData, session.gameState, playerProps);
+    this._channel.emit('ready', this._id, session.gameData, session.gameState, playerProps);
 
     this._session = session;
     this._playerId = playerProps.id;
@@ -57,6 +58,14 @@ class Client {
 
     this._session.removePlayer(this._playerId);
     this._session = null;
+  }
+
+  /**
+   * Called each time the client pings the server.
+   * @param {number} timestamp
+   */
+  handleLatency(timestamp) {
+    this._socket.emit('latency', timestamp);
   }
 
   /**

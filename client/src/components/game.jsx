@@ -55,7 +55,6 @@ export class Game extends Component {
     this.props.socket.on('connect', this.handleConnect);
     this.props.socket.on('ready', this.handleReady);
     this.props.socket.on('disconnect', this.handleDisconnect);
-    this.props.socket.on('set_state', this.props.onSetState);
   }
 
   handleConnect() {
@@ -71,7 +70,7 @@ export class Game extends Component {
     const delay = CONNECT_DELAY - (now() - this._createdAt);
 
     setTimeout(() => {
-      this._game = createGame(this.props.store, gameData, playerProps, {width: 800, height: 600});
+      this._game = createGame(this.props.store, this.props.socket, gameData, playerProps);
 
       this.props.onConnect();
       this.props.onStopLoading();

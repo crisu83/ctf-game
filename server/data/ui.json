@@ -1,0 +1,19 @@
+{
+  "texts": {
+    "ping": {
+      "text": "ping: {amount}",
+      "x": 10,
+      "y": -70
+    },
+    "packetLoss": {
+      "text": "packet loss: {amount}",
+      "x": 10,
+      "y": -50
+    },
+    "playersOnline": {
+      "text": "players online: {amount}",
+      "x": 10,
+      "y": -30
+    }
+  }
+}

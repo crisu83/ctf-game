@@ -1,18 +1,19 @@
 import Phaser, { Game } from 'phaser';
+import { get } from 'lodash';
 import GameState from '../game/states/game';
 
 /**
  *
  * @param store
+ * @param socket
  * @param {Object} gameData
  * @param {Object} playerProps
- * @param {Object} config
  * @returns {Phaser.Game}
  */
-export function createGame(store, gameData, playerProps, config) {
+export function createGame(store, socket, gameData, playerProps) {
   const game = new Game(
-    config.width,
-    config.height,
+    get(gameData, 'config.gameWidth') || 800,
+    get(gameData, 'config.gameHeight') || 600,
     Phaser.AUTO,
     'phaser',
     null/* state */,
@@ -20,7 +21,7 @@ export function createGame(store, gameData, playerProps, config) {
     false/* antialias */
   );
 
-  game.state.add('game', new GameState(store, gameData, playerProps), true/* auto-start */);
+  game.state.add('game', new GameState(store, socket, gameData, playerProps), true/* auto-start */);
 
   return game;
 }

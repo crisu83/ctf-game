@@ -1,15 +1,14 @@
 import shortid from 'shortid';
-import { forEach, find } from 'lodash';
+import { forEach, find, now } from 'lodash';
 import { toJS } from 'immutable';
-import { now } from 'lodash';
 import { logger } from '../helpers';
 import createStore from '../store';
-import { SET_STATE } from '../events';
 import { addEntity, removeEntity, assignTeam, leaveTeam, advanceTime } from '../actions/game';
 import { createEntity } from '../factories/entity';
 import { createMap } from '../factories/map';
 
 const GAME_TICK_RATE = 30;
+const GAME_SYNC_RATE = 30;
 
 // TODO: Separate game logic and generic game session logic into two different classes.
 
@@ -26,6 +25,8 @@ class Session {
     this._isRunning = false;
     this._lastTickAt = null;
     this._entities = [];
+    this._packetSequence = 0;
+    this._lastSyncAt = null;
 
     // Notify each client every time the state is changed.
     this._unsubscribeFromStore = this._store.subscribe(this.handleStateChange.bind(this));
@@ -41,7 +42,8 @@ class Session {
     return {
       assets: require('../../data/assets.json'),
       config: require('../../data/config.json'),
-      map: createMap('castle', this._store.dispatch)
+      map: createMap('castle', this._store.dispatch),
+      ui: require('../../data/ui.json')
     };
   }
 
@@ -175,8 +177,9 @@ class Session {
    * Called each time the state of this session changes.
    */
   handleStateChange() {
-    if (this._isRunning) {
-      this._io.to(this.channel).emit(SET_STATE, this.gameState);
+    if (this._isRunning && this.shouldSendState()) {
+      this._io.to(this.channel).emit('set_state', this.gameState, this._packetSequence++);
+      this._lastSyncAt = now();
     }
   }
 
@@ -186,6 +189,14 @@ class Session {
    */
   handleClientAction(action) {
     this._store.dispatch(action);
+  }
+
+  /**
+   *
+   * @returns {boolean}
+   */
+  shouldSendState() {
+    return !this._lastSyncAt || now() - this._lastSyncAt > 1000 / GAME_SYNC_RATE;
   }
 
   /**

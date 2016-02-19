@@ -1,3 +1,5 @@
 {
-  "version": "0.1.0"
+  "version": "0.1.0",
+  "gameWidth": 800,
+  "gameHeight": 600
 }

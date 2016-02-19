@@ -1,7 +1,9 @@
-import { forEach, find, get } from 'lodash';
+import { forEach, find, get, now, last } from 'lodash';
 import { Game, State, Physics, Keyboard, Tilemap, Group } from 'phaser';
+import { setState } from '../../actions/game';
 import { createLocalPlayer, createEntity } from '../../factories/entity';
 import Render from '../groups/render';
+import Text from '../text';
 
 const MUSIC_VOLUME = 0.01;
 const TILE_LAYER = 'tilelayer';
@@ -13,13 +15,15 @@ class GameState extends State {
   /**
    * Creates the actual game state.
    * @param store
+   * @param socket
    * @param {Object} gameData
    * @param {Object} playerProps
    */
-  constructor(store, gameData, playerProps) {
+  constructor(store, socket, gameData, playerProps) {
     super();
 
     this._store = store;
+    this._socket = socket;
     this._playerProps = playerProps;
     this._gameData = gameData;
     this._playerEntity = null;
@@ -28,6 +32,14 @@ class GameState extends State {
     this._root = null;
     this._groups = {};
     this._layers = {};
+    this._texts = {};
+    this._numPlayers = 0;
+    this._ping = 0;
+    this._pingSentAt = null;
+    this._packetSequences = [];
+
+    this._socket.on('latency', this.handleLatency.bind(this));
+    this._socket.on('set_state', this.handleSetState.bind(this));
   }
 
   /**
@@ -114,6 +126,7 @@ class GameState extends State {
     this.createMap();
     this.createGroups();
     this.createPlayer();
+    this.createUserInterface();
   }
 
   /**
@@ -165,6 +178,7 @@ class GameState extends State {
     this.addGroup('knights', this.add.group(this._root, 'knights', false, true));
     this.addGroup('flags', this.add.group(this._root, 'flags', false, true));
     this.addGroup('attacks', this.add.group(this._root, 'attacks', false, true));
+    this.addGroup('ui', this.add.group());
   }
 
   /**
@@ -176,6 +190,25 @@ class GameState extends State {
   }
 
   /**
+   * Creates the user interface elements (texts, etc.)
+   */
+  createUserInterface() {
+    const textData = this.getGameData('ui.texts');
+    const config = this.getGameData('config');
+    const uiGroup = this.getGroup('ui');
+
+    const style = {font: "14px Courier", stroke: "#000", strokeThickness: 5, fill: "#fff"};
+
+    forEach(textData, (data, key) => {
+      let x = data.x >= 0 ? data.x : config.gameWidth + data.x;
+      let y = data.y >= 0 ? data.y : config.gameHeight + data.y;
+      let text = this.add.text(x, y, data.text, style, uiGroup);
+      text.fixedToCamera = true;
+      this.addText(key, new Text(text, data.text));
+    })
+  }
+
+  /**
    * Called when the mute button (M) is pressed.
    */
   handleMutePressed() {
@@ -183,12 +216,31 @@ class GameState extends State {
   }
 
   /**
-   * Called when the game is updated to update the logic for the game.
+   *
+   * @param {Object} state
+   * @param {number} sequence
+   */
+  handleSetState(state, sequence) {
+    this._store.dispatch(setState(state));
+    this._packetSequences.push(sequence);
+  }
+
+  /**
+   * Called every time the server pings the client.
+   * @param {number} timestamp
+   */
+  handleLatency(timestamp) {
+    this._ping = now() - timestamp;
+  }
+
+  /**
+   * Called when the game is updated.
    */
   update() {
     const gameState = this.gameState;
 
     this.updateEntities(gameState);
+    this.updateTexts(gameState);
   }
 
   /**
@@ -226,10 +278,64 @@ class GameState extends State {
   }
 
   /**
+   * Updates the user interface texts for the game.
+   * @param gameState
+   */
+  updateTexts(gameState) {
+    const timeNow = now();
+
+    if (this.shouldUpdatePing()) {
+      this.updateText('ping', {amount: `${this._ping} ms`});
+    }
+
+    if (this.shouldUpdatePacketLoss()) {
+      const packetLoss = this.calculatePacketLoss();
+      this.updateText('packetLoss', {amount: `${packetLoss.toFixed(2)}%`});
+    }
+
+    this.updateText('playersOnline', {amount: this._numPlayers});
+  }
+
+  /**
+   * Returns whether or not the 'ping' text should be updated.
+   * @returns {boolean}
+   */
+  shouldUpdatePing() {
+    const timeNow = now();
+    this._socket.emit('latency', timeNow);
+    const result = timeNow - this._pingSentAt > 100;
+    this._pingSentAt = timeNow;
+    return result;
+  }
+
+  /**
+   * Returns whether or not the 'packet loss' text should be updated.
+   * @returns {boolean}
+   */
+  shouldUpdatePacketLoss() {
+    return last(this._packetSequences) % 100 === 0;
+  }
+
+  /**
+   * Calculates the packet loss.
+   * @returns {number}
+   */
+  calculatePacketLoss() {
+    const packetsReceived = this._packetSequences.length;
+    this._packetSequences.length = 0;
+    const packetsLost = 100 - packetsReceived;
+    return packetsLost > 0 ? packetsLost / packetsReceived : 0;
+  }
+
+  /**
    * Adds an entity to the game's entity pool.
    * @param {Entity} entity
    */
   addEntity(entity) {
+    if (entity.getProp('type') === 'player') {
+      this._numPlayers++;
+    }
+    
     this._entities.push(entity);
   }
 
@@ -258,6 +364,10 @@ class GameState extends State {
 
       if (isRemoved) {
         entity.destroy();
+
+        if (entity.getProp('type') === 'player') {
+          this._numPlayers--;
+        }
       }
 
       return !isRemoved;
@@ -307,6 +417,30 @@ class GameState extends State {
    */
   getGroup(key) {
     return this._groups[key];
+  }
+
+  /**
+   * 
+   * @param {string} key
+   * @param {Phaser.Text} text
+   */
+  addText(key, text) {
+    this._texts[key] = text;
+  }
+
+  /**
+   * 
+   * @param {string} key
+   * @param {Object} params
+   */
+  updateText(key, params) {
+    const text = this._texts[key];
+    
+    if (!text) {
+      return;
+    }
+
+    text.update(params);
   }
 
   /**
