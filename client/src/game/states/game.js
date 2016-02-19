@@ -1,3 +1,4 @@
+import { is, Map } from 'immutable';
 import { forEach, find, get, now, last } from 'lodash';
 import { Game, State, Physics, Keyboard, Tilemap, Group } from 'phaser';
 import { setState } from '../../actions/game';
@@ -37,6 +38,7 @@ class GameState extends State {
     this._ping = 0;
     this._pingSentAt = null;
     this._packetSequences = [];
+    this._lastAction = null;
 
     this._socket.on('latency', this.handleLatency.bind(this));
     this._socket.on('set_state', this.handleSetState.bind(this));
@@ -263,7 +265,7 @@ class GameState extends State {
       }
 
       if (entity) {
-        entity.update(props, this._store.dispatch);
+        entity.update(props, this.dispatch.bind(this));
       }
 
       // Remove updated entities from the list of entities to be removed.
@@ -439,6 +441,26 @@ class GameState extends State {
     }
 
     text.update(params);
+  }
+
+  /**
+   * Dispatches an action to the store.
+   * @param {Object} action
+   */
+  dispatch(action) {
+    if (this.shouldDispatchAction(action)) {
+      this._store.dispatch(action);
+      this._lastAction = action;
+    }
+  }
+
+  /**
+   * Returns whether or not an action should be dispatched, i.e. has it changed.
+   * This is necessary to ensure that the server is not flooded with duplicate actions.
+   * @returns {boolean}
+   */
+  shouldDispatchAction(action) {
+    return !this._lastAction || !is(Map(action), Map(this._lastAction));
   }
 
   /**
