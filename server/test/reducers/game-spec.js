@@ -11,7 +11,6 @@ import {
   damageEntity,
   killEntity,
   reviveEntity,
-  setIsAlive,
   captureFlag,
   advanceTime
 } from '../../src/reducers/game';
@@ -82,7 +81,6 @@ describe('game reducer', () => {
           Map({id: '5', name: 'Abe'}),
           Map({id: '6', name: 'Jo', damage: 50}),
           Map({id: '7', name: 'Mary-Ann', health: 100})
-
         ),
         time: Map({
           elapsed: 123
@@ -91,7 +89,7 @@ describe('game reducer', () => {
       const nextState = killEntity(state, '1', false);
       expect(nextState).to.equal(Map({
         entities: List.of(
-          Map({id: '1', name: 'John', x: 100, y: 100, health: 0, isAlive: false}),
+          Map({id: '1', name: 'John', x: 100, y: 100, health: 0, isDead: true}),
           Map({id: '2', name: 'Jane', vx: 100, vy: 0}),
           Map({id: '3', name: 'Alexia'}),
           Map({id: '4', name: 'Juliette', facing: 'down'}),
@@ -113,7 +111,7 @@ describe('game reducer', () => {
           Map({id: '3', name: 'Alexia'}),
           Map({id: '4', name: 'Juliette', facing: 'down'}),
           Map({id: '5', name: 'Abe'}),
-          Map({id: '6', name: 'Jo', health: -20, maxHealth: 100, isAlive: false}),
+          Map({id: '6', name: 'Jo', health: -20, maxHealth: 100, isDead: true}),
           Map({id: '7', name: 'Mary-Ann', health: 100})
 
         ),
@@ -129,7 +127,7 @@ describe('game reducer', () => {
           Map({id: '3', name: 'Alexia'}),
           Map({id: '4', name: 'Juliette', facing: 'down'}),
           Map({id: '5', name: 'Abe'}),
-          Map({id: '6', name: 'Jo', health: 100, maxHealth: 100, isAlive: true}),
+          Map({id: '6', name: 'Jo', health: 100, maxHealth: 100, isDead: false}),
           Map({id: '7', name: 'Mary-Ann', health: 100})
         ),
         time: Map({

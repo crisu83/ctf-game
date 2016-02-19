@@ -164,7 +164,7 @@ export function damageEntity(state, id, victimId) {
  * @returns {Map}
  */
 export function killEntity(state, id) {
-  const nextState = setIsAlive(state, id, false);
+  const nextState = setIsDead(state, id, true);
   const entityIndex = findEntityIndexById(state.get('entities').toJS(), id);
   return nextState.setIn(['entities', entityIndex, 'health'], 0);
 }
@@ -176,7 +176,7 @@ export function killEntity(state, id) {
  * @returns {Map}
  */
 export function reviveEntity(state, id) {
-  const nextState = setIsAlive(state, id, true);
+  const nextState = setIsDead(state, id, false);
   const entityIndex = findEntityIndexById(state.get('entities').toJS(), id);
   return nextState.setIn(['entities', entityIndex, 'health'], nextState.getIn(['entities', entityIndex, 'maxHealth']));
 }
@@ -188,9 +188,9 @@ export function reviveEntity(state, id) {
  * @param {boolean} value
  * @returns {Map}
  */
-export function setIsAlive(state, id, value) {
+export function setIsDead(state, id, value) {
   const entityIndex = findEntityIndexById(state.get('entities').toJS(), id);
-  return state.setIn(['entities', entityIndex, 'isAlive'], value);
+  return state.setIn(['entities', entityIndex, 'isDead'], value);
 }
 
 /**

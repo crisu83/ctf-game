@@ -24,11 +24,10 @@ function createPlayer(props) {
     maxHealth: 100,
     health: 100,
     damage: 100,
-    runSpeed: 800,
+    runSpeed: 500,
     attackCooldown: 500,
     attackRange: 20,
-    reviveDuration: 5000,
-    isAlive: true
+    reviveDuration: 5000
   };
 }
 
