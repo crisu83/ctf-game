@@ -10,9 +10,9 @@
     "start": "NODE_ENV=production npm run build && NODE_ENV=production node dist/index.js",
     "start:dev": "NODE_ENV=development nodemon --exec babel-node -- src/index.js",
     "test": "npm run test:client && npm run test:server",
-    "test:client": "mocha --compilers js:babel-core/register --require test/helper.js --recursive",
+    "test:client": "mocha --compilers js:babel-core/register --require test/index.js --recursive",
     "test:client:watch": "npm run test:client -- --watch",
-    "test:server": "mocha --compilers js:babel-core/register --require test/helper.js --recursive",
+    "test:server": "mocha --compilers js:babel-core/register --require test/index.js --recursive",
     "test:server:watch": "npm run test:server -- --watch"
   },
   "repository": {
