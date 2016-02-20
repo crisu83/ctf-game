@@ -65,6 +65,7 @@
     "style-loader": "^0.13.0",
     "url-loader": "^0.5.7",
     "webpack": "^1.12.13",
+    "webpack-dev-middleware": "^1.5.1",
     "webpack-hot-middleware": "^2.7.1",
     "webpack-livereload-plugin": "^0.5.3",
     "winston": "^2.1.1"
@@ -73,8 +74,7 @@
     "chai": "^3.5.0",
     "chai-immutable": "^1.5.3",
     "mocha": "^2.4.5",
-    "nodemon": "^1.8.1",
-    "webpack-hot-middleware": "^2.7.1"
+    "nodemon": "^1.8.1"
   },
   "babel": {
     "presets": [
