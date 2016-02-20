@@ -24,6 +24,7 @@ Fast-paced hot seat multiplayer game written in modern JavaScript.
 - [Phaser](http://phaser.io/) - Game framework
 - [Lodash](https://lodash.com/) - Utility library
 - [Babel](https://babeljs.io/) - EcmaScript6 transpiler
+- [ESLint](http://eslint.org/) - Linting utility
 - [Webpack](https://webpack.github.io/) - Module bundler
 - [Mocha](https://mochajs.org/) - Testing framework
 - [Chai](http://chaijs.com/) - Assertion library
