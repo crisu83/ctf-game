@@ -16,7 +16,6 @@ const basePlugins = [
     __PRODUCTION__: process.env.NODE_ENV === 'production',
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
   }),
-  // new ExtractTextPlugin('game.css'),
   new HtmlWebpackPlugin({
     inject: 'body',
     template: 'src/client/index.html'
@@ -29,12 +28,12 @@ const devPlugins = [
 ];
 
 const prodPlugins = [
-  new webpack.optimize.OccurenceOrderPlugin(),
-  new webpack.optimize.UglifyJsPlugin({
-    compressor: {
-      warnings: false
-    }
-  })
+  new webpack.optimize.OccurenceOrderPlugin()
+  // new webpack.optimize.UglifyJsPlugin({
+  //   compressor: {
+  //     warnings: false
+  //   }
+  // })
 ];
 
 const plugins = basePlugins
