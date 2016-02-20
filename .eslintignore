@@ -1,4 +1,4 @@
-client/lib
-client/test
-server/test
+dist
+src/client/vendor
+test
 **/*{.,-}min.js
