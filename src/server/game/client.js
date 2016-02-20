@@ -29,7 +29,7 @@ class Client {
    * @param {Session} session
    */
   joinSession(session) {
-    let playerProps = createProps({type: 'player'});
+    let playerProps = createProps({ type: 'player' });
 
     session.addPlayer(playerProps);
 

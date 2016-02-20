@@ -1,8 +1,9 @@
+/*eslint no-shadow: 0*/
+
 import { logger } from '../helpers/vendor';
 import Entity from 'shared/game/entity';
-import Attack from '../game/components/attack';
 import Health from '../game/components/health';
-import { killEntity, reviveEntity, resetAttack } from '../actions/game';
+import { killEntity, reviveEntity } from '../actions/game';
 
 /**
  *
@@ -25,12 +26,6 @@ function createPlayer(session, props) {
   };
 
   entity.addComponent(new Health(onHealthUpdate));
-
-  // const onAttackUpdate = function(props, dispatch) {
-  //
-  // };
-  //
-  // entity.addComponent(new Attack(onAttackUpdate));
 
   return entity;
 }

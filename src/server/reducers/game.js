@@ -26,7 +26,7 @@ import {
 
 const initialState = Map({
   entities: List(),
-  time: Map({elapsed: 0})
+  time: Map({ elapsed: 0 })
 });
 
 /**

@@ -58,7 +58,7 @@ export function findWeakestTeamIndex(entities) {
 }
 
 /**
- * 
+ *
  * @param {Array} entities
  * @param {string} id
  * @returns {number}
@@ -72,7 +72,7 @@ export function findTeamIndexByPlayerId(entities, id) {
         if (playerId === id) {
           result = index;
         }
-      });  
+      });
     }
   });
 
@@ -107,7 +107,7 @@ export function findTeamByColor(entities, color) {
  */
 export function calculateTeamSpawnPosition(playerProps, baseProps) {
   return {
-    x: chance.integer({min: baseProps.x, max: (baseProps.x + baseProps.width) - playerProps.width}),
-    y: chance.integer({min: baseProps.y, max: (baseProps.y + baseProps.height) - playerProps.height})
+    x: chance.integer({ min: baseProps.x, max: (baseProps.x + baseProps.width) - playerProps.width }),
+    y: chance.integer({ min: baseProps.y, max: (baseProps.y + baseProps.height) - playerProps.height })
   };
 }

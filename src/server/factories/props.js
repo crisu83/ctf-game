@@ -41,7 +41,7 @@ function createBase(props) {
     ...props,
     color: colors.splice(0, 1)[0],
     players: []
-  }
+  };
 }
 
 /**
