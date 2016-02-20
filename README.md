@@ -10,9 +10,10 @@ Fast-paced hot seat multiplayer game written in modern JavaScript.
 
 ## Concept in a nutshell
 
-- Players automatically join the weakest of the four teams
-- The idea is to tag flags for your team by running over them and kill enemy players
-- You and your team receive points during the match based on how many flags you have
+- Players automatically join the weakest of the four teams, each team has its own color
+- The idea is to tag flags for your team by running over them while kill enemy players
+- Teams receive points during the match based on how many flags they have tagged
+- When the match ends, the team with the highest score wins!
 
 ## Built with
 
