@@ -6,5 +6,4 @@ node_js:
   - "0.12"
   - "iojs"
 
-before_script: cd client && npm i && cd ../server && npm i && cd ..
-script: cd client && npm test && cd ../server && npm test
+script: npm start

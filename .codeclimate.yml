@@ -22,6 +22,5 @@ ratings:
   - "**.py"
   - "**.rb"
 exclude_paths:
-  - "client/lib"
-  - "client/test"
-  - "server/test"
+  - "src/client/vendor"
+  - "test"

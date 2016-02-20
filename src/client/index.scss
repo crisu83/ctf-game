@@ -1,0 +1,70 @@
+@import "../../node_modules/foundation-sites/scss/foundation";
+
+$body-font-family: Courier;
+
+@include foundation-everything;
+
+body {
+  background: #111;
+}
+
+#root {
+  height: inherit;
+}
+
+.app {
+  height: inherit;
+}
+
+.game {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  height: inherit;
+
+  &:before {
+    align-self: flex-start;
+    max-width: 50%;
+  }
+
+  &:after {
+    align-self: flex-end;
+    max-width: 50%;
+  }
+}
+
+.status {
+  color: #fff;
+  font-size: 14px;
+  text-align: center;
+}
+
+.loader {
+  $loader-color: #888;
+  $background-color: rgba(255, 255, 255, 0.2);
+
+  animation: loader 1.1s infinite linear;
+  border-top: 1.1em solid $background-color;
+  border-right: 1.1em solid $background-color;
+  border-bottom: 1.1em solid $background-color;
+  border-left: 1.1em solid $loader-color;
+  font-size: 10px;
+  margin: 60px auto;
+  position: relative;
+  transform: translateZ(0);
+
+  &, &:after {
+    border-radius: 50%;
+    width: 10em;
+    height: 10em;
+  }
+}
+
+@keyframes loader {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
