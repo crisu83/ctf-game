@@ -17,7 +17,7 @@ export const CONTEXT_SERVER = 'server';
  * @returns {{type: string, newState: Object, context: string}}
  */
 export function setState(newState) {
-  return {type: SET_STATE, newState, context: CONTEXT_CLIENT};
+  return { type: SET_STATE, newState, context: CONTEXT_CLIENT };
 }
 
 /**
@@ -29,7 +29,7 @@ export function setState(newState) {
  * @returns {{type: string, x: number, y: number}}
  */
 export function setPosition(id, x, y, context) {
-  return {type: SET_POSITION, id, x, y, context};
+  return { type: SET_POSITION, id, x, y, context };
 }
 
 /**
@@ -40,7 +40,7 @@ export function setPosition(id, x, y, context) {
  * @returns {{type: string, x: number, y: number}}
  */
 export function setVelocity(id, vx, vy) {
-  return {type: SET_VELOCITY, id, vx, vy};
+  return { type: SET_VELOCITY, id, vx, vy };
 }
 
 /**
@@ -50,7 +50,7 @@ export function setVelocity(id, vx, vy) {
  * @returns {{type: string, animation: string}}
  */
 export function setAnimation(id, animation) {
-  return {type: SET_ANIMATION, id, animation};
+  return { type: SET_ANIMATION, id, animation };
 }
 
 /**
@@ -60,7 +60,7 @@ export function setAnimation(id, animation) {
  * @returns {{type: string, id: string, facing: string}}
  */
 export function setFacing(id, facing) {
-  return {type: SET_FACING, id, facing};
+  return { type: SET_FACING, id, facing };
 }
 
 /**
@@ -69,7 +69,7 @@ export function setFacing(id, facing) {
  * @returns {{type: string, id: string}}
  */
 export function performAttack(id) {
-  return {type: PERFORM_ATTACK, id};
+  return { type: PERFORM_ATTACK, id };
 }
 
 /**
@@ -78,7 +78,7 @@ export function performAttack(id) {
  * @returns {{type: string, id: string}}
  */
 export function resetAttack(id) {
-  return {type: RESET_ATTACK, id};
+  return { type: RESET_ATTACK, id };
 }
 
 /**
@@ -88,7 +88,7 @@ export function resetAttack(id) {
  * @returns {{type: string, id: string, targetId: string}}
  */
 export function damageEntity(id, victimId) {
-  return {type: DAMAGE_ENTITY, id, victimId};
+  return { type: DAMAGE_ENTITY, id, victimId };
 }
 
 /**
@@ -98,5 +98,5 @@ export function damageEntity(id, victimId) {
  * @returns {{type: string, playerId: string, flagId: string, context: string}}
  */
 export function captureFlag(playerId, flagId) {
-  return {type: CAPTURE_FLAG, playerId, flagId, context: CONTEXT_SERVER};
+  return { type: CAPTURE_FLAG, playerId, flagId, context: CONTEXT_SERVER };
 }

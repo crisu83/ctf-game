@@ -1,5 +1,4 @@
 import { Map, fromJS } from 'immutable';
-import { forEach } from 'lodash';
 import { findEntityIndexById } from '../helpers/game';
 import {
   SET_STATE,

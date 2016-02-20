@@ -1,3 +1,5 @@
+/*eslint no-unused-vars: 0*/
+
 import { Map } from 'immutable';
 import { BEGIN_CONNECTION, END_CONNECTION, START_LOADING, STOP_LOADING } from '../actions/client';
 

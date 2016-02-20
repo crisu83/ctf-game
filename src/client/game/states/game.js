@@ -1,6 +1,6 @@
 import { is, Map } from 'immutable';
 import { forEach, find, get, now, last } from 'lodash';
-import { Game, State, Physics, Keyboard, Tilemap, Group } from 'phaser';
+import { State, Physics, Keyboard, Tilemap, Group } from 'phaser';
 import { setState } from '../../actions/game';
 import { createLocalPlayer, createEntity } from '../../factories/entity';
 import Render from '../groups/render';
@@ -199,7 +199,7 @@ class GameState extends State {
     const config = this.getGameData('config');
     const uiGroup = this.getGroup('ui');
 
-    const style = {font: "14px Courier", stroke: "#000", strokeThickness: 5, fill: "#fff"};
+    const style = { font: '14px Courier', stroke: '#000', strokeThickness: 5, fill: '#fff' };
 
     forEach(textData, (data, key) => {
       let x = data.x >= 0 ? data.x : config.gameWidth + data.x;
@@ -207,7 +207,7 @@ class GameState extends State {
       let text = this.add.text(x, y, data.text, style, uiGroup);
       text.fixedToCamera = true;
       this.addText(key, new Text(text, data.text));
-    })
+    });
   }
 
   /**
@@ -253,7 +253,7 @@ class GameState extends State {
     let removedEntityIds = this.getEntityIds();
 
     forEach(gameState.entities, props => {
-      let entity = find(this._entities, entity => entity.id == props.id);
+      let entity = find(this._entities, e => e.id === props.id);
 
       // Create the entity if it does not exist.
       if (!entity) {
@@ -281,19 +281,18 @@ class GameState extends State {
 
   /**
    * Updates the user interface texts for the game.
-   * @param gameState
    */
-  updateTexts(gameState) {
+  updateTexts() {
     if (this.shouldUpdatePing()) {
-      this.updateText('ping', {amount: `${this._ping} ms`});
+      this.updateText('ping', { amount: `${this._ping} ms` });
     }
 
     if (this.shouldUpdatePacketLoss()) {
       const packetLoss = this.calculatePacketLoss();
-      this.updateText('packetLoss', {amount: `${packetLoss.toFixed(2)}%`});
+      this.updateText('packetLoss', { amount: `${packetLoss.toFixed(2)}%` });
     }
 
-    this.updateText('playersOnline', {amount: this._numPlayers});
+    this.updateText('playersOnline', { amount: this._numPlayers });
   }
 
   /**
@@ -335,7 +334,7 @@ class GameState extends State {
     if (entity.getProp('type') === 'player') {
       this._numPlayers++;
     }
-    
+
     this._entities.push(entity);
   }
 
@@ -420,7 +419,7 @@ class GameState extends State {
   }
 
   /**
-   * 
+   *
    * @param {string} key
    * @param {Phaser.Text} text
    */
@@ -429,13 +428,13 @@ class GameState extends State {
   }
 
   /**
-   * 
+   *
    * @param {string} key
    * @param {Object} params
    */
   updateText(key, params) {
     const text = this._texts[key];
-    
+
     if (!text) {
       return;
     }

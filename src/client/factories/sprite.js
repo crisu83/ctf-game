@@ -1,3 +1,5 @@
+/*eslint no-unused-vars: 0*/
+
 const FRAME_RATE = 15;
 
 /**
@@ -17,7 +19,6 @@ function createKnight(state, group, props) {
   sprite.animations.add('runLeft', [4, 5, 6, 7], FRAME_RATE);
   sprite.animations.add('runUp', [8, 9, 10, 11], FRAME_RATE);
   sprite.animations.add('runRight', [12, 13, 14, 15], FRAME_RATE);
-  // TODO: Fix this properly, necessary to prevent double animation.
   sprite.animations.add('attackDown', [16, 17, 18, 19], FRAME_RATE);
   sprite.animations.add('attackLeft', [20, 21, 22, 23], FRAME_RATE);
   sprite.animations.add('attackUp', [24, 25, 26, 27], FRAME_RATE);

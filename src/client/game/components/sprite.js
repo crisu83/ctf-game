@@ -33,5 +33,3 @@ class Sprite extends Component {
 }
 
 export default Sprite;
-
-

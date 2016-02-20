@@ -24,7 +24,7 @@ class Text {
   }
 
   /**
-   * 
+   *
    */
   destroy() {
     this._text.destroy();

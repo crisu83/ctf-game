@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { now } from 'lodash';
 import { beginConnection, endConnection, startLoading, stopLoading } from '../actions/client';
 import { setState } from '../actions/game';
 import { createGame } from '../factories/game';
@@ -34,7 +33,7 @@ function mapDispatchToProps(dispatch) {
     onSetState(state) {
       dispatch(setState(state));
     }
-  }
+  };
 }
 
 export class Game extends Component {
@@ -82,14 +81,14 @@ export class Game extends Component {
       this._game.destroy();
     }
   }
-  
+
   render() {
     const { isConnected, isLoading } = this.props;
 
     return (
       <div className="game">
         {isLoading ? <Status isConnected={isConnected}/> : null}
-        <div id="phaser" style={{display: isConnected && !isLoading ? 'block' : 'none'}}></div>
+        <div id="phaser" style={{ display: isConnected && !isLoading ? 'block' : 'none' }}></div>
       </div>
     );
   }

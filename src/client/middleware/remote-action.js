@@ -1,4 +1,7 @@
-import {CONTEXT_CLIENT, CONTEXT_SERVER} from '../actions/game';
+/*eslint no-unused-vars: 0*/
+/*eslint consistent-return: 0*/
+
+import { CONTEXT_CLIENT, CONTEXT_SERVER } from '../actions/game';
 
 export default function remoteActionMiddleware(socket) {
   return store => next => action => {
@@ -10,5 +13,5 @@ export default function remoteActionMiddleware(socket) {
       socket.emit('action', action);
       return next(action);
     }
-  }
+  };
 }

@@ -8,7 +8,8 @@ class Component {
   constructor(key, priority, onUpdate) {
     this._key = key;
     this._priority = priority;
-    this._onUpdate = onUpdate ? onUpdate.bind(this) : () => {};
+    this._onUpdate = onUpdate ? onUpdate.bind(this) : () => {
+    };
     this._entity = null;
     this._props = {};
   }
@@ -60,7 +61,7 @@ class Component {
    * @param {Entity} entity
    */
   set entity(entity) {
-     this._entity = entity;
+    this._entity = entity;
   }
 
   /**

@@ -1,5 +1,7 @@
-import { Physics, Keyboard } from 'phaser';
-import { has } from 'lodash';
+/*eslint no-shadow: 0*/
+/*eslint no-unused-vars: 0*/
+
+import { Keyboard } from 'phaser';
 import Entity from 'shared/game/entity';
 import Input from '../game/components/input';
 import Sprite from '../game/components/sprite';
@@ -40,7 +42,7 @@ export function createLocalPlayer(state, props) {
   const attackGroup = state.getGroup('attacks');
 
   const knightSprite = createSprite(state, null, props);
-  const graveSprite = createSprite(state, rootGroup, {type: 'grave'});
+  const graveSprite = createSprite(state, rootGroup, { type: 'grave' });
 
   // Add the player to the root group so that it's rendered in the correct order.
   rootGroup.add(knightSprite);
@@ -50,39 +52,39 @@ export function createLocalPlayer(state, props) {
 
   knightSprite.body.collideWorldBounds = true;
 
-  const onSpriteUpdate = function(props, dispatch) {
+  const onSpriteUpdate = function(updateProps, dispatch) {
     const knightSprite = this.getSprite('knight');
     const graveSprite = this.getSprite('grave');
 
     state.physics.arcade.collide(knightSprite, wallLayer);
 
     state.physics.arcade.collide(knightSprite, flagGroup, null/* collideCallback */, (knight, flag) => {
-      dispatch(captureFlag(props.id, flag.name));
+      dispatch(captureFlag(updateProps.id, flag.name));
       return false; // allows passing through flags
     }/* processCallback */);
 
     knightSprite.body.velocity.set(0);
 
-    if (props.vx) {
-      knightSprite.body.velocity.x = props.vx;
-    } else if (props.vy) {
-      knightSprite.body.velocity.y = props.vy;
+    if (updateProps.vx) {
+      knightSprite.body.velocity.x = updateProps.vx;
+    } else if (updateProps.vy) {
+      knightSprite.body.velocity.y = updateProps.vy;
     }
 
-    const animation = resolveActionAnimation(props.isAttacking ? 'attack' : 'run', props.facing);
+    const animation = resolveActionAnimation(updateProps.isAttacking ? 'attack' : 'run', updateProps.facing);
     knightSprite.animations.play(animation, 15);
-    dispatch(setAnimation(props.id, animation));
+    dispatch(setAnimation(updateProps.id, animation));
 
-    if (!props.isDead && (knightSprite.x !== props.x || knightSprite.y !== props.y)) {
-      dispatch(setPosition(props.id, knightSprite.x, knightSprite.y, CONTEXT_SERVER));
+    if (!updateProps.isDead && (knightSprite.x !== updateProps.x || knightSprite.y !== updateProps.y)) {
+      dispatch(setPosition(updateProps.id, knightSprite.x, knightSprite.y, CONTEXT_SERVER));
     }
 
-    if (props.isDead && knightSprite.alive) {
+    if (updateProps.isDead && knightSprite.alive) {
       const dieSound = this.getComponent('sound').getSound('die');
       knightSprite.kill();
-      graveSprite.reset(props.x, props.y);
+      graveSprite.reset(updateProps.x, updateProps.y);
       dieSound.play();
-    } else if (!props.isDead && !knightSprite.alive) {
+    } else if (!updateProps.isDead && !knightSprite.alive) {
       graveSprite.kill();
       knightSprite.revive();
     }
@@ -92,10 +94,10 @@ export function createLocalPlayer(state, props) {
     // nameText.x = knightSprite.x + (knightSprite.width / 2);
     // nameText.y = knightSprite.y;
 
-    // state.game.debug.body(knight);
+    // state.game.debug.body(knightSprite);
   };
 
-  entity.addComponent(new Sprite({knight: knightSprite, grave: graveSprite}, onSpriteUpdate));
+  entity.addComponent(new Sprite({ knight: knightSprite, grave: graveSprite }, onSpriteUpdate));
 
   const cursorKeys = state.input.keyboard.createCursorKeys();
   const attackKey = state.input.keyboard.addKey(Keyboard.SPACEBAR);
@@ -136,15 +138,15 @@ export function createLocalPlayer(state, props) {
     }
   };
 
-  entity.addComponent(new Input({cursors: cursorKeys, attack: attackKey, sprint: sprintKey}, onInputUpdate));
+  entity.addComponent(new Input({ cursors: cursorKeys, attack: attackKey, sprint: sprintKey }, onInputUpdate));
 
   const hitSound = state.add.audio('knight-hit', SOUND_VOLUME);
   const dieSound = state.add.audio('knight-die', SOUND_VOLUME);
 
-  entity.addComponent(new Sound({hit: hitSound, die: dieSound}));
+  entity.addComponent(new Sound({ hit: hitSound, die: dieSound }));
 
-  for(let i = 0; i < 20; i++) {
-    createSprite(state, attackGroup, {type: 'attack'});
+  for (let i = 0; i < 20; i++) {
+    createSprite(state, attackGroup, { type: 'attack' });
   }
 
   const onAttackUpdate = function(props, dispatch) {
@@ -174,8 +176,8 @@ export function createLocalPlayer(state, props) {
 
   entity.addComponent(new Attack(attackGroup, onAttackUpdate));
 
-  const onHealthUpdate = function(props, dispatch) {
-    
+  const onHealthUpdate = function(props) {
+
   };
 
   entity.addComponent(new Health(onHealthUpdate));
@@ -200,9 +202,9 @@ function createRemotePlayer(state, props) {
   const knightGroup = state.getGroup('knights');
 
   const knightSprite = createSprite(state, knightGroup, props);
-  const graveSprite = createSprite(state, rootGroup, {type: 'grave'});
+  const graveSprite = createSprite(state, rootGroup, { type: 'grave' });
 
-  const onSpriteUpdate = function(props, dispatch) {
+  const onSpriteUpdate = function(props) {
     const knightSprite = this.getSprite('knight');
     const graveSprite = this.getSprite('grave');
 
@@ -231,15 +233,15 @@ function createRemotePlayer(state, props) {
     // state.game.debug.body(knight);
   };
 
-  entity.addComponent(new Sprite({knight: knightSprite, grave: graveSprite}, onSpriteUpdate));
+  entity.addComponent(new Sprite({ knight: knightSprite, grave: graveSprite }, onSpriteUpdate));
 
   const hitSound = state.add.audio('knight-hit', SOUND_VOLUME);
   const dieSound = state.add.audio('knight-die', SOUND_VOLUME);
 
-  entity.addComponent(new Sound({hit: hitSound, die: dieSound}));
+  entity.addComponent(new Sound({ hit: hitSound, die: dieSound }));
 
   const nameText = createNameTag(state, props);
-  entity.addComponent(new Text({name: nameText}));
+  entity.addComponent(new Text({ name: nameText }));
 
   return entity;
 }
@@ -257,7 +259,7 @@ function createFlag(state, props) {
 
   const flagSprite = createSprite(state, flagGroup, props);
 
-  const onSpriteUpdate = function(props, dispatch) {
+  const onSpriteUpdate = function(props) {
     const flagSprite = this.getSprite('flag');
 
     if (props.color !== this.getProp('color')) {
@@ -266,7 +268,7 @@ function createFlag(state, props) {
     }
   };
 
-  entity.addComponent(new Sprite({flag: flagSprite}, onSpriteUpdate));
+  entity.addComponent(new Sprite({ flag: flagSprite }, onSpriteUpdate));
 
   return entity;
 }
