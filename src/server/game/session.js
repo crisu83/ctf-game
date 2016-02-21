@@ -172,6 +172,14 @@ class Session {
   }
 
   /**
+   * Called by clients to dispatch actions received from the browser.
+   * @param {Object} action
+   */
+  handleClientAction(action) {
+    this._store.dispatch(action);
+  }
+
+  /**
    * Called each time the state of this session changes.
    */
   handleStateChange() {
@@ -182,19 +190,11 @@ class Session {
   }
 
   /**
-   * Called by clients to dispatch actions received from the browser.
-   * @param {Object} action
-   */
-  handleClientAction(action) {
-    this._store.dispatch(action);
-  }
-
-  /**
    *
    * @returns {boolean}
    */
   shouldSendState() {
-    return !this._lastSyncAt || now() - this._lastSyncAt > 1000 / GAME_SYNC_RATE;
+    return !this._lastSyncAt || (now() - this._lastSyncAt) > (1000 / GAME_SYNC_RATE);
   }
 
   /**
