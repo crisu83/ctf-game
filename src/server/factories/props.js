@@ -1,6 +1,8 @@
 import shortid from 'shortid';
 import { chance } from '../helpers/vendor';
 
+// TODO: Move as much of this as possible to an entities.json file.
+
 const colors = ['blue', 'green', 'orange', 'purple'];
 
 /**
@@ -21,7 +23,6 @@ function createPlayer(props) {
     width: 96,
     height: 96,
     group: 'knights',
-    maxHealth: 100,
     health: 100,
     damage: 100,
     runSpeed: 500,

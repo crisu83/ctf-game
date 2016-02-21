@@ -53,10 +53,11 @@ export function leaveTeam(id) {
 /**
  *
  * @param {string} id
- * @returns {{type: string, id: string}}
+ * @param {string} lastAttackerId
+ * @returns {{type: string, id: string, lastAttackerId: string}}
  */
-export function killEntity(id) {
-  return { type: KILL_ENTITY, id };
+export function killEntity(id, lastAttackerId) {
+  return { type: KILL_ENTITY, id, lastAttackerId };
 }
 
 /**

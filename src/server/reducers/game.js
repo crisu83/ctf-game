@@ -158,19 +158,25 @@ export function damageEntity(state, id, victimId) {
     return state;
   }
   const damage = state.getIn(['entities', attackerIndex, 'damage']);
-  return state.updateIn(['entities', victimIndex, 'health'], health => health - damage);
+  const health = state.getIn(['entities', victimIndex, 'health']);
+  return state.updateIn(['entities', victimIndex, 'currentHealth'], health, value => value - damage)
+    .setIn(['entities', victimIndex, 'lastAttackerId'], id);
 }
 
 /**
  *
  * @param {Map} state
  * @param {string} id
+ * @param {string} lastAttackerId
  * @returns {Map}
  */
-export function killEntity(state, id) {
+export function killEntity(state, id, lastAttackerId) {
   const entityIndex = findEntityIndexById(state.get('entities').toJS(), id);
+  const attackerIndex = findEntityIndexById(state.get('entities').toJS(), lastAttackerId);
   return setIsDead(state, id, true)
-    .setIn(['entities', entityIndex, 'health'], 0);
+    .setIn(['entities', entityIndex, 'currentHealth'], 0)
+    .updateIn(['entities', attackerIndex, 'numKills'], 0, value => value + 1)
+    .updateIn(['entities', entityIndex, 'numDeaths'], 0, value => value + 1);
 }
 
 /**
@@ -184,9 +190,10 @@ export function reviveEntity(state, id) {
   const playerProps = findEntityById(state.get('entities').toJS(), id);
   const baseProps = findEntityById(state.get('entities').toJS(), playerProps.team);
   const { x, y } = calculateBaseSpawnPosition(playerProps, baseProps);
-  const maxHealth = state.getIn(['entities', playerIndex, 'maxHealth']);
+  const health = state.getIn(['entities', playerIndex, 'health']);
   return setPosition(setIsDead(state, id, false), id, x, y)
-    .setIn(['entities', playerIndex, 'health'], maxHealth);
+    .setIn(['entities', playerIndex, 'currentHealth'], health)
+    .removeIn(['entities', playerIndex, 'lastAttackerId']);
 }
 
 /**
@@ -271,7 +278,7 @@ const reducer = (state = initialState, action) => {
       return damageEntity(state, action.id, action.victimId);
 
     case KILL_ENTITY:
-      return killEntity(state, action.id);
+      return killEntity(state, action.id, action.lastAttackerId);
 
     case REVIVE_ENTITY:
       return reviveEntity(state, action.id);
