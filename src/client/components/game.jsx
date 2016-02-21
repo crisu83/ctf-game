@@ -69,6 +69,10 @@ export class Game extends Component {
     this.props.onSetState(gameState);
 
     setTimeout(() => {
+      if (this._game) {
+        this._game.destroy();
+      }
+
       this._game = createGame(this.props.store, this.props.socket, gameData, playerProps);
 
       this.props.onStopLoading();
@@ -78,9 +82,8 @@ export class Game extends Component {
   handleDisconnect() {
     console.log('DISCONNECTED');
 
-    if (this._game) {
-      this._game.destroy();
-    }
+    this.props.onStartLoading();
+    this.props.onDisconnect();
   }
 
   render() {
