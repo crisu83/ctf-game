@@ -44,6 +44,10 @@ body {
   color: #fff;
   font-size: 14px;
   text-align: center;
+
+  &-tip {
+    color: $dark-gray;
+  }
 }
 
 .loader {

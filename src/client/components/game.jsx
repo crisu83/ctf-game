@@ -95,12 +95,11 @@ export class Game extends Component {
         <Visibility className="game-container" isVisible={isConnected && !isLoading}>
           <div id="phaser"></div>
           <div className="game-instructions">
-            How to play:
+            HOW TO PLAY:
             <ul>
               <li>Use ARROW keys to move, SHIFT to sprint and SPACE to attack</li>
               <li>Tag flags for your team by running over them while killing enemy players</li>
-              <li>Your team receive points based on how many flags you have tagged</li>
-              <li>When the match ends, the team with the highest score wins!</li>
+              <li>You receive points based on how many flags are tagged for your team</li>
             </ul>
           </div>
         </Visibility>
