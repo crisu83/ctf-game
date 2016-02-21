@@ -1,5 +1,5 @@
 import { Map, List, fromJS } from 'immutable';
-import { isNumber, forEach } from 'lodash';
+import { isNumber } from 'lodash';
 import {
   findEntityIndexById,
   findWeakestTeamIndex,
@@ -69,7 +69,6 @@ export function assignTeam(state, id) {
     .setIn(['entities', entityIndex, 'y'], y);
 }
 
-
 /**
  *
  * @param {Map} state
@@ -93,7 +92,6 @@ export function setPosition(state, id, x, y) {
   const entityIndex = findEntityIndexById(state.get('entities').toJS(), id);
   return state.setIn(['entities', entityIndex, 'x'], x).setIn(['entities', entityIndex, 'y'], y);
 }
-
 
 /**
  *
@@ -153,6 +151,9 @@ export function setIsAttacking(state, id, value) {
 export function damageEntity(state, id, victimId) {
   const attackerIndex = findEntityIndexById(state.get('entities').toJS(), id);
   const victimIndex = findEntityIndexById(state.get('entities').toJS(), victimId);
+  if (state.getIn('entities', attackerIndex, 'color') === state.getIn('entities', victimIndex, 'color')) {
+    return state;
+  }
   const damage = state.getIn(['entities', attackerIndex, 'damage']);
   return state.updateIn(['entities', victimIndex, 'health'], health => health - damage);
 }

@@ -1,6 +1,7 @@
-/*eslint no-shadow: 0*/
 /*eslint no-unused-vars: 0*/
+/*eslint no-shadow: 0*/
 
+import { get, now } from 'lodash';
 import { Keyboard } from 'phaser';
 import Entity from 'shared/game/entity';
 import Input from '../game/components/input';
@@ -53,40 +54,40 @@ export function createLocalPlayer(state, props) {
   knightSprite.body.collideWorldBounds = true;
 
   const onSpriteUpdate = function(updateProps, dispatch) {
-    const knightSprite = this.getSprite('knight');
-    const graveSprite = this.getSprite('grave');
+    const knight = this.getSprite('knight');
+    const grave = this.getSprite('grave');
 
-    state.physics.arcade.collide(knightSprite, wallLayer);
+    state.physics.arcade.collide(knight, wallLayer);
 
-    state.physics.arcade.collide(knightSprite, flagGroup, null/* collideCallback */, (knight, flag) => {
+    state.physics.arcade.collide(knight, flagGroup, null/* collideCallback */, (knight, flag) => {
       dispatch(captureFlag(updateProps.id, flag.name));
       return false; // allows passing through flags
     }/* processCallback */);
 
-    knightSprite.body.velocity.set(0);
+    knight.body.velocity.set(0);
 
     if (updateProps.vx) {
-      knightSprite.body.velocity.x = updateProps.vx;
+      knight.body.velocity.x = updateProps.vx;
     } else if (updateProps.vy) {
-      knightSprite.body.velocity.y = updateProps.vy;
+      knight.body.velocity.y = updateProps.vy;
     }
 
     const animation = resolveActionAnimation(updateProps.isAttacking ? 'attack' : 'run', updateProps.facing);
-    knightSprite.animations.play(animation, 15);
+    knight.animations.play(animation, 15);
     dispatch(setAnimation(updateProps.id, animation));
 
-    if (!updateProps.isDead && (knightSprite.x !== updateProps.x || knightSprite.y !== updateProps.y)) {
-      dispatch(setPosition(updateProps.id, knightSprite.x, knightSprite.y, CONTEXT_SERVER));
+    if (!updateProps.isDead && (knight.x !== updateProps.x || knight.y !== updateProps.y)) {
+      dispatch(setPosition(updateProps.id, knight.x, knight.y, CONTEXT_SERVER));
     }
 
-    if (updateProps.isDead && knightSprite.alive) {
+    if (updateProps.isDead && knight.alive) {
       const dieSound = this.getComponent('sound').getSound('die');
-      knightSprite.kill();
-      graveSprite.reset(updateProps.x, updateProps.y);
+      knight.kill();
+      grave.reset(updateProps.x, updateProps.y);
       dieSound.play();
-    } else if (!updateProps.isDead && !knightSprite.alive) {
-      graveSprite.kill();
-      knightSprite.revive();
+    } else if (!updateProps.isDead && !knight.alive) {
+      grave.kill();
+      knight.revive();
     }
 
     // const nameText = this.getComponent('text').getText('name');
@@ -103,38 +104,39 @@ export function createLocalPlayer(state, props) {
   const attackKey = state.input.keyboard.addKey(Keyboard.SPACEBAR);
   const sprintKey = state.input.keyboard.addKey(Keyboard.SHIFT);
 
-  const onInputUpdate = function(props, dispatch) {
-    const cursorKeys = this.getKey('cursors');
-    const attackKey = this.getKey('attack');
-    const sprintKey = this.getKey('sprint');
+  const onInputUpdate = function(updateProps, dispatch) {
+    const cursors = this.getKey('cursors');
+    const attack = this.getKey('attack');
+    const sprint = this.getKey('sprint');
 
     const attackComponent = this.getComponent('attack');
 
-    if (attackKey.isDown && attackComponent.canAttack()) {
-      dispatch(performAttack(props.id));
+    if (attack.isDown && attackComponent.canAttack()) {
+      dispatch(performAttack(updateProps.id));
 
+      // TODO: Figure out a better way to reset the isAttacking property.
       setTimeout(() => {
-        dispatch(resetAttack(props.id));
+        dispatch(resetAttack(updateProps.id));
       }, 100);
     }
 
-    const velocity = sprintKey.isDown ? props.runSpeed * 1.5 : props.runSpeed;
+    const velocity = sprint.isDown ? updateProps.runSpeed * 1.5 : updateProps.runSpeed;
 
-    if (cursorKeys.left.isDown) {
-      dispatch(setVelocity(props.id, -velocity, 0));
-      dispatch(setFacing(props.id, 'left'));
-    } else if (cursorKeys.right.isDown) {
-      dispatch(setVelocity(props.id, velocity, 0));
-      dispatch(setFacing(props.id, 'right'));
-    } else if (cursorKeys.up.isDown) {
-      dispatch(setVelocity(props.id, 0, -velocity));
-      dispatch(setFacing(props.id, 'up'));
-    } else if (cursorKeys.down.isDown) {
-      dispatch(setVelocity(props.id, 0, velocity));
-      dispatch(setFacing(props.id, 'down'));
-    } else if (!isEntityMoving(props)) {
-      dispatch(setVelocity(props.id, 0, 0));
-      dispatch(setFacing(props.id, null));
+    if (cursors.left.isDown) {
+      dispatch(setVelocity(updateProps.id, -velocity, 0));
+      dispatch(setFacing(updateProps.id, 'left'));
+    } else if (cursors.right.isDown) {
+      dispatch(setVelocity(updateProps.id, velocity, 0));
+      dispatch(setFacing(updateProps.id, 'right'));
+    } else if (cursors.up.isDown) {
+      dispatch(setVelocity(updateProps.id, 0, -velocity));
+      dispatch(setFacing(updateProps.id, 'up'));
+    } else if (cursors.down.isDown) {
+      dispatch(setVelocity(updateProps.id, 0, velocity));
+      dispatch(setFacing(updateProps.id, 'down'));
+    } else if (!isEntityMoving(updateProps)) {
+      dispatch(setVelocity(updateProps.id, 0, 0));
+      dispatch(setFacing(updateProps.id, null));
     }
   };
 
@@ -149,24 +151,26 @@ export function createLocalPlayer(state, props) {
     createSprite(state, attackGroup, { type: 'attack' });
   }
 
-  const onAttackUpdate = function(props, dispatch) {
-    if (props.isAttacking && this.canAttack()) {
-      const attackSprite = this.getAttackSprite();
+  const onAttackUpdate = function(updateProps, dispatch) {
+    if (updateProps.isAttacking && this.canAttack()) {
+      const attack = this.getAttackSprite();
 
-      if (attackSprite) {
-        const hitSound = this.getComponent('sound').getSound('hit');
-        const { x, y } = this.calculateAttackTarget(attackSprite, props);
+      if (attack) {
+        const hit = this.getComponent('sound').getSound('hit');
+        const { x, y } = this.calculateAttackTarget(attack, updateProps);
 
-        attackSprite.reset(x, y);
-        hitSound.play();
+        attack.reset(x, y);
+        hit.play();
+        
+        this.performAttack();
 
-        state.physics.arcade.collide(attackSprite, knightGroup, null/* collideCallback */, (attack, knight) => {
-          dispatch(damageEntity(props.id, knight.name));
+        state.physics.arcade.collide(attack, knightGroup, null/* collideCallback */, (attack, knight) => {
+          dispatch(damageEntity(updateProps.id, knight.name));
           return false; // allows passing through attacks
         });
 
         setTimeout(() => {
-          attackSprite.kill();
+          attack.kill();
         }, 100);
 
         // state.game.debug.body(attack);
@@ -204,31 +208,31 @@ function createRemotePlayer(state, props) {
   const knightSprite = createSprite(state, knightGroup, props);
   const graveSprite = createSprite(state, rootGroup, { type: 'grave' });
 
-  const onSpriteUpdate = function(props) {
-    const knightSprite = this.getSprite('knight');
-    const graveSprite = this.getSprite('grave');
+  const onSpriteUpdate = function(updateProps) {
+    const knight = this.getSprite('knight');
+    const grave = this.getSprite('grave');
 
-    knightSprite.x = props.x;
-    knightSprite.y = props.y;
+    knight.x = updateProps.x;
+    knight.y = updateProps.y;
 
-    if (props.animation && props.aniamtion !== knightSprite.animations.currentAnim()) {
-      knightSprite.animations.play(props.animation);
+    if (updateProps.animation && updateProps.aniamtion !== get(knight, 'animations.currentAnim.name')) {
+      knight.animations.play(updateProps.animation);
     }
 
-    if (props.isDead && knightSprite.alive) {
+    if (updateProps.isDead && knight.alive) {
       const dieSound = this.getComponent('sound').getSound('die');
-      knightSprite.kill();
-      graveSprite.reset(props.x, props.y);
+      knight.kill();
+      grave.reset(updateProps.x, updateProps.y);
       dieSound.play();
-    } else if (!props.isDead && !knightSprite.alive) {
-      graveSprite.kill();
-      knightSprite.revive();
+    } else if (!updateProps.isDead && !knight.alive) {
+      grave.kill();
+      knight.revive();
     }
 
-    const nameText = this.getComponent('text').getText('name');
+    const name = this.getComponent('text').getText('name');
 
-    nameText.x = knightSprite.x + (knightSprite.width / 2);
-    nameText.y = knightSprite.y;
+    name.x = knight.x + (knight.width / 2);
+    name.y = knight.y;
 
     // state.game.debug.body(knight);
   };

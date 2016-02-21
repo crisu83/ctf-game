@@ -1,9 +1,13 @@
 /*eslint no-shadow: 0*/
+/*eslint no-unused-vars: 0*/
 
 import { logger } from '../helpers/vendor';
 import Entity from 'shared/game/entity';
 import Health from '../game/components/health';
-import { killEntity, reviveEntity } from '../actions/game';
+import {
+  killEntity,
+  reviveEntity
+} from '../actions/game';
 
 /**
  *
