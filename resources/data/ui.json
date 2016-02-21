@@ -1,9 +1,19 @@
 {
   "texts": {
-    "playerStats": {
-      "text": "kills: {kills} deaths: {deaths}",
+    "playerName": {
+      "text": "{name}",
       "x": 10,
       "y": 10
+    },
+    "playerKills": {
+      "text": "kills: {amount}",
+      "x": 10,
+      "y": 40
+    },
+    "playerDeaths": {
+      "text": "deaths: {amount}",
+      "x": 10,
+      "y": 60
     },
     "ping": {
       "text": "ping: {amount}",

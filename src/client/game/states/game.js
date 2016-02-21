@@ -206,7 +206,7 @@ class GameState extends State {
       let y = data.y >= 0 ? data.y : config.gameHeight + data.y;
       let text = this.add.text(x, y, data.text, style, uiGroup);
       text.fixedToCamera = true;
-      this.addText(key, new Text(text, data.text));
+      this.addText(key, new Text(text, style, data.text));
     });
   }
 
@@ -283,6 +283,16 @@ class GameState extends State {
    * Updates the user interface texts for the game.
    */
   updateTexts() {
+    if (this._playerEntity) {
+      this.updateText(
+        'playerName',
+        { name: this._playerEntity.getProp('name') },
+        { fill: this._playerEntity.getProp('hexColor') }
+      );
+      this.updateText('playerKills', { amount: this._playerEntity.getProp('numKills') || 0 });
+      this.updateText('playerDeaths', { amount: this._playerEntity.getProp('numDeaths') || 0 });
+    }
+
     if (this.shouldUpdatePing()) {
       this.updateText('ping', { amount: `${this._ping} ms` });
     }
@@ -292,11 +302,6 @@ class GameState extends State {
       this.updateText('packetLoss', { amount: `${packetLoss.toFixed(2)}%` });
     }
 
-    this.updateText('playerStats', {
-      kills: this._playerEntity.getProp('numKills') || 0,
-      deaths: this._playerEntity.getProp('numDeaths') || 0
-    });
-    
     this.updateText('playersOnline', { amount: this._numPlayers });
   }
 
@@ -436,15 +441,16 @@ class GameState extends State {
    *
    * @param {string} key
    * @param {Object} params
+   * @param {Object} style
    */
-  updateText(key, params) {
+  updateText(key, params, style) {
     const text = this._texts[key];
 
     if (!text) {
       return;
     }
 
-    text.update(params);
+    text.update(params, style);
   }
 
   /**

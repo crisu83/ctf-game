@@ -47,8 +47,9 @@ export function findWeakestTeamIndex(entities) {
 
   forEach(entities, (entity, index) => {
     if (entity.type === 'base') {
-      if (isUndefined(leastPlayers) || entity.players.length < leastPlayers) {
-        leastPlayers = entity.players.length;
+      let teamSize = entity.players ? entity.players.length : 0;
+      if (isUndefined(leastPlayers) || teamSize < leastPlayers) {
+        leastPlayers = teamSize;
         result = index;
       }
     }

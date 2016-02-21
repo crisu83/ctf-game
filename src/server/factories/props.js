@@ -3,7 +3,12 @@ import { chance } from '../helpers/vendor';
 
 // TODO: Move as much of this as possible to an entities.json file.
 
-const colors = ['blue', 'green', 'orange', 'purple'];
+const teams = [
+  { color: 'blue', hexColor: '#46bce3' },
+  { color: 'green', hexColor: '#86d93d' },
+  { color: 'orange', hexColor: '#fda551' },
+  { color: 'purple', hexColor: '#9c44b5' }
+];
 
 /**
  *
@@ -38,11 +43,13 @@ function createPlayer(props) {
  * @returns {Object}
  */
 function createBase(props) {
+  // TODO: Move this logic somewhere else.
+  const teamProps = teams.splice(0, 1)[0];
+
   return {
     ...props,
-    id: shortid.generate(),
-    color: colors.splice(0, 1)[0],
-    players: []
+    ...teamProps,
+    id: shortid.generate()
   };
 }
 
