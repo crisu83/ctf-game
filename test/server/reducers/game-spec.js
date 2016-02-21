@@ -11,7 +11,7 @@ import {
   damageEntity,
   killEntity,
   reviveEntity,
-  captureFlag,
+  tagFlag,
   advanceTime
 } from '../../../src/server/reducers/game';
 
@@ -335,7 +335,7 @@ describe('game reducer', () => {
           elapsed: 321
         })
       });
-      const nextState = captureFlag(state, '99', '1');
+      const nextState = tagFlag(state, '99', '1');
       expect(nextState).to.equal(Map({
         entities: List.of(
           Map({type: 'player', id: '1', name: 'John', x: 100, y: 100, color: 'blue'}),

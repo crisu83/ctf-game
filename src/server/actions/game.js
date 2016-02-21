@@ -11,7 +11,7 @@ export const END_ATTACK = 'game/END_ATTACK';
 export const DAMAGE_ENTITY = 'game/DAMAGE_ENTITY';
 export const KILL_ENTITY = 'game/KILL_ENTITY';
 export const REVIVE_ENTITY = 'game/REVIVE_ENTITY';
-export const CAPTURE_FLAG = 'game/CAPTURE_FLAG';
+export const TAG_FLAG = 'game/TAG_FLAG';
 export const ADVANCE_TIME = 'game/ADVANCE_TIME';
 
 /**

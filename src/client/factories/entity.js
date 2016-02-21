@@ -22,7 +22,7 @@ import {
   beginAttack,
   endAttack,
   damageEntity,
-  captureFlag
+  tagFlag
 } from '../actions/game';
 
 const SOUND_VOLUME = 0.03;
@@ -99,7 +99,7 @@ export function createLocalPlayer(state, props) {
     state.physics.arcade.collide(knight, wallLayer);
 
     state.physics.arcade.collide(knight, flagGroup, null/* collideCallback */, (knight, flag) => {
-      dispatch(captureFlag(updateProps.id, flag.name));
+      dispatch(tagFlag(updateProps.id, flag.name));
       return false; // allows passing through flags
     }/* processCallback */);
 

@@ -6,7 +6,7 @@ export const SET_FACING = 'game/SET_FACING';
 export const BEGIN_ATTACK = 'game/BEGIN_ATTACK';
 export const END_ATTACK = 'game/END_ATTACK';
 export const DAMAGE_ENTITY = 'game/DAMAGE_ENTITY';
-export const CAPTURE_FLAG = 'game/CAPTURE_FLAG';
+export const TAG_FLAG = 'game/TAG_FLAG';
 
 export const CONTEXT_CLIENT = 'client';
 export const CONTEXT_SERVER = 'server';
@@ -98,6 +98,6 @@ export function damageEntity(id, victimId) {
  * @param {string} flagId
  * @returns {{type: string, playerId: string, flagId: string, context: string}}
  */
-export function captureFlag(playerId, flagId) {
-  return { type: CAPTURE_FLAG, playerId, flagId, context: CONTEXT_SERVER };
+export function tagFlag(playerId, flagId) {
+  return { type: TAG_FLAG, playerId, flagId, context: CONTEXT_SERVER };
 }

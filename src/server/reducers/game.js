@@ -20,7 +20,7 @@ import {
   DAMAGE_ENTITY,
   KILL_ENTITY,
   REVIVE_ENTITY,
-  CAPTURE_FLAG,
+  TAG_FLAG,
   ADVANCE_TIME
 } from '../actions/game';
 
@@ -203,7 +203,7 @@ export function setIsDead(state, id, value) {
  * @param {string} playerId
  * @returns {Map}
  */
-export function captureFlag(state, flagId, playerId) {
+export function tagFlag(state, flagId, playerId) {
   const playerIndex = findEntityIndexById(state.get('entities').toJS(), playerId);
   const flagIndex = findEntityIndexById(state.get('entities').toJS(), flagId);
   const playerColor = state.getIn(['entities', playerIndex, 'color']);
@@ -271,8 +271,8 @@ const reducer = (state = initialState, action) => {
     case REVIVE_ENTITY:
       return reviveEntity(state, action.id);
 
-    case CAPTURE_FLAG:
-      return captureFlag(state, action.flagId, action.playerId);
+    case TAG_FLAG:
+      return tagFlag(state, action.flagId, action.playerId);
 
     case ADVANCE_TIME:
       return advanceTime(state, action.elapsed);
