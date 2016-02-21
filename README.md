@@ -17,6 +17,8 @@ Fast-paced hot seat multiplayer game written in modern JavaScript.
 
 ## Built with
 
+This experiment mixes some of the most popular JavaScript tools.
+
 - [Express](http://expressjs.com/) - Web server
 - [SocketIO](http://socket.io/) - Real-time communication
 - [Redux](http://redux.js.org/) - Predictable state container
@@ -31,6 +33,8 @@ Fast-paced hot seat multiplayer game written in modern JavaScript.
 - [Chai](http://chaijs.com/) - Assertion library
 
 ## Checklist
+
+This is my TODO list and also the road map for this project.
 
 - [x] Game server
 - [x] Game client
@@ -49,3 +53,35 @@ Fast-paced hot seat multiplayer game written in modern JavaScript.
 - [x] Basic physics
 - [ ] Teams and points
 - [ ] Game logic
+
+## Development
+
+Run the following commands to start the development server:
+
+```
+npm install
+npm run start:dev
+```
+
+Alternatively you can run the production server with:
+
+```
+npm start
+```
+
+## Running tests
+
+Run the following command to run the test suite:
+
+```
+npm test
+```
+
+## Contributing
+
+This project is still under active development, so I am not actively looking for contributors. 
+However once the first version is ready and released I will add more details instructions on how you can contribute.
+
+## License
+
+See [LICENSE](LICENSE).
