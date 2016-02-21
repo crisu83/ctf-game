@@ -7,6 +7,7 @@
     "build": "npm run build:client && npm run build:server",
     "build:server": "babel src --ignore src/client --out-dir dist --source-maps --minified",
     "build:client": "webpack -p",
+    "lint": "eslint src",
     "start": "NODE_ENV=production npm run build && NODE_ENV=production node dist/index.js",
     "start:dev": "NODE_ENV=development nodemon --exec babel-node -- src/index.js",
     "test": "npm run test:client && npm run test:server",
