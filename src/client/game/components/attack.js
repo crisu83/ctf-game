@@ -1,7 +1,4 @@
-import { now } from 'lodash';
-import Component from 'shared/game/component';
-
-const DEFAULT_COOLDOWN = 500;
+import Component from 'shared/game/components/attack';
 
 class Attack extends Component {
   /**
@@ -10,10 +7,9 @@ class Attack extends Component {
    * @param {function} onUpdate
    */
   constructor(group, onUpdate) {
-    super('attack', 0, onUpdate);
+    super(onUpdate);
 
     this._group = group;
-    this._attackedAt = null;
   }
 
   /**
@@ -48,21 +44,9 @@ class Attack extends Component {
 
   /**
    *
-   * @returns {boolean}
-   */
-  canAttack() {
-    const cooldown = this.getProp('attackCooldown') || DEFAULT_COOLDOWN;
-
-    return !this._attackedAt || now() - this._attackedAt > cooldown;
-  }
-
-  /**
-   *
    * @returns {Phaser.Sprite}
    */
   getAttackSprite() {
-    this._attackedAt = now();
-
     return this._group.getFirstExists(false);
   }
 }

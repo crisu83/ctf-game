@@ -1,8 +1,8 @@
-import Component from 'shared/game/component';
+import Component from 'shared/game/components/attack';
 
 class Attack extends Component {
   constructor(onUpdate) {
-    super('attack', 0, onUpdate);
+    super(onUpdate);
   }
 }
 
