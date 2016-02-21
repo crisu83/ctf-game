@@ -12,7 +12,7 @@ import Attack from '../game/components/attack';
 import Health from '../game/components/health';
 import { createSprite } from './sprite';
 import { createNameTag } from './text';
-import { isEntityMoving, resolveActionAnimation } from '../helpers/game';
+import { isEntityMoving, resolveActionAnimation, validateSpritePosition } from '../helpers/game';
 import {
   CONTEXT_SERVER,
   setPosition,
@@ -121,10 +121,6 @@ export function createLocalPlayer(state, props) {
       dispatch(setAnimation(updateProps.id, animation, CONTEXT_SERVER));
     }
 
-    if (!updateProps.isDead && (knight.x !== updateProps.x || knight.y !== updateProps.y)) {
-      dispatch(setPosition(updateProps.id, knight.x, knight.y, CONTEXT_SERVER));
-    }
-
     if (updateProps.isDead && knight.alive) {
       const dieSound = this.getComponent('sound').getSound('die');
       knight.kill();
@@ -133,6 +129,15 @@ export function createLocalPlayer(state, props) {
     } else if (!updateProps.isDead && !knight.alive) {
       grave.kill();
       knight.revive();
+    }
+
+    if (!updateProps.isDead && knight.x !== updateProps.x || knight.y !== updateProps.y) {
+      if (validateSpritePosition(knight, updateProps)) {
+        dispatch(setPosition(updateProps.id, knight.x, knight.y, CONTEXT_SERVER));
+      } else {
+        knight.x = updateProps.x;
+        knight.y = updateProps.y;
+      }
     }
 
     // const nameText = this.getComponent('text').getText('name');

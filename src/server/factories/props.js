@@ -39,6 +39,7 @@ function createPlayer(props) {
 function createBase(props) {
   return {
     ...props,
+    id: shortid.generate(),
     color: colors.splice(0, 1)[0],
     players: []
   };

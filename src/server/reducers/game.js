@@ -1,10 +1,11 @@
 import { Map, List, fromJS } from 'immutable';
 import { isNumber } from 'lodash';
 import {
+  findEntityById,
   findEntityIndexById,
   findWeakestTeamIndex,
   findTeamIndexByPlayerId,
-  calculateTeamSpawnPosition
+  calculateBaseSpawnPosition
 } from '../helpers/game';
 import {
   ADD_ENTITY,
@@ -58,15 +59,15 @@ export function removeEntity(state, id) {
  * @returns {Map}
  */
 export function assignTeam(state, id) {
-  const entityIndex = findEntityIndexById(state.get('entities').toJS(), id);
+  const playerIndex = findEntityIndexById(state.get('entities').toJS(), id);
   const teamIndex = findWeakestTeamIndex(state.get('entities').toJS());
-  const playerProps = state.getIn(['entities', entityIndex]).toJS();
+  const playerProps = state.getIn(['entities', playerIndex]).toJS();
   const baseProps = state.getIn(['entities', teamIndex]).toJS();
-  const { x, y } = calculateTeamSpawnPosition(playerProps, baseProps);
-  return state.updateIn(['entities', teamIndex, 'players'], players => players.push(id))
-    .setIn(['entities', entityIndex, 'color'], baseProps.color)
-    .setIn(['entities', entityIndex, 'x'], x)
-    .setIn(['entities', entityIndex, 'y'], y);
+  const { x, y } = calculateBaseSpawnPosition(playerProps, baseProps);
+  return setPosition(state, id, x, y)
+    .updateIn(['entities', teamIndex, 'players'], players => players.push(id))
+    .setIn(['entities', playerIndex, 'team'], baseProps.id)
+    .setIn(['entities', playerIndex, 'color'], baseProps.color);
 }
 
 /**
@@ -167,9 +168,9 @@ export function damageEntity(state, id, victimId) {
  * @returns {Map}
  */
 export function killEntity(state, id) {
-  const nextState = setIsDead(state, id, true);
   const entityIndex = findEntityIndexById(state.get('entities').toJS(), id);
-  return nextState.setIn(['entities', entityIndex, 'health'], 0);
+  return setIsDead(state, id, true)
+    .setIn(['entities', entityIndex, 'health'], 0);
 }
 
 /**
@@ -179,9 +180,13 @@ export function killEntity(state, id) {
  * @returns {Map}
  */
 export function reviveEntity(state, id) {
-  const nextState = setIsDead(state, id, false);
-  const entityIndex = findEntityIndexById(state.get('entities').toJS(), id);
-  return nextState.setIn(['entities', entityIndex, 'health'], nextState.getIn(['entities', entityIndex, 'maxHealth']));
+  const playerIndex = findEntityIndexById(state.get('entities').toJS(), id);
+  const playerProps = findEntityById(state.get('entities').toJS(), id);
+  const baseProps = findEntityById(state.get('entities').toJS(), playerProps.team);
+  const { x, y } = calculateBaseSpawnPosition(playerProps, baseProps);
+  const maxHealth = state.getIn(['entities', playerIndex, 'maxHealth']);
+  return setPosition(setIsDead(state, id, false), id, x, y)
+    .setIn(['entities', playerIndex, 'health'], maxHealth);
 }
 
 /**

@@ -1,5 +1,7 @@
 import { forEach, has } from 'lodash';
 
+const MAX_ALLOWED_MOVEMENT = 100;
+
 /**
  *
  * @param {Array} entities
@@ -62,4 +64,14 @@ export function resolveActionAnimation(action, facing) {
   } else {
     return action + facing.charAt(0).toUpperCase() + facing.slice(1);
   }
+}
+
+/**
+ *
+ * @param {Phaser.Sprite} sprite
+ * @param {Object} props
+ * @returns {boolean}
+ */
+export function validateSpritePosition(sprite, props) {
+  return Math.abs(sprite.x - props.x) < MAX_ALLOWED_MOVEMENT && Math.abs(sprite.y - props.y) < MAX_ALLOWED_MOVEMENT;
 }

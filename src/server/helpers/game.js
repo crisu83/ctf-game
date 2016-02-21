@@ -105,7 +105,7 @@ export function findTeamByColor(entities, color) {
  * @param {Object} baseProps
  * @returns {{x: number, y: number}}
  */
-export function calculateTeamSpawnPosition(playerProps, baseProps) {
+export function calculateBaseSpawnPosition(playerProps, baseProps) {
   return {
     x: chance.integer({ min: baseProps.x, max: (baseProps.x + baseProps.width) - playerProps.width }),
     y: chance.integer({ min: baseProps.y, max: (baseProps.y + baseProps.height) - playerProps.height })
