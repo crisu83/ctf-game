@@ -19,8 +19,8 @@ import {
   setVelocity,
   setAnimation,
   setFacing,
-  performAttack,
-  resetAttack,
+  beginAttack,
+  endAttack,
   damageEntity,
   captureFlag
 } from '../actions/game';
@@ -41,6 +41,45 @@ export function createLocalPlayer(state, props) {
   const knightGroup = state.getGroup('knights');
   const flagGroup = state.getGroup('flags');
   const attackGroup = state.getGroup('attacks');
+
+  const cursorKeys = state.input.keyboard.createCursorKeys();
+  const attackKey = state.input.keyboard.addKey(Keyboard.SPACEBAR);
+  const sprintKey = state.input.keyboard.addKey(Keyboard.SHIFT);
+
+  const onInputUpdate = function(updateProps, dispatch) {
+    const cursors = this.getKey('cursors');
+    const attack = this.getKey('attack');
+    const sprint = this.getKey('sprint');
+
+    const attackComponent = this.getComponent('attack');
+
+    if (attack.isDown && attackComponent.canAttack()) {
+      dispatch(beginAttack(updateProps.id));
+    }
+
+    const velocity = sprint.isDown ? updateProps.runSpeed * 1.5 : updateProps.runSpeed;
+
+    // TODO: Add constants for facing directions to game/actions.
+
+    if (cursors.left.isDown) {
+      dispatch(setVelocity(updateProps.id, -velocity, 0));
+      dispatch(setFacing(updateProps.id, 'left'));
+    } else if (cursors.right.isDown) {
+      dispatch(setVelocity(updateProps.id, velocity, 0));
+      dispatch(setFacing(updateProps.id, 'right'));
+    } else if (cursors.up.isDown) {
+      dispatch(setVelocity(updateProps.id, 0, -velocity));
+      dispatch(setFacing(updateProps.id, 'up'));
+    } else if (cursors.down.isDown) {
+      dispatch(setVelocity(updateProps.id, 0, velocity));
+      dispatch(setFacing(updateProps.id, 'down'));
+    } else if (!isEntityMoving(updateProps)) {
+      dispatch(setVelocity(updateProps.id, 0, 0));
+      dispatch(setFacing(updateProps.id, null));
+    }
+  };
+
+  entity.addComponent(new Input({ cursors: cursorKeys, attack: attackKey, sprint: sprintKey }, onInputUpdate));
 
   const knightSprite = createSprite(state, null, props);
   const graveSprite = createSprite(state, rootGroup, { type: 'grave' });
@@ -72,9 +111,15 @@ export function createLocalPlayer(state, props) {
       knight.body.velocity.y = updateProps.vy;
     }
 
+    // TODO: Clean up code related to determining the current animation.
+
     const animation = resolveActionAnimation(updateProps.isAttacking ? 'attack' : 'run', updateProps.facing);
-    knight.animations.play(animation, 15);
-    dispatch(setAnimation(updateProps.id, animation));
+    const currentAnimation = get(knight, 'animations.currentAnim.name');
+
+    if (animation && animation !== currentAnimation) {
+      knight.animations.play(animation);
+      dispatch(setAnimation(updateProps.id, animation, CONTEXT_SERVER));
+    }
 
     if (!updateProps.isDead && (knight.x !== updateProps.x || knight.y !== updateProps.y)) {
       dispatch(setPosition(updateProps.id, knight.x, knight.y, CONTEXT_SERVER));
@@ -100,48 +145,6 @@ export function createLocalPlayer(state, props) {
 
   entity.addComponent(new Sprite({ knight: knightSprite, grave: graveSprite }, onSpriteUpdate));
 
-  const cursorKeys = state.input.keyboard.createCursorKeys();
-  const attackKey = state.input.keyboard.addKey(Keyboard.SPACEBAR);
-  const sprintKey = state.input.keyboard.addKey(Keyboard.SHIFT);
-
-  const onInputUpdate = function(updateProps, dispatch) {
-    const cursors = this.getKey('cursors');
-    const attack = this.getKey('attack');
-    const sprint = this.getKey('sprint');
-
-    const attackComponent = this.getComponent('attack');
-
-    if (attack.isDown && attackComponent.canAttack()) {
-      dispatch(performAttack(updateProps.id));
-
-      // TODO: Figure out a better way to reset the isAttacking property.
-      setTimeout(() => {
-        dispatch(resetAttack(updateProps.id));
-      }, 100);
-    }
-
-    const velocity = sprint.isDown ? updateProps.runSpeed * 1.5 : updateProps.runSpeed;
-
-    if (cursors.left.isDown) {
-      dispatch(setVelocity(updateProps.id, -velocity, 0));
-      dispatch(setFacing(updateProps.id, 'left'));
-    } else if (cursors.right.isDown) {
-      dispatch(setVelocity(updateProps.id, velocity, 0));
-      dispatch(setFacing(updateProps.id, 'right'));
-    } else if (cursors.up.isDown) {
-      dispatch(setVelocity(updateProps.id, 0, -velocity));
-      dispatch(setFacing(updateProps.id, 'up'));
-    } else if (cursors.down.isDown) {
-      dispatch(setVelocity(updateProps.id, 0, velocity));
-      dispatch(setFacing(updateProps.id, 'down'));
-    } else if (!isEntityMoving(updateProps)) {
-      dispatch(setVelocity(updateProps.id, 0, 0));
-      dispatch(setFacing(updateProps.id, null));
-    }
-  };
-
-  entity.addComponent(new Input({ cursors: cursorKeys, attack: attackKey, sprint: sprintKey }, onInputUpdate));
-
   const hitSound = state.add.audio('knight-hit', SOUND_VOLUME);
   const dieSound = state.add.audio('knight-die', SOUND_VOLUME);
 
@@ -162,15 +165,17 @@ export function createLocalPlayer(state, props) {
         attack.reset(x, y);
         hit.play();
         
-        this.performAttack();
-
         state.physics.arcade.collide(attack, knightGroup, null/* collideCallback */, (attack, knight) => {
           dispatch(damageEntity(updateProps.id, knight.name));
           return false; // allows passing through attacks
         });
 
+        attack.kill();
+        
+        this.performAttack();
+
         setTimeout(() => {
-          attack.kill();
+          dispatch(endAttack(updateProps.id));
         }, 100);
 
         // state.game.debug.body(attack);
@@ -215,7 +220,11 @@ function createRemotePlayer(state, props) {
     knight.x = updateProps.x;
     knight.y = updateProps.y;
 
-    if (updateProps.animation && updateProps.aniamtion !== get(knight, 'animations.currentAnim.name')) {
+    const currentAnimation = get(knight, 'animations.currentAnim.name');
+
+    // TODO: Ensure that this works as intended.
+
+    if (updateProps.animation && updateProps.animation !== currentAnimation) {
       knight.animations.play(updateProps.animation);
     }
 
@@ -263,12 +272,11 @@ function createFlag(state, props) {
 
   const flagSprite = createSprite(state, flagGroup, props);
 
-  const onSpriteUpdate = function(props) {
-    const flagSprite = this.getSprite('flag');
+  const onSpriteUpdate = function(updateProps) {
+    const flag = this.getSprite('flag');
 
-    if (props.color !== this.getProp('color')) {
-      flagSprite.animations.play(props.color);
-      this.setProp('color', props.color);
+    if (updateProps.color !== this.getProp('color')) {
+      flag.animations.play(updateProps.color);
     }
   };
 

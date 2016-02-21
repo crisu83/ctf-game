@@ -34,11 +34,10 @@ class Attack extends Component {
       case 'up':
         return { x, y: y - attackRange };
 
+      // NOTE: Attack direction is down when standing still.
       case 'down':
-        return { x, y: y + attackRange };
-
       default:
-        return { x, y };
+        return { x, y: y + attackRange };
     }
   }
 

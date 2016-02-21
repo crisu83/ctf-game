@@ -5,8 +5,8 @@ import {
   SET_POSITION,
   SET_VELOCITY,
   SET_ANIMATION,
-  PERFORM_ATTACK,
-  RESET_ATTACK
+  BEGIN_ATTACK,
+  END_ATTACK
 } from '../actions/game';
 
 const initialState = Map();
@@ -86,10 +86,10 @@ const reducer = (state = initialState, action) => {
     case SET_ANIMATION:
       return setAnimation(state, action.id, action.animation);
 
-    case PERFORM_ATTACK:
+    case BEGIN_ATTACK:
       return setIsAttacking(state, action.id, true);
 
-    case RESET_ATTACK:
+    case END_ATTACK:
       return setIsAttacking(state, action.id, false);
 
     default:

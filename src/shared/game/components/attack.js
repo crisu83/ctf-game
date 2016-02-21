@@ -13,8 +13,6 @@ class Attack extends Component {
   canAttack() {
     const cooldown = this.getProp('attackCooldown') || DEFAULT_COOLDOWN;
 
-    console.log(now() - this._lastAttackAt);
-
     return !this._lastAttackAt || (now() - this._lastAttackAt) > cooldown;
   }
 
