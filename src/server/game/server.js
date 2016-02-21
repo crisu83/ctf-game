@@ -1,4 +1,3 @@
-import { find } from 'lodash';
 import Session from './session';
 import Client from './client';
 
@@ -58,7 +57,7 @@ class Server {
     const client = new Client(this, socket);
 
     this.addClient(client);
-    this.findSessionForClient(client)
+    this.findSessionForClient(client);
   }
 
   /**

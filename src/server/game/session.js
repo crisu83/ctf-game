@@ -1,6 +1,5 @@
 import shortid from 'shortid';
 import { forEach, find, now } from 'lodash';
-import { toJS } from 'immutable';
 import { logger } from '../helpers/vendor';
 import createStore from '../store';
 import { addEntity, removeEntity, assignTeam, leaveTeam, advanceTime } from '../actions/game';
@@ -97,7 +96,7 @@ class Session {
     let removedEntityIds = this.getEntityIds();
 
     forEach(gameState.entities, props => {
-      let entity = find(this._entities, entity => entity.id == props.id);
+      let entity = find(this._entities, e => e.id === props.id);
 
       // Create the entity if it does not exist.
       if (!entity) {

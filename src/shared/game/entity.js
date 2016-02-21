@@ -21,6 +21,8 @@ class Entity {
     forEach(this._components, component => {
       component.update(props, dispatch);
     });
+    
+    this._props = props;
   }
 
   /**

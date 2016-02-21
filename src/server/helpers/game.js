@@ -88,7 +88,7 @@ export function findTeamIndexByPlayerId(entities, id) {
 export function findTeamByColor(entities, color) {
   let result = -1;
 
-  forEach(entities, (entity, index) => {
+  forEach(entities, entity => {
     if (entity.type === 'base') {
       if (entity.color === color) {
         result = entity;
