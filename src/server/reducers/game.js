@@ -151,7 +151,9 @@ export function setIsAttacking(state, id, value) {
 export function damageEntity(state, id, victimId) {
   const attackerIndex = findEntityIndexById(state.get('entities').toJS(), id);
   const victimIndex = findEntityIndexById(state.get('entities').toJS(), victimId);
-  if (state.getIn('entities', attackerIndex, 'color') === state.getIn('entities', victimIndex, 'color')) {
+  const attackerColor = state.getIn('entities', attackerIndex, 'color');
+  const victimColor = state.getIn('entities', victimIndex, 'color');
+  if (attackerColor === victimColor) {
     return state;
   }
   const damage = state.getIn(['entities', attackerIndex, 'damage']);
@@ -204,7 +206,12 @@ export function setIsDead(state, id, value) {
 export function captureFlag(state, flagId, playerId) {
   const playerIndex = findEntityIndexById(state.get('entities').toJS(), playerId);
   const flagIndex = findEntityIndexById(state.get('entities').toJS(), flagId);
-  return state.setIn(['entities', flagIndex, 'color'], state.getIn(['entities', playerIndex, 'color']));
+  const playerColor = state.getIn(['entities', playerIndex, 'color']);
+  const flagColor = state.getIn(['entities', flagIndex, 'color']);
+  if (playerColor === flagColor) {
+    return state;
+  }
+  return state.setIn(['entities', flagIndex, 'color'], playerColor);
 }
 
 /**
