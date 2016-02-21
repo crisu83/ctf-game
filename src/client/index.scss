@@ -31,6 +31,13 @@ body {
     align-self: flex-end;
     max-width: 50%;
   }
+
+  &-instructions {
+    color: $dark-gray;
+    font-size: 14px;
+    line-height: 150%;
+    margin-top: 20px;
+  }
 }
 
 .status {

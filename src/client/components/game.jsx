@@ -4,6 +4,7 @@ import { beginConnection, endConnection, startLoading, stopLoading } from '../ac
 import { setState } from '../actions/game';
 import { createGame } from '../factories/game';
 import Status from './status';
+import Visibility from './visibility';
 
 const LOAD_DELAY = 750;
 
@@ -88,7 +89,18 @@ export class Game extends Component {
     return (
       <div className="game">
         {isLoading ? <Status isConnected={isConnected}/> : null}
-        <div id="phaser" style={{ display: isConnected && !isLoading ? 'block' : 'none' }}></div>
+        <Visibility className="game-container" isVisible={isConnected && !isLoading}>
+          <div id="phaser"></div>
+          <div className="game-instructions">
+            How to play:
+            <ul>
+              <li>Use ARROW keys to move, SHIFT to sprint and SPACE to attack</li>
+              <li>Tag flags for your team by running over them while killing enemy players</li>
+              <li>Your team receive points based on how many flags you have tagged</li>
+              <li>When the match ends, the team with the highest score wins!</li>
+            </ul>
+          </div>
+        </Visibility>
       </div>
     );
   }
