@@ -8,7 +8,7 @@ class Text {
    * @param {string} placeholder
    */
   constructor(text, string, placeholder = '...') {
-    text.text = string.replace(/\{\w+\}/, placeholder);
+    text.text = string.replace(/\{\w+\}/g, placeholder);
 
     this._text = text;
     this._string = string;
@@ -19,7 +19,7 @@ class Text {
    * @param {Object} params
    */
   update(params) {
-    const value = this._string.replace(/\{\w+\}/, key => get(params, key.substring(1, key.length - 1), key));
+    const value = this._string.replace(/\{\w+\}/g, key => get(params, key.substring(1, key.length - 1), key));
     this._text.text = value;
   }
 

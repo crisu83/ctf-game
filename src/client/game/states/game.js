@@ -292,6 +292,11 @@ class GameState extends State {
       this.updateText('packetLoss', { amount: `${packetLoss.toFixed(2)}%` });
     }
 
+    this.updateText('playerStats', {
+      kills: this._playerEntity.getProp('numKills') || 0,
+      deaths: this._playerEntity.getProp('numDeaths') || 0
+    });
+    
     this.updateText('playersOnline', { amount: this._numPlayers });
   }
 

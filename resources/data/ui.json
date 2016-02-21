@@ -1,5 +1,10 @@
 {
   "texts": {
+    "playerStats": {
+      "text": "kills: {kills} deaths: {deaths}",
+      "x": 10,
+      "y": 10
+    },
     "ping": {
       "text": "ping: {amount}",
       "x": 10,
