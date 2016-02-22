@@ -1,4 +1,4 @@
-'use strict';Object.defineProperty(exports,'__esModule',{value:true});exports.addEntity=addEntity;exports.removeEntity=removeEntity;exports.assignTeam=assignTeam;exports.leaveTeam=leaveTeam;exports.setPosition=setPosition;exports.setVelocity=setVelocity;exports.setAnimation=setAnimation;exports.setFacing=setFacing;exports.setIsAttacking=setIsAttacking;exports.damageEntity=damageEntity;exports.killEntity=killEntity;exports.reviveEntity=reviveEntity;exports.setIsDead=setIsDead;exports.addPoints=addPoints;exports.tagFlag=tagFlag;exports.advanceTime=advanceTime;var _immutable=require('immutable');var _lodash=require('lodash');var _game=require('../helpers/game');var _game2=require('../actions/game');var initialState=(0,_immutable.Map)({entities:(0,_immutable.List)(),time:(0,_immutable.Map)({elapsed:0})}); /**
+'use strict';Object.defineProperty(exports,'__esModule',{value:true});exports.addEntity=addEntity;exports.removeEntity=removeEntity;exports.assignTeam=assignTeam;exports.leaveTeam=leaveTeam;exports.setPosition=setPosition;exports.setVelocity=setVelocity;exports.setAnimation=setAnimation;exports.setFacing=setFacing;exports.setIsAttacking=setIsAttacking;exports.damageEntity=damageEntity;exports.killEntity=killEntity;exports.beginRevive=beginRevive;exports.setIsDead=setIsDead;exports.setIsReviving=setIsReviving;exports.addPoints=addPoints;exports.tagFlag=tagFlag;exports.advanceTime=advanceTime;var _immutable=require('immutable');var _lodash=require('lodash');var _game=require('../helpers/game');var _game2=require('../actions/game');var initialState=(0,_immutable.Map)({entities:(0,_immutable.List)(),time:(0,_immutable.Map)({elapsed:0})}); /**
  *
  * @param {Map} state
  * @param {Object} entity
@@ -68,13 +68,19 @@
  * @param {Map} state
  * @param {string} id
  * @returns {Map}
- */function reviveEntity(state,id){var playerIndex=(0,_game.findEntityIndexById)(state.get('entities').toJS(),id);var playerProps=(0,_game.findEntityById)(state.get('entities').toJS(),id);if(playerProps.team){var baseProps=(0,_game.findEntityById)(state.get('entities').toJS(),playerProps.team);var _calculateBaseSpawnPo2=(0,_game.calculateBaseSpawnPosition)(playerProps,baseProps);var x=_calculateBaseSpawnPo2.x;var y=_calculateBaseSpawnPo2.y;state=setPosition(state,id,x,y)}var health=state.getIn(['entities',playerIndex,'health']);return setIsDead(state,id,false).setIn(['entities',playerIndex,'currentHealth'],health).removeIn(['entities',playerIndex,'lastAttackerId'])} /**
+ */function beginRevive(state,id){var playerIndex=(0,_game.findEntityIndexById)(state.get('entities').toJS(),id);var playerProps=(0,_game.findEntityById)(state.get('entities').toJS(),id);if(playerProps.team){var baseProps=(0,_game.findEntityById)(state.get('entities').toJS(),playerProps.team);var _calculateBaseSpawnPo2=(0,_game.calculateBaseSpawnPosition)(playerProps,baseProps);var x=_calculateBaseSpawnPo2.x;var y=_calculateBaseSpawnPo2.y;state=setPosition(state,id,x,y)}var health=state.getIn(['entities',playerIndex,'health']);return setIsDead(setIsReviving(state,id,true),id,false).setIn(['entities',playerIndex,'currentHealth'],health).removeIn(['entities',playerIndex,'lastAttackerId'])} /**
  *
  * @param {Map} state
  * @param {string} id
  * @param {boolean} value
  * @returns {Map}
  */function setIsDead(state,id,value){var entityIndex=(0,_game.findEntityIndexById)(state.get('entities').toJS(),id);return state.setIn(['entities',entityIndex,'isDead'],value)} /**
+ * 
+ * @param {Map} state
+ * @param {string} id
+ * @param {boolean} value
+ * @returns {Map}
+ */function setIsReviving(state,id,value){var entityIndex=(0,_game.findEntityIndexById)(state.get('entities').toJS(),id);return state.setIn(['entities',entityIndex,'isReviving'],value)} /**
  *
  * @param {Map} state
  * @param {string} id
@@ -96,5 +102,5 @@
  * @param {Map} state
  * @param {Object} action
  * @returns {Map}
- */var reducer=function reducer(){var state=arguments.length<=0||arguments[0]===undefined?initialState:arguments[0];var action=arguments[1];switch(action.type){case _game2.ADD_ENTITY:return addEntity(state,action.entity);case _game2.REMOVE_ENTITY:return removeEntity(state,action.id);case _game2.ASSIGN_TEAM:return assignTeam(state,action.id);case _game2.LEAVE_TEAM:return leaveTeam(state,action.id);case _game2.SET_POSITION:return setPosition(state,action.id,action.x,action.y);case _game2.SET_VELOCITY:return setVelocity(state,action.id,action.vx,action.vy);case _game2.SET_ANIMATION:return setAnimation(state,action.id,action.animation);case _game2.SET_FACING:return setFacing(state,action.id,action.facing);case _game2.BEGIN_ATTACK:return setIsAttacking(state,action.id,true);case _game2.END_ATTACK:return setIsAttacking(state,action.id,false);case _game2.DAMAGE_ENTITY:return damageEntity(state,action.id,action.victimId);case _game2.KILL_ENTITY:return killEntity(state,action.id,action.lastAttackerId);case _game2.REVIVE_ENTITY:return reviveEntity(state,action.id);case _game2.ADD_POINTS:return addPoints(state,action.id,action.points);case _game2.TAG_FLAG:return tagFlag(state,action.flagId,action.playerId);case _game2.ADVANCE_TIME:return advanceTime(state,action.elapsed);default:return state;}};exports.default=reducer;
+ */var reducer=function reducer(){var state=arguments.length<=0||arguments[0]===undefined?initialState:arguments[0];var action=arguments[1];switch(action.type){case _game2.ADD_ENTITY:return addEntity(state,action.entity);case _game2.REMOVE_ENTITY:return removeEntity(state,action.id);case _game2.ASSIGN_TEAM:return assignTeam(state,action.id);case _game2.LEAVE_TEAM:return leaveTeam(state,action.id);case _game2.SET_POSITION:return setPosition(state,action.id,action.x,action.y);case _game2.SET_VELOCITY:return setVelocity(state,action.id,action.vx,action.vy);case _game2.SET_ANIMATION:return setAnimation(state,action.id,action.animation);case _game2.SET_FACING:return setFacing(state,action.id,action.facing);case _game2.BEGIN_ATTACK:return setIsAttacking(state,action.id,true);case _game2.END_ATTACK:return setIsAttacking(state,action.id,false);case _game2.DAMAGE_ENTITY:return damageEntity(state,action.id,action.victimId);case _game2.KILL_ENTITY:return killEntity(state,action.id,action.lastAttackerId);case _game2.BEGIN_REVIVE:return beginRevive(state,action.id);case _game2.END_REVIVE:return setIsReviving(state,action.id,false);case _game2.ADD_POINTS:return addPoints(state,action.id,action.points);case _game2.TAG_FLAG:return tagFlag(state,action.flagId,action.playerId);case _game2.ADVANCE_TIME:return advanceTime(state,action.elapsed);default:return state;}};exports.default=reducer;
 //# sourceMappingURL=game.js.map

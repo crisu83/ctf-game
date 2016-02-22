@@ -4,7 +4,7 @@
  * @param {Object} props
  * @returns {Entity}
  */ /*eslint no-shadow: 0*/ /*eslint no-unused-vars: 0*/function createPlayer(session,props){var entity=new _entity2.default(props);var onHealthUpdate=function onHealthUpdate(props,dispatch){if(!props.isDead&&props.currentHealth<=0){dispatch((0,_game.killEntity)(props.id,props.lastAttackerId)); // Automatically revive the entity in a while
-setTimeout(function(){dispatch((0,_game.reviveEntity)(props.id))},props.reviveDuration)}};entity.addComponent(new _health2.default(onHealthUpdate));return entity} /**
+setTimeout(function(){dispatch((0,_game.beginRevive)(props.id));setTimeout(function(){dispatch((0,_game.endRevive)(props.id))},100)},props.reviveDuration)}};entity.addComponent(new _health2.default(onHealthUpdate));return entity} /**
  *
  * @param {Session} session
  * @param {Object} props
