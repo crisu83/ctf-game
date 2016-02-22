@@ -66,7 +66,8 @@ npm run start:dev
 Alternatively you can run the production server with:
 
 ```
-npm start
+NODE_ENV=production npm build
+NODE_ENV=production npm start
 ```
 
 ## Running tests
