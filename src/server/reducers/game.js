@@ -188,10 +188,13 @@ export function killEntity(state, id, lastAttackerId) {
 export function reviveEntity(state, id) {
   const playerIndex = findEntityIndexById(state.get('entities').toJS(), id);
   const playerProps = findEntityById(state.get('entities').toJS(), id);
-  const baseProps = findEntityById(state.get('entities').toJS(), playerProps.team);
-  const { x, y } = calculateBaseSpawnPosition(playerProps, baseProps);
+  if (playerProps.team) {
+    const baseProps = findEntityById(state.get('entities').toJS(), playerProps.team);
+    const { x, y } = calculateBaseSpawnPosition(playerProps, baseProps);
+    state = setPosition(state, id, x, y);
+  }
   const health = state.getIn(['entities', playerIndex, 'health']);
-  return setPosition(setIsDead(state, id, false), id, x, y)
+  return setIsDead(state, id, false)
     .setIn(['entities', playerIndex, 'currentHealth'], health)
     .removeIn(['entities', playerIndex, 'lastAttackerId']);
 }
