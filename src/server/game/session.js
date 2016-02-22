@@ -1,8 +1,10 @@
+/*eslint no-unused-vars: 0*/
+
 import shortid from 'shortid';
-import { forEach, find, now } from 'lodash';
+import { forEach, find, get, now } from 'lodash';
 import { logger } from '../helpers/vendor';
 import createStore from '../store';
-import { addEntity, removeEntity, assignTeam, leaveTeam, advanceTime } from '../actions/game';
+import { addEntity, removeEntity, advanceTime } from '../actions/game';
 import { createEntity } from '../factories/entity';
 import { createMap } from '../factories/map';
 import { DATA_PATH, GAME_TICK_RATE, GAME_SYNC_RATE } from '../constants';
@@ -12,9 +14,11 @@ import { DATA_PATH, GAME_TICK_RATE, GAME_SYNC_RATE } from '../constants';
 class Session {
   /**
    * Creates a new game session.
+   * @param {string} name
    * @param io
    */
-  constructor(io) {
+  constructor(name, io) {
+    this._name = name;
     this._io = io;
     this._id = shortid.generate();
     this._store = createStore();
@@ -28,7 +32,7 @@ class Session {
     // Notify each client every time the state is changed.
     this._unsubscribeFromStore = this._store.subscribe(this.handleStateChange.bind(this));
 
-    logger.info(`session.create (session_id: ${this._id})`);
+    this.create();
   }
 
   /**
@@ -39,9 +43,16 @@ class Session {
     return {
       assets: require(`${DATA_PATH}/assets.json`),
       config: require(`${DATA_PATH}/config.json`),
+      entities: require(`${DATA_PATH}/entities.json`),
       ui: require(`${DATA_PATH}/ui.json`),
-      map: createMap('castle', this._store.dispatch)
+      map: createMap(this._name, this._store.dispatch)
     };
+  }
+
+  /**
+   * Creates this session.
+   */
+  create() {
   }
 
   /**
@@ -77,9 +88,7 @@ class Session {
    * Called each time this sessions should be updated.
    */
   update() {
-    const gameState = this.gameState;
-
-    this.updateEntities(gameState);
+    this.updateEntities();
   }
 
   /**
@@ -90,9 +99,27 @@ class Session {
   }
 
   /**
+   * Adds a player to this session.
+   * @param {Object} props
+   */
+  addPlayer(props) {
+    this.dispatch(addEntity(props));
+  }
+
+  /**
+   * Removes a player from this session.
+   * @param {string} id
+   */
+  removePlayer(id) {
+    this.dispatch(removeEntity(id));
+  }
+
+  /**
    * Updates each entity in this session.
    */
-  updateEntities(gameState) {
+  updateEntities() {
+    const gameState = this.gameState;
+    
     let removedEntityIds = this.getEntityIds();
 
     forEach(gameState.entities, props => {
@@ -153,24 +180,6 @@ class Session {
   }
 
   /**
-   * Adds a player to this session.
-   * @param {Object} props
-   */
-  addPlayer(props) {
-    this._store.dispatch(addEntity(props));
-    this._store.dispatch(assignTeam(props.id));
-  }
-
-  /**
-   * Removes a player from this session.
-   * @param {string} id
-   */
-  removePlayer(id) {
-    this._store.dispatch(leaveTeam(id));
-    this._store.dispatch(removeEntity(id));
-  }
-
-  /**
    * Called by clients to dispatch actions received from the browser.
    * @param {Object} action
    */
@@ -194,6 +203,23 @@ class Session {
    */
   shouldSendState() {
     return !this._lastSyncAt || (now() - this._lastSyncAt) > (1000 / GAME_SYNC_RATE);
+  }
+
+  /**
+   * Dispatches an action to the sessions store.
+   * @param {Object} action
+   */
+  dispatch(action) {
+    this._store.dispatch(action);
+  }
+
+  /**
+   * Returns data for this game.
+   * @param {string} key
+   * @returns {*}
+   */
+  getGameData(key) {
+    return get(this._gameData, key);
   }
 
   /**

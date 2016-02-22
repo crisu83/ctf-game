@@ -10,6 +10,10 @@ import {
   endRevive
 } from '../actions/game';
 
+export const PLAYER = 'player';
+export const TEAM = 'team';
+export const FLAG = 'flag';
+
 /**
  *
  * @param {Session} session
@@ -57,7 +61,7 @@ function createFlag(session, props) {
  * @param {Object} props
  * @returns {Entity}
  */
-function createBase(session, props) {
+function createTeam(session, props) {
   const entity = new Entity(props);
 
   return entity;
@@ -71,14 +75,14 @@ function createBase(session, props) {
  */
 export function createEntity(session, props) {
   switch (props.type) {
-    case 'player':
+    case PLAYER:
       return createPlayer(session, props);
 
-    case 'flag':
+    case FLAG:
       return createFlag(session, props);
 
-    case 'base':
-      return createBase(session, props);
+    case TEAM:
+      return createTeam(session, props);
 
     default:
       logger.warn(`trying to create entity of unknown type ${props.type}.`);

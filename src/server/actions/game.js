@@ -1,6 +1,6 @@
 export const ADD_ENTITY = 'game/ADD_ENTITY';
 export const REMOVE_ENTITY = 'game/REMOVE_ENTITY';
-export const ASSIGN_TEAM = 'game/ASSIGN_TEAM';
+export const JOIN_TEAM = 'game/JOIN_TEAM';
 export const LEAVE_TEAM = 'game/LEAVE_TEAM';
 export const SET_POSITION = 'game/SET_POSITION';
 export const SET_VELOCITY = 'game/SET_VELOCITY';
@@ -37,10 +37,11 @@ export function removeEntity(id) {
 /**
  *
  * @param {string} id
- * @returns {{type: string, id: string}}
+ * @param {string} teamId
+ * @returns {{type: string, id: string, teamId: string}}
  */
-export function assignTeam(id) {
-  return { type: ASSIGN_TEAM, id };
+export function joinTeam(id, teamId) {
+  return { type: JOIN_TEAM, id, teamId };
 }
 
 /**
@@ -78,6 +79,16 @@ export function beginRevive(id) {
  */
 export function endRevive(id) {
   return { type: END_REVIVE, id };
+}
+
+/**
+ *
+ * @param {string} id
+ * @param {number} points
+ * @returns {{type: string, id: string, points: number}}
+ */
+export function addPoints(id, points) {
+  return { type: ADD_POINTS, id, points };
 }
 
 /**

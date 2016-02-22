@@ -1,0 +1,19 @@
+{
+  "player": {
+    "type": "player",
+    "width": 96,
+    "height": 96,
+    "group": "knights",
+    "health": 100,
+    "damage": 100,
+    "runSpeed": 500,
+    "attackCooldown": 500,
+    "attackRange": 20,
+    "reviveDuration": 5000
+  },
+  "flag": {
+    "type": "flag",
+    "color": "neutral",
+    "group": "flags"
+  }
+}

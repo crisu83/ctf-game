@@ -1,4 +1,4 @@
-import Session from './session';
+import Castle from './sessions/castle';
 import Client from './client';
 
 class Server {
@@ -16,7 +16,7 @@ class Server {
    * Boots the game server.
    */
   boot() {
-    const session = new Session(this._io);
+    const session = new Castle(this._io);
 
     this.addSession(session);
 

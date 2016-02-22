@@ -3,14 +3,14 @@ import { isNumber } from 'lodash';
 import {
   findEntityById,
   findEntityIndexById,
-  findWeakestTeamIndex,
+  findWeakestTeamId,
   findTeamIndexByPlayerId,
   calculateBaseSpawnPosition
 } from '../helpers/game';
 import {
   ADD_ENTITY,
   REMOVE_ENTITY,
-  ASSIGN_TEAM,
+  JOIN_TEAM,
   LEAVE_TEAM,
   SET_POSITION,
   SET_VELOCITY,
@@ -58,19 +58,20 @@ export function removeEntity(state, id) {
  *
  * @param {Map} state
  * @param {string} id
+ * @param {string} teamId
  * @returns {Map}
  */
-export function assignTeam(state, id) {
+export function joinTeam(state, id, teamId) {
   const playerIndex = findEntityIndexById(state.get('entities').toJS(), id);
-  const teamIndex = findWeakestTeamIndex(state.get('entities').toJS());
+  const teamIndex = findEntityIndexById(state.get('entities').toJS(), teamId);
   const playerProps = state.getIn(['entities', playerIndex]).toJS();
-  const baseProps = state.getIn(['entities', teamIndex]).toJS();
-  const { x, y } = calculateBaseSpawnPosition(playerProps, baseProps);
+  const teamProps = state.getIn(['entities', teamIndex]).toJS();
+  const { x, y } = calculateBaseSpawnPosition(playerProps, teamProps.base);
   return setPosition(state, id, x, y)
     .updateIn(['entities', teamIndex, 'players'], List(), players => players.push(id))
-    .setIn(['entities', playerIndex, 'team'], baseProps.id)
-    .setIn(['entities', playerIndex, 'color'], baseProps.color)
-    .setIn(['entities', playerIndex, 'hexColor'], baseProps.hexColor);
+    .setIn(['entities', playerIndex, 'team'], teamProps.id)
+    .setIn(['entities', playerIndex, 'color'], teamProps.color)
+    .setIn(['entities', playerIndex, 'hexColor'], teamProps.hexColor);
 }
 
 /**
@@ -192,7 +193,8 @@ export function beginRevive(state, id) {
   const playerIndex = findEntityIndexById(state.get('entities').toJS(), id);
   const playerProps = findEntityById(state.get('entities').toJS(), id);
   if (playerProps.team) {
-    const baseProps = findEntityById(state.get('entities').toJS(), playerProps.team);
+    const teamIndex = findEntityIndexById(state.get('entities').toJS(), playerProps.team);
+    const baseProps = state.getIn(['entities', teamIndex, 'base']);
     const { x, y } = calculateBaseSpawnPosition(playerProps, baseProps);
     state = setPosition(state, id, x, y);
   }
@@ -236,12 +238,17 @@ export function setIsReviving(state, id, value) {
 export function tagFlag(state, flagId, playerId) {
   const playerIndex = findEntityIndexById(state.get('entities').toJS(), playerId);
   const flagIndex = findEntityIndexById(state.get('entities').toJS(), flagId);
+  const oldTeamIndex = findEntityIndexById(state.getIn(['entities', flagIndex, 'team']));
+  const newTeamIndex = findEntityIndexById(state.getIn(['entities', playerIndex, 'team']));
   const playerColor = state.getIn(['entities', playerIndex, 'color']);
   const flagColor = state.getIn(['entities', flagIndex, 'color']);
   if (playerColor === flagColor) {
     return state;
   }
-  return state.setIn(['entities', flagIndex, 'color'], playerColor);
+  return state.setIn(['entities', flagIndex, 'color'], playerColor)
+    .setIn(['entities', flagIndex, 'team'], newTeamIndex)
+    .updateIn(['entities', oldTeamIndex, 'numFlags'], value => value - 1)
+    .updateIn(['entities', newTeamIndex, 'numFlags'], 0, value => value + 1);
 }
 
 /**
@@ -251,7 +258,7 @@ export function tagFlag(state, flagId, playerId) {
  * @returns {Map}
  */
 export function advanceTime(state, time) {
-  return state.updateIn(['time', 'elapsed'], elapsed => isNumber(time) ? elapsed + time : elapsed);
+  return state.updateIn(['time', 'elapsed'], 0, elapsed => isNumber(time) ? elapsed + time : elapsed);
 }
 
 /**
@@ -268,8 +275,8 @@ const reducer = (state = initialState, action) => {
     case REMOVE_ENTITY:
       return removeEntity(state, action.id);
 
-    case ASSIGN_TEAM:
-      return assignTeam(state, action.id);
+    case JOIN_TEAM:
+      return joinTeam(state, action.id, action.teamId);
 
     case LEAVE_TEAM:
       return leaveTeam(state, action.id);

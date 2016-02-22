@@ -1,5 +1,6 @@
 import { forEach, isUndefined } from 'lodash';
 import { chance } from './vendor';
+import { TEAM } from '../factories/entity';
 
 /**
  *
@@ -40,17 +41,17 @@ export function findEntityIndexById(entities, id) {
 /**
  *
  * @param {Array} entities
- * @returns {number}
+ * @returns {string}
  */
-export function findWeakestTeamIndex(entities) {
+export function findWeakestTeamId(entities) {
   let leastPlayers, result = -1;
 
-  forEach(entities, (entity, index) => {
-    if (entity.type === 'base') {
+  forEach(entities, entity => {
+    if (entity.type === TEAM) {
       let teamSize = entity.players ? entity.players.length : 0;
       if (isUndefined(leastPlayers) || teamSize < leastPlayers) {
         leastPlayers = teamSize;
-        result = index;
+        result = entity.id;
       }
     }
   });
@@ -68,32 +69,12 @@ export function findTeamIndexByPlayerId(entities, id) {
   let result = -1;
 
   forEach(entities, (entity, index) => {
-    if (entity.type === 'base') {
+    if (entity.type === TEAM) {
       forEach(entity.players, playerId => {
         if (playerId === id) {
           result = index;
         }
       });
-    }
-  });
-
-  return result;
-}
-
-/**
- *
- * @param {Array} entities
- * @param {string} color
- * @returns {Object}
- */
-export function findTeamByColor(entities, color) {
-  let result = -1;
-
-  forEach(entities, entity => {
-    if (entity.type === 'base') {
-      if (entity.color === color) {
-        result = entity;
-      }
     }
   });
 
