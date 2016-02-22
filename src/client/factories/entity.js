@@ -177,7 +177,7 @@ export function createLocalPlayer(state, props) {
 
         attack.kill();
         
-        this.performAttack();
+        this.attackPerformed();
 
         setTimeout(() => {
           dispatch(endAttack(updateProps.id));
