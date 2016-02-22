@@ -20,7 +20,9 @@ import {
   END_ATTACK,
   DAMAGE_ENTITY,
   KILL_ENTITY,
-  REVIVE_ENTITY,
+  BEGIN_REVIVE,
+  END_REVIVE,
+  ADD_POINTS,
   TAG_FLAG,
   ADVANCE_TIME
 } from '../actions/game';
@@ -65,9 +67,10 @@ export function assignTeam(state, id) {
   const baseProps = state.getIn(['entities', teamIndex]).toJS();
   const { x, y } = calculateBaseSpawnPosition(playerProps, baseProps);
   return setPosition(state, id, x, y)
-    .updateIn(['entities', teamIndex, 'players'], players => players.push(id))
+    .updateIn(['entities', teamIndex, 'players'], List(), players => players.push(id))
     .setIn(['entities', playerIndex, 'team'], baseProps.id)
-    .setIn(['entities', playerIndex, 'color'], baseProps.color);
+    .setIn(['entities', playerIndex, 'color'], baseProps.color)
+    .setIn(['entities', playerIndex, 'hexColor'], baseProps.hexColor);
 }
 
 /**
@@ -185,7 +188,7 @@ export function killEntity(state, id, lastAttackerId) {
  * @param {string} id
  * @returns {Map}
  */
-export function reviveEntity(state, id) {
+export function beginRevive(state, id) {
   const playerIndex = findEntityIndexById(state.get('entities').toJS(), id);
   const playerProps = findEntityById(state.get('entities').toJS(), id);
   if (playerProps.team) {
@@ -194,7 +197,7 @@ export function reviveEntity(state, id) {
     state = setPosition(state, id, x, y);
   }
   const health = state.getIn(['entities', playerIndex, 'health']);
-  return setIsDead(state, id, false)
+  return setIsDead(setIsReviving(state, id, true), id, false)
     .setIn(['entities', playerIndex, 'currentHealth'], health)
     .removeIn(['entities', playerIndex, 'lastAttackerId']);
 }
@@ -209,6 +212,18 @@ export function reviveEntity(state, id) {
 export function setIsDead(state, id, value) {
   const entityIndex = findEntityIndexById(state.get('entities').toJS(), id);
   return state.setIn(['entities', entityIndex, 'isDead'], value);
+}
+
+/**
+ * 
+ * @param {Map} state
+ * @param {string} id
+ * @param {boolean} value
+ * @returns {Map}
+ */
+export function setIsReviving(state, id, value) {
+  const entityIndex = findEntityIndexById(state.get('entities').toJS(), id);
+  return state.setIn(['entities', entityIndex, 'isReviving'], value);
 }
 
 /**
@@ -283,8 +298,11 @@ const reducer = (state = initialState, action) => {
     case KILL_ENTITY:
       return killEntity(state, action.id, action.lastAttackerId);
 
-    case REVIVE_ENTITY:
-      return reviveEntity(state, action.id);
+    case BEGIN_REVIVE:
+      return beginRevive(state, action.id);
+    
+    case END_REVIVE:
+      return setIsReviving(state, action.id, false);
 
     case TAG_FLAG:
       return tagFlag(state, action.flagId, action.playerId);

@@ -10,7 +10,9 @@ export const BEGIN_ATTACK = 'game/BEGIN_ATTACK';
 export const END_ATTACK = 'game/END_ATTACK';
 export const DAMAGE_ENTITY = 'game/DAMAGE_ENTITY';
 export const KILL_ENTITY = 'game/KILL_ENTITY';
-export const REVIVE_ENTITY = 'game/REVIVE_ENTITY';
+export const BEGIN_REVIVE = 'game/BEGIN_REVIVE';
+export const END_REVIVE = 'game/END_REVIVE';
+export const ADD_POINTS = 'game/ADD_POINTS';
 export const TAG_FLAG = 'game/TAG_FLAG';
 export const ADVANCE_TIME = 'game/ADVANCE_TIME';
 
@@ -65,8 +67,17 @@ export function killEntity(id, lastAttackerId) {
  * @param {string} id
  * @returns {{type: string, id: string}}
  */
-export function reviveEntity(id) {
-  return { type: REVIVE_ENTITY, id };
+export function beginRevive(id) {
+  return { type: BEGIN_REVIVE, id };
+}
+
+/**
+ *
+ * @param {string} id
+ * @returns {{type: string, id: string}}
+ */
+export function endRevive(id) {
+  return { type: END_REVIVE, id };
 }
 
 /**

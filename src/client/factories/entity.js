@@ -132,14 +132,12 @@ export function createLocalPlayer(state, props) {
     }
 
     if (!updateProps.isDead && knight.x !== updateProps.x || knight.y !== updateProps.y) {
-      // TODO: Fix this so that players can be moved back to their base on death.
-      dispatch(setPosition(updateProps.id, knight.x, knight.y, CONTEXT_SERVER));
-      // if (validateSpritePosition(knight, updateProps)) {
-      //   dispatch(setPosition(updateProps.id, knight.x, knight.y, CONTEXT_SERVER));
-      // } else {
-      //   knight.x = updateProps.x;
-      //   knight.y = updateProps.y;
-      // }
+      if (!updateProps.isReviving) {
+        dispatch(setPosition(updateProps.id, knight.x, knight.y, CONTEXT_SERVER));
+      } else {
+        knight.x = updateProps.x;
+        knight.y = updateProps.y;
+      }
     }
 
     // const nameText = this.getComponent('text').getText('name');

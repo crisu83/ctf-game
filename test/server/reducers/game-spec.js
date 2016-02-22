@@ -10,7 +10,7 @@ import {
   setIsAttacking,
   damageEntity,
   killEntity,
-  reviveEntity,
+  beginRevive,
   tagFlag,
   advanceTime
 } from '../../../src/server/reducers/game';
@@ -71,10 +71,10 @@ describe('game reducer', () => {
           Map({id: '1', name: 'John', currentHealth: -20, health: 100, isDead: true})
         )
       }));
-      const nextState = reviveEntity(state, '1');
+      const nextState = beginRevive(state, '1');
       expect(nextState).to.equal(Map({
         entities: List.of(
-          Map({id: '1', name: 'John', currentHealth: 100, health: 100, isDead: false}),
+          Map({id: '1', name: 'John', currentHealth: 100, health: 100, isReviving: true, isDead: false}),
         )
       }));
     });

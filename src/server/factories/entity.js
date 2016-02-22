@@ -6,7 +6,8 @@ import Entity from 'shared/game/entity';
 import Health from '../game/components/health';
 import {
   killEntity,
-  reviveEntity
+  beginRevive,
+  endRevive
 } from '../actions/game';
 
 /**
@@ -24,7 +25,11 @@ function createPlayer(session, props) {
 
       // Automatically revive the entity in a while
       setTimeout(() => {
-        dispatch(reviveEntity(props.id));
+        dispatch(beginRevive(props.id));
+
+        setTimeout(() => {
+          dispatch(endRevive(props.id));
+        }, 100);
       }, props.reviveDuration);
     }
   };
