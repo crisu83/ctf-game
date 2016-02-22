@@ -28,12 +28,12 @@ const devPlugins = [
 ];
 
 const prodPlugins = [
-  new webpack.optimize.OccurenceOrderPlugin(),
-  new webpack.optimize.UglifyJsPlugin({
-    compressor: {
-      warnings: false
-    }
-  })
+  new webpack.optimize.OccurenceOrderPlugin()
+  // new webpack.optimize.UglifyJsPlugin({
+  //   compressor: {
+  //     warnings: false
+  //   }
+  // })
 ];
 
 const plugins = basePlugins
