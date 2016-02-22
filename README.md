@@ -36,8 +36,7 @@ This experiment mixes some of the most popular JavaScript tools.
 
 This is my TODO list and also the road map for this project.
 
-- [x] Game server
-- [x] Game client
+- [x] Game server and client
 - [x] Client to server communication
 - [x] Create player on the server
 - [x] Send game state to clients
@@ -80,8 +79,8 @@ npm test
 
 ## Contributing
 
-This project is still under active development, so I am not actively looking for contributors. 
-However once the first version is ready and released I will add more details instructions on how you can contribute.
+This project is under active development, so I am not actively looking for contributors. 
+However once the first version is ready I will add instructions for how to contribute.
 
 ## License
 
