@@ -2,10 +2,6 @@
   "castle": {
     "src": "tiled/castle/castle.json",
     "image": "castle",
-    "music": "8-bit-rebel",
-    "collision": {
-      "layer": "Walls",
-      "indices": [41]
-    }
+    "music": "8-bit-rebel"
   }
 }

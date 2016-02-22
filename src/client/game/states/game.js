@@ -3,6 +3,7 @@ import { forEach, find, get, now, last } from 'lodash';
 import { State, Physics, Keyboard, Tilemap, Group } from 'phaser';
 import { setState } from '../../actions/game';
 import { createLocalPlayer, createEntity } from '../../factories/entity';
+import { createLayer } from '../../factories/layer';
 import Render from '../groups/render';
 import Text from '../text';
 
@@ -154,19 +155,9 @@ class GameState extends State {
 
     map.addTilesetImage(mapData.key, mapData.image);
 
-    forEach(mapData.layers, data => {
-      if (data.type === TILE_LAYER) {
-        let layer = map.createLayer(data.name);
-
-        layer.resizeWorld();
-
-        // TODO: Check that the collision data actually exists.
-
-        if (data.name === mapData.collision.layer) {
-          map.setCollision(mapData.collision.indices, true, layer);
-        }
-
-        this.addLayer(data.name, layer);
+    forEach(mapData.layers, props => {
+      if (props.type === TILE_LAYER) {
+        this.addLayer(props.name, createLayer(map, props));
       }
     });
   }
