@@ -1,6 +1,6 @@
 import { forEach, has } from 'lodash';
 
-const MAX_ALLOWED_MOVEMENT = 100;
+const MAX_ALLOWED_MOVEMENT = 1000;
 
 /**
  *

@@ -1,0 +1,2 @@
+'use strict';Object.defineProperty(exports,'__esModule',{value:true});var GAME_TICK_RATE=exports.GAME_TICK_RATE=30;var GAME_SYNC_RATE=exports.GAME_SYNC_RATE=30;var LAYER_OBJECTS=exports.LAYER_OBJECTS='objectgroup';var DATA_PATH=exports.DATA_PATH='../../../resources/data';
+//# sourceMappingURL=constants.js.map

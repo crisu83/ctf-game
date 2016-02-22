@@ -1,0 +1,6 @@
+'use strict';Object.defineProperty(exports,'__esModule',{value:true});exports.createMap=createMap;var _shortid=require('shortid');var _shortid2=_interopRequireDefault(_shortid);var _lodash=require('lodash');var _game=require('../actions/game');var _props=require('../factories/props');var _constants=require('../constants');function _interopRequireDefault(obj){return obj&&obj.__esModule?obj:{default:obj}}var mapsData=require(_constants.DATA_PATH+'/maps.json'); /**
+ *
+ * @param {string} key
+ * @param {function} dispatch
+ */function createMap(key,dispatch){if(!mapsData[key]){throw new Error('Failed to load data for unknown map.')}var mapData=mapsData[key];var json=require(_constants.DATA_PATH+'/'+mapData.src);if(!json){throw new Error('Failed to load unknown map.')}(0,_lodash.forEach)(json.layers,function(layer){if(layer.type===_constants.LAYER_OBJECTS){(0,_lodash.forEach)(layer.objects,function(object){var props=(0,_props.createProps)({type:object.type,x:object.x,y:object.y,width:object.width,height:object.height});if(props){dispatch((0,_game.addEntity)(props))}})}});return {id:_shortid2.default.generate(),key:key,image:mapData.image,music:mapData.music,collision:mapData.collision,data:json,layers:json.layers,width:json.width*json.tilesets[0].tilewidth,height:json.height*json.tilesets[0].tileheight}}
+//# sourceMappingURL=map.js.map
