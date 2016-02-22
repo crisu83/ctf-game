@@ -1,18 +1,23 @@
 /*eslint no-shadow: 0*/
 /*eslint no-unused-vars: 0*/
 
+import { forEach } from 'lodash';
 import { logger } from '../helpers/vendor';
 import Entity from 'shared/game/entity';
 import Health from '../game/components/health';
+import Points from '../game/components/points';
 import {
   killEntity,
   beginRevive,
-  endRevive
+  endRevive,
+  givePoints
 } from '../actions/game';
 
 export const PLAYER = 'player';
 export const TEAM = 'team';
 export const FLAG = 'flag';
+
+const POINTS_PER_FLAG = 50;
 
 /**
  *
@@ -63,6 +68,20 @@ function createFlag(session, props) {
  */
 function createTeam(session, props) {
   const entity = new Entity(props);
+
+  const onPointsUpdate = function(updateProps, dispatch) {
+    if (updateProps.players && updateProps.numFlags && this.shouldGivePoints()) {
+      const points = updateProps.numFlags * POINTS_PER_FLAG;
+
+      forEach(updateProps.players, playerId => {
+        dispatch(givePoints(playerId, points));
+      });
+      
+      this.pointsGiven();
+    }
+  };
+
+  entity.addComponent(new Points(onPointsUpdate));
 
   return entity;
 }

@@ -51,7 +51,7 @@ This is my TODO list and also the road map for this project.
 - [x] Render tilemap
 - [x] Collision detection
 - [x] Basic physics
-- [ ] Teams and points
+- [x] Teams and points
 - [ ] Game logic
 
 ## Development

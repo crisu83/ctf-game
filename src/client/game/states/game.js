@@ -280,6 +280,7 @@ class GameState extends State {
         { name: this._playerEntity.getProp('name') },
         { fill: this._playerEntity.getProp('hexColor') }
       );
+      this.updateText('playerPoints', { amount: this._playerEntity.getProp('points') || 0 });
       this.updateText('playerKills', { amount: this._playerEntity.getProp('numKills') || 0 });
       this.updateText('playerDeaths', { amount: this._playerEntity.getProp('numDeaths') || 0 });
     }

@@ -5,15 +5,20 @@
       "x": 10,
       "y": 10
     },
+    "playerPoints": {
+      "text": "points: {amount}",
+      "x": 10,
+      "y": 40
+    },
     "playerKills": {
       "text": "kills: {amount}",
       "x": 10,
-      "y": 40
+      "y": 60
     },
     "playerDeaths": {
       "text": "deaths: {amount}",
       "x": 10,
-      "y": 60
+      "y": 80
     },
     "ping": {
       "text": "ping: {amount}",

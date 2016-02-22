@@ -22,7 +22,7 @@ import {
   KILL_ENTITY,
   BEGIN_REVIVE,
   END_REVIVE,
-  ADD_POINTS,
+  GIVE_POINTS,
   TAG_FLAG,
   ADVANCE_TIME
 } from '../actions/game';
@@ -95,7 +95,8 @@ export function leaveTeam(state, id) {
  */
 export function setPosition(state, id, x, y) {
   const entityIndex = findEntityIndexById(state.get('entities').toJS(), id);
-  return state.setIn(['entities', entityIndex, 'x'], x).setIn(['entities', entityIndex, 'y'], y);
+  return state.setIn(['entities', entityIndex, 'x'], x)
+    .setIn(['entities', entityIndex, 'y'], y);
 }
 
 /**
@@ -108,7 +109,8 @@ export function setPosition(state, id, x, y) {
  */
 export function setVelocity(state, id, vx, vy) {
   const entityIndex = findEntityIndexById(state.get('entities').toJS(), id);
-  return state.setIn(['entities', entityIndex, 'vx'], vx).setIn(['entities', entityIndex, 'vy'], vy);
+  return state.setIn(['entities', entityIndex, 'vx'], vx)
+    .setIn(['entities', entityIndex, 'vy'], vy);
 }
 /**
  *
@@ -217,7 +219,7 @@ export function setIsDead(state, id, value) {
 }
 
 /**
- * 
+ *
  * @param {Map} state
  * @param {string} id
  * @param {boolean} value
@@ -231,6 +233,18 @@ export function setIsReviving(state, id, value) {
 /**
  *
  * @param {Map} state
+ * @param {string} id
+ * @param {number} points
+ * @returns {Map}
+ */
+export function givePoints(state, id, points) {
+  const entityIndex = findEntityIndexById(state.get('entities').toJS(), id);
+  return state.updateIn(['entities', entityIndex, 'points'], 0, value => value + points);
+}
+
+/**
+ *
+ * @param {Map} state
  * @param {string} flagId
  * @param {string} playerId
  * @returns {Map}
@@ -238,17 +252,19 @@ export function setIsReviving(state, id, value) {
 export function tagFlag(state, flagId, playerId) {
   const playerIndex = findEntityIndexById(state.get('entities').toJS(), playerId);
   const flagIndex = findEntityIndexById(state.get('entities').toJS(), flagId);
-  const oldTeamIndex = findEntityIndexById(state.getIn(['entities', flagIndex, 'team']));
-  const newTeamIndex = findEntityIndexById(state.getIn(['entities', playerIndex, 'team']));
+  const oldTeamId = state.getIn(['entities', flagIndex, 'team']);
+  const newTeamId = state.getIn(['entities', playerIndex, 'team']);
+  const oldTeamIndex = findEntityIndexById(state.get('entities').toJS(), oldTeamId);
+  const newTeamIndex = findEntityIndexById(state.get('entities').toJS(), newTeamId);
   const playerColor = state.getIn(['entities', playerIndex, 'color']);
   const flagColor = state.getIn(['entities', flagIndex, 'color']);
   if (playerColor === flagColor) {
     return state;
   }
   return state.setIn(['entities', flagIndex, 'color'], playerColor)
-    .setIn(['entities', flagIndex, 'team'], newTeamIndex)
+    .setIn(['entities', flagIndex, 'team'], newTeamId)
     .updateIn(['entities', oldTeamIndex, 'numFlags'], value => value - 1)
-    .updateIn(['entities', newTeamIndex, 'numFlags'], 0, value => value + 1);
+    .updateIn(['entities', newTeamIndex, 'numFlags'], value => (value || 0) + 1);
 }
 
 /**
@@ -310,6 +326,9 @@ const reducer = (state = initialState, action) => {
     
     case END_REVIVE:
       return setIsReviving(state, action.id, false);
+
+    case GIVE_POINTS:
+      return givePoints(state, action.id, action.points);
 
     case TAG_FLAG:
       return tagFlag(state, action.flagId, action.playerId);

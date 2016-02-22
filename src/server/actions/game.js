@@ -12,7 +12,7 @@ export const DAMAGE_ENTITY = 'game/DAMAGE_ENTITY';
 export const KILL_ENTITY = 'game/KILL_ENTITY';
 export const BEGIN_REVIVE = 'game/BEGIN_REVIVE';
 export const END_REVIVE = 'game/END_REVIVE';
-export const ADD_POINTS = 'game/ADD_POINTS';
+export const GIVE_POINTS = 'game/GIVE_POINTS';
 export const TAG_FLAG = 'game/TAG_FLAG';
 export const ADVANCE_TIME = 'game/ADVANCE_TIME';
 
@@ -87,8 +87,8 @@ export function endRevive(id) {
  * @param {number} points
  * @returns {{type: string, id: string, points: number}}
  */
-export function addPoints(id, points) {
-  return { type: ADD_POINTS, id, points };
+export function givePoints(id, points) {
+  return { type: GIVE_POINTS, id, points };
 }
 
 /**
