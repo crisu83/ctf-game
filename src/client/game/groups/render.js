@@ -35,7 +35,7 @@ function getChildrenRecursive(group) {
  * Inspired by the research by Krummelz (http://www.html5gamedevs.com/profile/7879-krummelz/).
  * @see http://www.html5gamedevs.com/topic/3085-depth-sort-multiple-groups/
  */
-class Render extends Group {
+class RenderGroup extends Group {
   /**
    * @inheritdoc
    */
@@ -118,4 +118,4 @@ class Render extends Group {
   }
 }
 
-export default Render;
+export default RenderGroup;

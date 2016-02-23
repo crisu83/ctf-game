@@ -1,6 +1,6 @@
 import Phaser, { Game } from 'phaser';
 import { get } from 'lodash';
-import GameState from '../game/states/game';
+import RemoteState from '../game/states/remote';
 
 /**
  *
@@ -21,7 +21,7 @@ export function createGame(store, socket, gameData, playerProps) {
     false/* antialias */
   );
 
-  game.state.add('game', new GameState(store, socket, gameData, playerProps), true/* auto-start */);
+  game.state.add('game', new RemoteState(store, socket, gameData, playerProps), true/* autoStart */);
 
   return game;
 }

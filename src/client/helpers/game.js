@@ -2,24 +2,6 @@ import { forEach, has } from 'lodash';
 
 /**
  *
- * @param {Array} entities
- * @param {string} id
- * @returns {Object}
- */
-export function findEntityById(entities, id) {
-  let result = null;
-
-  forEach(entities, (entity) => {
-    if (entity.id === id) {
-      result = entity;
-    }
-  });
-
-  return result;
-}
-
-/**
- *
  * @param {Array}entities
  * @param {string} id
  * @returns {number}
@@ -54,7 +36,7 @@ export function isEntityMoving(props) {
 export function resolveActionAnimation(action, facing) {
   facing = facing || 'none';
 
-  // TODO: Refactor this
+  // TODO: Refactor this method
   if (action === 'run' && facing === 'none') {
     return 'idle';
   } else if (action === 'attack' && facing === 'none') {
