@@ -142,13 +142,6 @@ export function createLocalPlayer(state, props) {
         knight.y = updateProps.y;
       }
     }
-
-    // const nameText = this.getComponent('text').getText('name');
-    //
-    // nameText.x = knightSprite.x + (knightSprite.width / 2);
-    // nameText.y = knightSprite.y;
-
-    // state.game.debug.body(knightSprite);
   };
 
   entity.addComponent(new SpriteComponent({ knight: knightSprite, grave: graveSprite }, onSpriteComponentUpdate));
@@ -192,10 +185,6 @@ export function createLocalPlayer(state, props) {
   };
 
   entity.addComponent(new AttackComponent(attackGroup, onAttackComponentUpdate));
-
-  // TODO: Fix name tag positioning
-  // const nameText = createNameTag(state, props);
-  // entity.addComponent(new Text({name: nameText}));
 
   return entity;
 }
