@@ -1,13 +1,15 @@
 /*eslint no-unused-vars: 0*/
 
 import shortid from 'shortid';
-import { forEach, find, get, now, remove } from 'lodash';
+import { forEach, get, now } from 'lodash';
 import { logger } from '../helpers/vendor';
 import createStore from '../store';
 import { addEntity, removeEntity, advanceTime } from '../actions/game';
 import { createEntity } from '../factories/entity';
 import { createMap } from '../factories/map';
+import { findEntityIndexById } from '../helpers/game';
 import { DATA_PATH, GAME_TICK_RATE, GAME_SYNC_RATE } from '../constants';
+import Entity from 'shared/game/entity';
 
 // TODO: Separate game logic and generic game session logic into two different classes.
 
@@ -100,7 +102,7 @@ class Session {
     const updatedEntityIds = [];
 
     forEach(gameState.entities, props => {
-      let entity = this.createEntityIfNotExists(props);
+      let entity = this.getEntity(props);
 
       if (entity) {
         entity.update(props, this.dispatch.bind(this));
@@ -109,48 +111,48 @@ class Session {
       updatedEntityIds.push(props.id);
     });
 
-    forEach(this._entities, entity => {
-      if (updatedEntityIds.indexOf(entity.id) === -1) {
-        this.removeEntity(entity);
+    this._entities = this._entities.filter(entity => {
+      const found = updatedEntityIds.indexOf(entity.id) !== -1;
+
+      if (!found) {
+        entity.destroy();
       }
+
+      return found;
     });
   }
 
   /**
-   * Creates a new entity from given props (if possible).
-   * @param {Object} props
-   * @returns {Entity}
-   */
-  createEntityIfNotExists(props) {
-    let entity = find(this._entities, e => e.id === props.id);
-
-    if (!entity) {
-      entity = createEntity(this, props);
-
-      if (entity) {
-        this.addEntity(entity);
-      }
-    }
-
-    return entity;
-  }
-
-  /**
-   * Adds an entity to the session's entity pool.
+   * Adds an entity to the game's entity pool.
    * @param {Entity} entity
    */
   addEntity(entity) {
+    if (!entity instanceof Entity) {
+      throw new Error('State entities must be instances of Entity.');
+    }
+
     this._entities.push(entity);
   }
 
   /**
-   * Removes an entity from the session's entity pool.
-   * @param {Entity} entity
+   * Returns an entity from the game's entity pool (creating it if it doesn't exist).
+   * @param {Object} props
+   * @returns {Entity}
    */
-  removeEntity(entity) {
-    entity.destroy();
+  getEntity(props) {
+    const index = findEntityIndexById(this._entities, props.id);
 
-    remove(this._entities, e => e.id === entity.id);
+    if (index !== -1) {
+      return this._entities[index];
+    }
+
+    const entity = createEntity(this, props);
+
+    if (entity) {
+      this.addEntity(entity);
+    }
+
+    return entity;
   }
 
   /**

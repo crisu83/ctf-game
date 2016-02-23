@@ -1,11 +1,13 @@
 import { is, Map } from 'immutable';
-import { forEach, find, get, last, now, remove } from 'lodash';
+import { forEach, get, last, now } from 'lodash';
 import { State, Physics, Keyboard, Tilemap, Group } from 'phaser';
 import { setState } from '../../actions/game';
 import { createLocalPlayer, createEntity, PLAYER } from '../../factories/entity';
 import { createLayer } from '../../factories/layer';
+import { findEntityIndexById } from '../../helpers/game';
 import RenderGroup from '../groups/render';
 import Text from '../text';
+import Entity from 'shared/game/entity';
 
 const MUSIC_VOLUME = 0.01;
 const TILE_LAYER = 'tilelayer';
@@ -246,8 +248,8 @@ class RemoteState extends State {
     const updatedEntityIds = [];
 
     forEach(gameState.entities, props => {
-      let entity = this.createEntityIfNotExists(props);
-
+      let entity = this.getEntity(props);
+      
       if (entity) {
         entity.update(props, this.dispatch.bind(this));
       }
@@ -255,42 +257,52 @@ class RemoteState extends State {
       updatedEntityIds.push(props.id);
     });
 
-    forEach(this._entities, entity => {
-      if (updatedEntityIds.indexOf(entity.id) === -1) {
+    this._entities = this._entities.filter(entity => {
+      const found = updatedEntityIds.indexOf(entity.id) !== -1;
+
+      if (!found) {
         this.removeEntity(entity);
       }
+
+      return found;
     });
   }
-
-  /**
-   * Creates a new entity from given props (if possible).
-   * @param {Object} props
-   * @returns {Entity}
-   */
-  createEntityIfNotExists(props) {
-    let entity = find(this._entities, e => e.id === props.id);
-
-    if (!entity) {
-      entity = createEntity(this, props);
-
-      if (entity) {
-        this.addEntity(entity);
-      }
-    }
-
-    return entity;
-  }
-
+  
   /**
    * Adds an entity to the game's entity pool.
    * @param {Entity} entity
    */
   addEntity(entity) {
+    if (!entity instanceof Entity) {
+      throw new Error('Session entities must be instances of Entity.');
+    }
+
     if (entity.getProp('type') === PLAYER) {
       this._numPlayers++;
     }
 
     this._entities.push(entity);
+  }
+
+  /**
+   * Returns an entity from the game's entity pool (creating it if it doesn't exist).
+   * @param {Object} props
+   * @returns {Entity}
+   */
+  getEntity(props) {
+    const index = findEntityIndexById(this._entities, props.id);
+    
+    if (index !== -1) {
+      return this._entities[index];
+    }
+
+    const entity = createEntity(this, props);
+
+    if (entity) {
+      this.addEntity(entity);
+    }
+
+    return entity;
   }
 
   /**
@@ -303,8 +315,6 @@ class RemoteState extends State {
     }
 
     entity.destroy();
-
-    remove(this._entities, e => e.id === entity.id);
   }
 
   /**
