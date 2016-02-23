@@ -69,7 +69,7 @@
  * @param {Map} state
  * @param {string} id
  * @returns {Map}
- */function beginRevive(state,id){var playerIndex=(0,_game.findEntityIndexById)(state.get('entities').toJS(),id);var playerProps=(0,_game.findEntityById)(state.get('entities').toJS(),id);if(playerProps.team){var teamIndex=(0,_game.findEntityIndexById)(state.get('entities').toJS(),playerProps.team);var baseProps=state.getIn(['entities',teamIndex,'base']);var _calculateBaseSpawnPo2=(0,_game.calculateBaseSpawnPosition)(playerProps,baseProps);var x=_calculateBaseSpawnPo2.x;var y=_calculateBaseSpawnPo2.y;state=setPosition(state,id,x,y)}var health=state.getIn(['entities',playerIndex,'health']);return setIsDead(setIsReviving(state,id,true),id,false).setIn(['entities',playerIndex,'currentHealth'],health).removeIn(['entities',playerIndex,'lastAttackerId'])} /**
+ */function beginRevive(state,id){var playerIndex=(0,_game.findEntityIndexById)(state.get('entities').toJS(),id);var playerProps=(0,_game.findEntityById)(state.get('entities').toJS(),id);if(playerProps.team){var teamIndex=(0,_game.findEntityIndexById)(state.get('entities').toJS(),playerProps.team);var teamProps=state.getIn(['entities',teamIndex]).toJS();var _calculateBaseSpawnPo2=(0,_game.calculateBaseSpawnPosition)(playerProps,teamProps.base);var x=_calculateBaseSpawnPo2.x;var y=_calculateBaseSpawnPo2.y;state=setPosition(state,id,x,y)}var health=state.getIn(['entities',playerIndex,'health']);return setIsDead(setIsReviving(state,id,true),id,false).setIn(['entities',playerIndex,'currentHealth'],health).removeIn(['entities',playerIndex,'lastAttackerId'])} /**
  *
  * @param {Map} state
  * @param {string} id
