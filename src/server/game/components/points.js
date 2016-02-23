@@ -3,7 +3,7 @@ import Component from 'shared/game/component';
 
 const POINTS_INTERVAL = 10000;
 
-class Points extends Component {
+class PointsComponent extends Component {
   constructor(onUpdate) {
     super('points', 0, onUpdate);
     
@@ -19,4 +19,4 @@ class Points extends Component {
   }
 }
 
-export default Points;
+export default PointsComponent;

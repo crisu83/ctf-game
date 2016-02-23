@@ -4,8 +4,9 @@
 import { forEach } from 'lodash';
 import { logger } from '../helpers/vendor';
 import Entity from 'shared/game/entity';
-import Health from '../game/components/health';
-import Points from '../game/components/points';
+import HealthComponent from '../game/components/health';
+import PointsComponent from '../game/components/points';
+import { POINTS_PER_FLAG } from '../constants';
 import {
   killEntity,
   beginRevive,
@@ -17,8 +18,6 @@ export const PLAYER = 'player';
 export const TEAM = 'team';
 export const FLAG = 'flag';
 
-const POINTS_PER_FLAG = 50;
-
 /**
  *
  * @param {Session} session
@@ -28,7 +27,7 @@ const POINTS_PER_FLAG = 50;
 function createPlayer(session, props) {
   const entity = new Entity(props);
 
-  const onHealthUpdate = function(props, dispatch) {
+  const onHealthComponentUpdate = function(props, dispatch) {
     if (!props.isDead && props.currentHealth <= 0) {
       dispatch(killEntity(props.id, props.lastAttackerId));
 
@@ -43,7 +42,7 @@ function createPlayer(session, props) {
     }
   };
 
-  entity.addComponent(new Health(onHealthUpdate));
+  entity.addComponent(new HealthComponent(onHealthComponentUpdate));
 
   return entity;
 }
@@ -69,7 +68,7 @@ function createFlag(session, props) {
 function createTeam(session, props) {
   const entity = new Entity(props);
 
-  const onPointsUpdate = function(updateProps, dispatch) {
+  const onPointsComponentUpdate = function(updateProps, dispatch) {
     if (updateProps.players && updateProps.numFlags && this.shouldGivePoints()) {
       const points = updateProps.numFlags * POINTS_PER_FLAG;
 
@@ -81,7 +80,7 @@ function createTeam(session, props) {
     }
   };
 
-  entity.addComponent(new Points(onPointsUpdate));
+  entity.addComponent(new PointsComponent(onPointsComponentUpdate));
 
   return entity;
 }
