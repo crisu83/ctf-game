@@ -12,7 +12,7 @@ import Attack from '../game/components/attack';
 import Health from '../game/components/health';
 import { createSprite } from './sprite';
 import { createNameTag } from './text';
-import { isEntityMoving, resolveActionAnimation, validateSpritePosition } from '../helpers/game';
+import { isEntityMoving, resolveActionAnimation } from '../helpers/game';
 import {
   CONTEXT_SERVER,
   setPosition,
