@@ -1,7 +1,7 @@
 import { forEach } from 'lodash';
 import Component from 'shared/game/component';
 
-class Sound extends Component {
+class SoundComponent extends Component {
   /**
    *
    * @param {Array<Phaser.Sound>} sounds
@@ -32,4 +32,4 @@ class Sound extends Component {
   }
 }
 
-export default Sound;
+export default SoundComponent;

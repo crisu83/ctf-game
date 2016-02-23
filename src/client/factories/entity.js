@@ -4,12 +4,11 @@
 import { get, now } from 'lodash';
 import { Keyboard } from 'phaser';
 import Entity from 'shared/game/entity';
-import Input from '../game/components/input';
-import Sprite from '../game/components/sprite';
-import Text from '../game/components/text';
-import Sound from '../game/components/sound';
-import Attack from '../game/components/attack';
-import Health from '../game/components/health';
+import InputComponent from '../game/components/input';
+import SpriteComponent from '../game/components/sprite';
+import TextComponent from '../game/components/text';
+import SoundComponent from '../game/components/sound';
+import AttackComponent from '../game/components/attack';
 import { createSprite } from './sprite';
 import { createNameTag } from './text';
 import { isEntityMoving, resolveActionAnimation } from '../helpers/game';
@@ -24,6 +23,10 @@ import {
   damageEntity,
   tagFlag
 } from '../actions/game';
+
+export const PLAYER = 'player';
+export const FLAG = 'flag';
+export const TEAM = 'team';
 
 const SOUND_VOLUME = 0.03;
 
@@ -46,7 +49,7 @@ export function createLocalPlayer(state, props) {
   const attackKey = state.input.keyboard.addKey(Keyboard.SPACEBAR);
   const sprintKey = state.input.keyboard.addKey(Keyboard.SHIFT);
 
-  const onInputUpdate = function(updateProps, dispatch) {
+  const onInputComponentUpdate = function(updateProps, dispatch) {
     const cursors = this.getKey('cursors');
     const attack = this.getKey('attack');
     const sprint = this.getKey('sprint');
@@ -79,7 +82,7 @@ export function createLocalPlayer(state, props) {
     }
   };
 
-  entity.addComponent(new Input({ cursors: cursorKeys, attack: attackKey, sprint: sprintKey }, onInputUpdate));
+  entity.addComponent(new InputComponent({ cursors: cursorKeys, attack: attackKey, sprint: sprintKey }, onInputComponentUpdate));
 
   const knightSprite = createSprite(state, null, props);
   const graveSprite = createSprite(state, rootGroup, { type: 'grave' });
@@ -92,7 +95,7 @@ export function createLocalPlayer(state, props) {
 
   knightSprite.body.collideWorldBounds = true;
 
-  const onSpriteUpdate = function(updateProps, dispatch) {
+  const onSpriteComponentUpdate = function(updateProps, dispatch) {
     const knight = this.getSprite('knight');
     const grave = this.getSprite('grave');
 
@@ -148,18 +151,18 @@ export function createLocalPlayer(state, props) {
     // state.game.debug.body(knightSprite);
   };
 
-  entity.addComponent(new Sprite({ knight: knightSprite, grave: graveSprite }, onSpriteUpdate));
+  entity.addComponent(new SpriteComponent({ knight: knightSprite, grave: graveSprite }, onSpriteComponentUpdate));
 
   const hitSound = state.add.audio('knight-hit', SOUND_VOLUME);
   const dieSound = state.add.audio('knight-die', SOUND_VOLUME);
 
-  entity.addComponent(new Sound({ hit: hitSound, die: dieSound }));
+  entity.addComponent(new SoundComponent({ hit: hitSound, die: dieSound }));
 
   for (let i = 0; i < 20; i++) {
     createSprite(state, attackGroup, { type: 'attack' });
   }
 
-  const onAttackUpdate = function(updateProps, dispatch) {
+  const onAttackComponentUpdate = function(updateProps, dispatch) {
     if (updateProps.isAttacking && this.canAttack()) {
       const attack = this.getAttackSprite();
 
@@ -188,13 +191,7 @@ export function createLocalPlayer(state, props) {
     }
   };
 
-  entity.addComponent(new Attack(attackGroup, onAttackUpdate));
-
-  const onHealthUpdate = function(props) {
-
-  };
-
-  entity.addComponent(new Health(onHealthUpdate));
+  entity.addComponent(new AttackComponent(attackGroup, onAttackComponentUpdate));
 
   // TODO: Fix name tag positioning
   // const nameText = createNameTag(state, props);
@@ -218,7 +215,7 @@ function createRemotePlayer(state, props) {
   const knightSprite = createSprite(state, knightGroup, props);
   const graveSprite = createSprite(state, rootGroup, { type: 'grave' });
 
-  const onSpriteUpdate = function(updateProps) {
+  const onSpriteComponentUpdate = function(updateProps) {
     const knight = this.getSprite('knight');
     const grave = this.getSprite('grave');
 
@@ -251,15 +248,15 @@ function createRemotePlayer(state, props) {
     // state.game.debug.body(knight);
   };
 
-  entity.addComponent(new Sprite({ knight: knightSprite, grave: graveSprite }, onSpriteUpdate));
+  entity.addComponent(new SpriteComponent({ knight: knightSprite, grave: graveSprite }, onSpriteComponentUpdate));
 
   const hitSound = state.add.audio('knight-hit', SOUND_VOLUME);
   const dieSound = state.add.audio('knight-die', SOUND_VOLUME);
 
-  entity.addComponent(new Sound({ hit: hitSound, die: dieSound }));
+  entity.addComponent(new SoundComponent({ hit: hitSound, die: dieSound }));
 
   const nameText = createNameTag(state, props);
-  entity.addComponent(new Text({ name: nameText }));
+  entity.addComponent(new TextComponent({ name: nameText }));
 
   return entity;
 }
@@ -277,7 +274,7 @@ function createFlag(state, props) {
 
   const flagSprite = createSprite(state, flagGroup, props);
 
-  const onSpriteUpdate = function(updateProps) {
+  const onSpriteComponentUpdate = function(updateProps) {
     const flag = this.getSprite('flag');
 
     if (updateProps.color !== this.getProp('color')) {
@@ -285,7 +282,7 @@ function createFlag(state, props) {
     }
   };
 
-  entity.addComponent(new Sprite({ flag: flagSprite }, onSpriteUpdate));
+  entity.addComponent(new SpriteComponent({ flag: flagSprite }, onSpriteComponentUpdate));
 
   return entity;
 }
@@ -297,10 +294,10 @@ function createFlag(state, props) {
  */
 export function createEntity(state, props) {
   switch (props.type) {
-    case 'player':
+    case PLAYER:
       return createRemotePlayer(state, props);
 
-    case 'flag':
+    case FLAG:
       return createFlag(state, props);
 
     default:

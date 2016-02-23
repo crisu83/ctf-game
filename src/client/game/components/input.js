@@ -1,6 +1,6 @@
 import Component from 'shared/game/component';
 
-class Input extends Component {
+class InputComponent extends Component {
   /**
    *
    * @param {Object} keys
@@ -22,4 +22,4 @@ class Input extends Component {
   }
 }
 
-export default Input;
+export default InputComponent;

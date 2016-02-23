@@ -3,7 +3,7 @@ import Component from 'shared/game/component';
 
 const DEFAULT_COOLDOWN = 500;
 
-class Attack extends Component {
+class AttackComponent extends Component {
   /**
    *
    * @param {Phaser.Group} group
@@ -64,4 +64,4 @@ class Attack extends Component {
   }
 }
 
-export default Attack;
+export default AttackComponent;

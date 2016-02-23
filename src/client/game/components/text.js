@@ -1,7 +1,7 @@
 import { forEach } from 'lodash';
 import Component from 'shared/game/component';
 
-class Text extends Component {
+class TextComponent extends Component {
   /**
    *
    * @param {Array<Phaser.Text>} texts
@@ -32,4 +32,4 @@ class Text extends Component {
   }
 }
 
-export default Text;
+export default TextComponent;

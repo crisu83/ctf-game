@@ -1,7 +1,7 @@
 import { forEach } from 'lodash';
 import Component from 'shared/game/component';
 
-class Sprite extends Component {
+class SpriteComponent extends Component {
   /**
    *
    * @param {Array<Phaser.Sprite>} sprites
@@ -32,4 +32,4 @@ class Sprite extends Component {
   }
 }
 
-export default Sprite;
+export default SpriteComponent;
