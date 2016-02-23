@@ -196,8 +196,8 @@ export function beginRevive(state, id) {
   const playerProps = findEntityById(state.get('entities').toJS(), id);
   if (playerProps.team) {
     const teamIndex = findEntityIndexById(state.get('entities').toJS(), playerProps.team);
-    const baseProps = state.getIn(['entities', teamIndex, 'base']);
-    const { x, y } = calculateBaseSpawnPosition(playerProps, baseProps);
+    const teamProps = state.getIn(['entities', teamIndex]).toJS();
+    const { x, y } = calculateBaseSpawnPosition(playerProps, teamProps.base);
     state = setPosition(state, id, x, y);
   }
   const health = state.getIn(['entities', playerIndex, 'health']);
