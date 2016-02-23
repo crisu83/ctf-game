@@ -1,7 +1,7 @@
 /*eslint no-unused-vars: 0*/
 
 import shortid from 'shortid';
-import { forEach, find, get, now } from 'lodash';
+import { forEach, find, get, now, remove } from 'lodash';
 import { logger } from '../helpers/vendor';
 import createStore from '../store';
 import { addEntity, removeEntity, advanceTime } from '../actions/game';
@@ -92,6 +92,68 @@ class Session {
   }
 
   /**
+   * Updates the state for each entity in the session,
+   * as well as creates new entities and destroys expired entities.
+   */
+  updateEntities() {
+    const gameState = this.gameState;
+    const updatedEntityIds = [];
+
+    forEach(gameState.entities, props => {
+      let entity = this.createEntityIfNotExists(props);
+
+      if (entity) {
+        entity.update(props, this.dispatch.bind(this));
+      }
+
+      updatedEntityIds.push(props.id);
+    });
+
+    forEach(this._entities, entity => {
+      if (updatedEntityIds.indexOf(entity.id) === -1) {
+        this.removeEntity(entity);
+      }
+    });
+  }
+
+  /**
+   * Creates a new entity from given props (if possible).
+   * @param {Object} props
+   * @returns {Entity}
+   */
+  createEntityIfNotExists(props) {
+    let entity = find(this._entities, e => e.id === props.id);
+
+    if (!entity) {
+      entity = createEntity(this, props);
+
+      if (entity) {
+        this.addEntity(entity);
+      }
+    }
+
+    return entity;
+  }
+
+  /**
+   * Adds an entity to the session's entity pool.
+   * @param {Entity} entity
+   */
+  addEntity(entity) {
+    this._entities.push(entity);
+  }
+
+  /**
+   * Removes an entity from the session's entity pool.
+   * @param {Entity} entity
+   */
+  removeEntity(entity) {
+    entity.destroy();
+
+    remove(this._entities, e => e.id === entity.id);
+  }
+
+  /**
    * Ends this session.
    */
   end() {
@@ -112,71 +174,6 @@ class Session {
    */
   removePlayer(id) {
     this.dispatch(removeEntity(id));
-  }
-
-  /**
-   * Updates each entity in this session.
-   */
-  updateEntities() {
-    const gameState = this.gameState;
-    
-    let removedEntityIds = this.getEntityIds();
-
-    forEach(gameState.entities, props => {
-      let entity = find(this._entities, e => e.id === props.id);
-
-      // Create the entity if it does not exist.
-      if (!entity) {
-        entity = createEntity(this, props);
-        this.addEntity(entity);
-      }
-
-      entity.update(props, this._store.dispatch);
-
-      // Remove updated entities from the list of entities to be removed.
-      removedEntityIds = removedEntityIds.filter(id => id !== props.id);
-    });
-
-    // Destroy entities that have been removed.
-    this.destroyEntities(removedEntityIds);
-  }
-
-  /**
-   * Adds an entity to this session's entity pool.
-   * @param {Entity} entity
-   */
-  addEntity(entity) {
-    this._entities.push(entity);
-  }
-
-  /**
-   * Returns a list containing the id of every entity in this session.
-   * @returns {Array}
-   */
-  getEntityIds() {
-    let ids = [];
-
-    forEach(this._entities, entity => {
-      ids.push(entity.id);
-    });
-
-    return ids;
-  }
-
-  /**
-   * Destroys a set of entities from this session's entity pool.
-   * @param {Array} ids
-   */
-  destroyEntities(ids) {
-    this._entities = this._entities.filter(entity => {
-      let isRemoved = ids.indexOf(entity.id) !== -1;
-
-      if (isRemoved) {
-        entity.destroy();
-      }
-
-      return !isRemoved;
-    });
   }
 
   /**
