@@ -3,7 +3,6 @@ import { isNumber } from 'lodash';
 import {
   findEntityById,
   findEntityIndexById,
-  findWeakestTeamId,
   findTeamIndexByPlayerId,
   calculateBaseSpawnPosition
 } from '../helpers/game';
@@ -158,8 +157,8 @@ export function setIsAttacking(state, id, value) {
 export function damageEntity(state, id, victimId) {
   const attackerIndex = findEntityIndexById(state.get('entities').toJS(), id);
   const victimIndex = findEntityIndexById(state.get('entities').toJS(), victimId);
-  const attackerColor = state.getIn('entities', attackerIndex, 'color');
-  const victimColor = state.getIn('entities', victimIndex, 'color');
+  const attackerColor = state.getIn(['entities', attackerIndex, 'color']);
+  const victimColor = state.getIn(['entities', victimIndex, 'color']);
   if (attackerColor === victimColor) {
     return state;
   }
