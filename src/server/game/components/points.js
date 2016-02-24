@@ -1,7 +1,6 @@
 import { now } from 'lodash';
 import Component from 'shared/game/component';
-
-const POINTS_INTERVAL = 10000;
+import { GIVE_POINTS_SECONDS } from '../../constants';
 
 class PointsComponent extends Component {
   constructor(onUpdate) {
@@ -11,7 +10,7 @@ class PointsComponent extends Component {
   }
   
   shouldGivePoints() {
-    return (now() - this._lastGivenAt) > POINTS_INTERVAL;
+    return (now() - this._lastGivenAt) > (GIVE_POINTS_SECONDS * 1000);
   }
   
   pointsGiven() {
