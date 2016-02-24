@@ -36,15 +36,15 @@ describe('game reducer', () => {
     it('damaging an entity reduces its health in the state', () => {
       const state = Map(Map({
         entities: List.of(
-          Map({id: '1', name: 'John', damage: 50}),
-          Map({id: '2', name: 'Jane', currentHealth: 100})
+          Map({id: '1', name: 'John', damage: 50, color: 'blue'}),
+          Map({id: '2', name: 'Jane', currentHealth: 100, color: 'green'})
         )
       }));
       const nextState = damageEntity(state, '1', '2');
       expect(nextState).to.equal(Map({
         entities: List.of(
-          Map({id: '1', name: 'John', damage: 50}),
-          Map({id: '2', name: 'Jane', currentHealth: 50, lastAttackerId: '1'})
+          Map({id: '1', name: 'John', damage: 50, color: 'blue'}),
+          Map({id: '2', name: 'Jane', currentHealth: 50, color: 'green', lastAttackerId: '1'})
         )
       }));
     });
