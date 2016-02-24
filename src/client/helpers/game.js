@@ -29,6 +29,22 @@ export function isEntityMoving(props) {
 
 /**
  *
+ * @param {number} value1
+ * @param {number} value2
+ * @returns {float}
+ */
+export function calculateRatio(value1, value2) {
+  if (value1 === 0) {
+    return 0;
+  } else if (value2 === 0) {
+    return value1;
+  } else {
+    return value1 / value2;
+  }
+}
+
+/**
+ *
  * @param {string} action
  * @param {string} facing
  * @returns {string}

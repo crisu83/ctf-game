@@ -23,9 +23,19 @@ class Text {
    * @param {Object} style
    */
   update(params, style) {
+    if (!this._text.visible) {
+      this._text.visible = true;
+    }
     const value = this._string.replace(/\{\w+\}/g, key => get(params, key.substring(1, key.length - 1), key));
     this._text.text = value;
     this._text.setStyle({ ...this._style, ...style });
+  }
+
+  /**
+   *
+   */
+  hide() {
+    this._text.visible = false;
   }
 
   /**

@@ -1,12 +1,12 @@
 import { is, Map } from 'immutable';
 import { forEach, get, last, now } from 'lodash';
-import { State, Physics, Keyboard, Tilemap, Group } from 'phaser';
-import { setState } from '../../actions/game';
-import { createLocalPlayer, createEntity, PLAYER } from '../../factories/entity';
-import { createLayer } from '../../factories/layer';
-import { findEntityIndexById } from '../../helpers/game';
-import RenderGroup from '../groups/render';
-import Text from '../text';
+import Phaser, { Physics, Keyboard, Tilemap, Group } from 'phaser';
+import { setState } from '../actions/game';
+import { createLocalPlayer, createEntity, PLAYER } from '../factories/entity';
+import { createLayer } from '../factories/layer';
+import { findEntityIndexById } from '../helpers/game';
+import RenderGroup from './groups/render';
+import Text from './text';
 import Entity from 'shared/game/entity';
 
 const MUSIC_VOLUME = 0.01;
@@ -15,7 +15,7 @@ const TILE_LAYER = 'tilelayer';
 // Require for dynamic loading of assets provided by the server.
 const req = require.context('resources/assets', true, /\.(png|jpg|mp3|ogg|wav)$/);
 
-class RemoteState extends State {
+class State extends Phaser.State {
   /**
    * Creates the actual game state.
    * @param store
@@ -199,6 +199,9 @@ class RemoteState extends State {
       let y = data.y >= 0 ? data.y : config.gameHeight + data.y;
       let text = this.add.text(x, y, data.text, style, uiGroup);
       text.fixedToCamera = true;
+      if (data.x < 0) {
+        text.anchor.set(1, 0);
+      }
       this.addText(key, new Text(text, style, data.text));
     });
   }
@@ -249,7 +252,7 @@ class RemoteState extends State {
 
     forEach(gameState.entities, props => {
       let entity = this.getEntity(props);
-      
+
       if (entity) {
         entity.update(props, this.dispatch.bind(this));
       }
@@ -261,13 +264,17 @@ class RemoteState extends State {
       const found = updatedEntityIds.indexOf(entity.id) !== -1;
 
       if (!found) {
-        this.removeEntity(entity);
+        if (entity.getProp('type') === PLAYER) {
+          this._numPlayers--;
+        }
+
+        entity.destroy();
       }
 
       return found;
     });
   }
-  
+
   /**
    * Adds an entity to the game's entity pool.
    * @param {Entity} entity
@@ -291,7 +298,7 @@ class RemoteState extends State {
    */
   getEntity(props) {
     const index = findEntityIndexById(this._entities, props.id);
-    
+
     if (index !== -1) {
       return this._entities[index];
     }
@@ -303,45 +310,6 @@ class RemoteState extends State {
     }
 
     return entity;
-  }
-
-  /**
-   * Removes an entity from the game's entity pool.
-   * @param {Entity} entity
-   */
-  removeEntity(entity) {
-    if (entity.getProp('type') === PLAYER) {
-      this._numPlayers--;
-    }
-
-    entity.destroy();
-  }
-
-  /**
-   * Updates the user interface texts for the game.
-   */
-  updateTexts() {
-    if (this._playerEntity) {
-      this.updateText(
-        'playerName',
-        { name: this._playerEntity.getProp('name') },
-        { fill: this._playerEntity.getProp('hexColor') }
-      );
-      this.updateText('playerPoints', { amount: this._playerEntity.getProp('points') || 0 });
-      this.updateText('playerKills', { amount: this._playerEntity.getProp('numKills') || 0 });
-      this.updateText('playerDeaths', { amount: this._playerEntity.getProp('numDeaths') || 0 });
-    }
-
-    if (this.shouldUpdatePing()) {
-      this.updateText('ping', { amount: `${this._ping} ms` });
-    }
-
-    if (this.shouldUpdatePacketLoss()) {
-      const packetLoss = this.calculatePacketLoss();
-      this.updateText('packetLoss', { amount: `${packetLoss.toFixed(2)}%` });
-    }
-
-    this.updateText('playersOnline', { amount: this._numPlayers });
   }
 
   /**
@@ -466,6 +434,20 @@ class RemoteState extends State {
   }
 
   /**
+   *
+   * @param key
+   */
+  hideText(key) {
+    const text = this._texts[key];
+
+    if (!text) {
+      return;
+    }
+
+    text.hide();
+  }
+
+  /**
    * Dispatches an action to the store.
    * @param {Object} action
    */
@@ -494,4 +476,4 @@ class RemoteState extends State {
   }
 }
 
-export default RemoteState;
+export default State;

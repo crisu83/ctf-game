@@ -6,32 +6,62 @@
       "y": 10
     },
     "playerPoints": {
-      "text": "points: {amount}",
+      "text": "Points {amount}",
       "x": 10,
-      "y": 40
+      "y": 30
     },
     "playerKills": {
-      "text": "kills: {amount}",
+      "text": "Kills {amount}",
       "x": 10,
-      "y": 60
+      "y": 50
     },
     "playerDeaths": {
-      "text": "deaths: {amount}",
+      "text": "Deaths {amount}",
       "x": 10,
-      "y": 80
+      "y": 70
+    },
+    "teamFlags": {
+      "text": "Flags {amount} / 16",
+      "x": -10,
+      "y": 10
     },
     "ping": {
-      "text": "ping: {amount}",
-      "x": 10,
+      "text": "Ping {amount}",
+      "x": -10,
       "y": -70
     },
     "packetLoss": {
-      "text": "packet loss: {amount}",
-      "x": 10,
+      "text": "Packet Loss {amount}",
+      "x": -10,
       "y": -50
     },
     "playersOnline": {
-      "text": "players online: {amount}",
+      "text": "Players Online {amount}",
+      "x": -10,
+      "y": -30
+    },
+    "top5_1": {
+      "text": "#1 {player} {points}",
+      "x": 10,
+      "y": -110
+    },
+    "top5_2": {
+      "text": "#2 {player} {points}",
+      "x": 10,
+      "y": -90
+    },
+    "top5_3": {
+      "text": "#3 {player} {points}",
+      "x": 10,
+      "y": -70
+    },
+    "top5_4": {
+      "text": "#4 {player} {points}",
+      "x": 10,
+      "y": -50
+    },
+    "top5_5": {
+      "text": "#5 {player} {points}",
       "x": 10,
       "y": -30
     }
