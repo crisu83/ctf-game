@@ -1,4 +1,4 @@
-'use strict';Object.defineProperty(exports,'__esModule',{value:true});var _createClass=function(){function defineProperties(target,props){for(var i=0;i<props.length;i++){var descriptor=props[i];descriptor.enumerable=descriptor.enumerable||false;descriptor.configurable=true;if('value' in descriptor)descriptor.writable=true;Object.defineProperty(target,descriptor.key,descriptor)}}return function(Constructor,protoProps,staticProps){if(protoProps)defineProperties(Constructor.prototype,protoProps);if(staticProps)defineProperties(Constructor,staticProps);return Constructor}}(); /*eslint no-unused-vars: 0*/var _shortid=require('shortid');var _shortid2=_interopRequireDefault(_shortid);var _lodash=require('lodash');var _vendor=require('../helpers/vendor');var _store=require('../store');var _store2=_interopRequireDefault(_store);var _game=require('../actions/game');var _entity=require('../factories/entity');var _map=require('../factories/map');var _constants=require('../constants');function _interopRequireDefault(obj){return obj&&obj.__esModule?obj:{default:obj}}function _classCallCheck(instance,Constructor){if(!(instance instanceof Constructor)){throw new TypeError('Cannot call a class as a function')}} // TODO: Separate game logic and generic game session logic into two different classes.
+'use strict';Object.defineProperty(exports,'__esModule',{value:true});var _createClass=function(){function defineProperties(target,props){for(var i=0;i<props.length;i++){var descriptor=props[i];descriptor.enumerable=descriptor.enumerable||false;descriptor.configurable=true;if('value' in descriptor)descriptor.writable=true;Object.defineProperty(target,descriptor.key,descriptor)}}return function(Constructor,protoProps,staticProps){if(protoProps)defineProperties(Constructor.prototype,protoProps);if(staticProps)defineProperties(Constructor,staticProps);return Constructor}}(); /*eslint no-unused-vars: 0*/var _shortid=require('shortid');var _shortid2=_interopRequireDefault(_shortid);var _lodash=require('lodash');var _vendor=require('../helpers/vendor');var _store=require('../store');var _store2=_interopRequireDefault(_store);var _game=require('../actions/game');var _entity=require('../factories/entity');var _map=require('../factories/map');var _game2=require('../helpers/game');var _constants=require('../constants');var _entity2=require('../../shared/game/entity');var _entity3=_interopRequireDefault(_entity2);function _interopRequireDefault(obj){return obj&&obj.__esModule?obj:{default:obj}}function _classCallCheck(instance,Constructor){if(!(instance instanceof Constructor)){throw new TypeError('Cannot call a class as a function')}} // TODO: Separate game logic and generic game session logic into two different classes.
 var Session=function(){ /**
    * Creates a new game session.
    * @param {string} name
@@ -16,6 +16,16 @@ this._unsubscribeFromStore=this._store.subscribe(this.handleStateChange.bind(thi
    */},{key:'tick',value:function tick(){var timeNow=undefined,timeElapsed=undefined;if(this._isRunning){timeNow=(0,_lodash.now)();timeElapsed=this._lastTickAt?timeNow-this._lastTickAt:0;this._store.dispatch((0,_game.advanceTime)(timeElapsed));this.update();this._lastTickAt=timeNow}} /**
    * Called each time this sessions should be updated.
    */},{key:'update',value:function update(){this.updateEntities()} /**
+   * Updates the state for each entity in the session,
+   * as well as creates new entities and destroys expired entities.
+   */},{key:'updateEntities',value:function updateEntities(){var _this=this;var gameState=this.gameState;var updatedEntityIds=[];(0,_lodash.forEach)(gameState.entities,function(props){var entity=_this.getEntity(props);if(entity){entity.update(props,_this.dispatch.bind(_this))}updatedEntityIds.push(props.id)});this._entities=this._entities.filter(function(entity){var found=updatedEntityIds.indexOf(entity.id)!==-1;if(!found){entity.destroy()}return found})} /**
+   * Adds an entity to the game's entity pool.
+   * @param {Entity} entity
+   */},{key:'addEntity',value:function addEntity(entity){if(!entity instanceof _entity3.default){throw new Error('State entities must be instances of Entity.')}this._entities.push(entity)} /**
+   * Returns an entity from the game's entity pool (creating it if it doesn't exist).
+   * @param {Object} props
+   * @returns {Entity}
+   */},{key:'getEntity',value:function getEntity(props){var index=(0,_game2.findEntityIndexById)(this._entities,props.id);if(index!==-1){return this._entities[index]}var entity=(0,_entity.createEntity)(this,props);if(entity){this.addEntity(entity)}return entity} /**
    * Ends this session.
    */},{key:'end',value:function end(){this._unsubscribeFromStore()} /**
    * Adds a player to this session.
@@ -24,20 +34,6 @@ this._unsubscribeFromStore=this._store.subscribe(this.handleStateChange.bind(thi
    * Removes a player from this session.
    * @param {string} id
    */},{key:'removePlayer',value:function removePlayer(id){this.dispatch((0,_game.removeEntity)(id))} /**
-   * Updates each entity in this session.
-   */},{key:'updateEntities',value:function updateEntities(){var _this=this;var gameState=this.gameState;var removedEntityIds=this.getEntityIds();(0,_lodash.forEach)(gameState.entities,function(props){var entity=(0,_lodash.find)(_this._entities,function(e){return e.id===props.id}); // Create the entity if it does not exist.
-if(!entity){entity=(0,_entity.createEntity)(_this,props);_this.addEntity(entity)}entity.update(props,_this._store.dispatch); // Remove updated entities from the list of entities to be removed.
-removedEntityIds=removedEntityIds.filter(function(id){return id!==props.id})}); // Destroy entities that have been removed.
-this.destroyEntities(removedEntityIds)} /**
-   * Adds an entity to this session's entity pool.
-   * @param {Entity} entity
-   */},{key:'addEntity',value:function addEntity(entity){this._entities.push(entity)} /**
-   * Returns a list containing the id of every entity in this session.
-   * @returns {Array}
-   */},{key:'getEntityIds',value:function getEntityIds(){var ids=[];(0,_lodash.forEach)(this._entities,function(entity){ids.push(entity.id)});return ids} /**
-   * Destroys a set of entities from this session's entity pool.
-   * @param {Array} ids
-   */},{key:'destroyEntities',value:function destroyEntities(ids){this._entities=this._entities.filter(function(entity){var isRemoved=ids.indexOf(entity.id)!==-1;if(isRemoved){entity.destroy()}return!isRemoved})} /**
    * Called by clients to dispatch actions received from the browser.
    * @param {Object} action
    */},{key:'handleClientAction',value:function handleClientAction(action){this._store.dispatch(action)} /**

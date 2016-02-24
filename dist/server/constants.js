@@ -1,2 +1,2 @@
-'use strict';Object.defineProperty(exports,'__esModule',{value:true});var GAME_TICK_RATE=exports.GAME_TICK_RATE=30;var GAME_SYNC_RATE=exports.GAME_SYNC_RATE=30;var LAYER_OBJECTS=exports.LAYER_OBJECTS='objectgroup';var DATA_PATH=exports.DATA_PATH='../../../resources/data';
+'use strict';Object.defineProperty(exports,'__esModule',{value:true});var GAME_TICK_RATE=exports.GAME_TICK_RATE=30;var GAME_SYNC_RATE=exports.GAME_SYNC_RATE=30;var LAYER_OBJECTS=exports.LAYER_OBJECTS='objectgroup';var DATA_PATH=exports.DATA_PATH='../../../resources/data';var POINTS_PER_FLAG=exports.POINTS_PER_FLAG=50;var GIVE_POINTS_SECONDS=exports.GIVE_POINTS_SECONDS=30;
 //# sourceMappingURL=constants.js.map

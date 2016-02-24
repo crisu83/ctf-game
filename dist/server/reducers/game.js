@@ -58,7 +58,7 @@
  * @param {string} id
  * @param {string} victimId
  * @returns {Map}
- */function damageEntity(state,id,victimId){var attackerIndex=(0,_game.findEntityIndexById)(state.get('entities').toJS(),id);var victimIndex=(0,_game.findEntityIndexById)(state.get('entities').toJS(),victimId);var attackerColor=state.getIn('entities',attackerIndex,'color');var victimColor=state.getIn('entities',victimIndex,'color');if(attackerColor===victimColor){return state}var damage=state.getIn(['entities',attackerIndex,'damage']);var health=state.getIn(['entities',victimIndex,'health']);return state.updateIn(['entities',victimIndex,'currentHealth'],health,function(value){return value-damage}).setIn(['entities',victimIndex,'lastAttackerId'],id)} /**
+ */function damageEntity(state,id,victimId){var attackerIndex=(0,_game.findEntityIndexById)(state.get('entities').toJS(),id);var victimIndex=(0,_game.findEntityIndexById)(state.get('entities').toJS(),victimId);var attackerColor=state.getIn(['entities',attackerIndex,'color']);var victimColor=state.getIn(['entities',victimIndex,'color']);if(attackerColor===victimColor){return state}var damage=state.getIn(['entities',attackerIndex,'damage']);var health=state.getIn(['entities',victimIndex,'health']);return state.updateIn(['entities',victimIndex,'currentHealth'],health,function(value){return value-damage}).setIn(['entities',victimIndex,'lastAttackerId'],id)} /**
  *
  * @param {Map} state
  * @param {string} id
