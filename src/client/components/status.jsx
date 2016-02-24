@@ -16,7 +16,9 @@ function randomTip() {
     'Tell your friends to join for more fun'
   ];
 
-  return tips[Math.round(Math.random() * tips.length) - 1];
+  const tipIndex = Math.round(Math.random() * tips.length);
+
+  return tips[tipIndex];
 }
 
 class Status extends Component {
