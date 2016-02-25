@@ -156,7 +156,7 @@ export function createLocalPlayer(state, props) {
   }
 
   const onAttackComponentUpdate = function(updateProps, dispatch) {
-    if (updateProps.isAttacking && this.canAttack()) {
+    if (!updateProps.isDead && updateProps.isAttacking && this.canAttack()) {
       const attack = this.getAttackSprite();
 
       if (attack) {
@@ -165,14 +165,14 @@ export function createLocalPlayer(state, props) {
 
         attack.reset(x, y);
         hit.play();
-        
+
         state.physics.arcade.collide(attack, knightGroup, null/* collideCallback */, (attack, knight) => {
           dispatch(damageEntity(updateProps.id, knight.name));
           return false; // allows passing through attacks
         });
 
         attack.kill();
-        
+
         this.attackPerformed();
 
         setTimeout(() => {
