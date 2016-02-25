@@ -1,4 +1,5 @@
 import State from '../state';
+import { PLAYER, FLAG } from '../../factories/entity';
 
 class Castle extends State {
   /**
@@ -9,18 +10,17 @@ class Castle extends State {
   }
 
   /**
-   * Called when the game is updated.
-   */
-  update() {
-    super.update();
-
-    this.updateTexts();
-  }
-
-  /**
    * Updates the user interface texts for the game.
    */
   updateTexts() {
+    super.updateTexts();
+    this.updatePlayerTexts();
+    this.updateFlagsText();
+    this.updateTop5Text();
+    this.updateText('playersOnline', { amount: this._numPlayers });
+  }
+
+  updatePlayerTexts() {
     if (this._playerEntity) {
       this.updateText(
         'playerName',
@@ -31,11 +31,15 @@ class Castle extends State {
       this.updateText('playerKills', { amount: this._playerEntity.getProp('numKills') || 0 });
       this.updateText('playerDeaths', { amount: this._playerEntity.getProp('numDeaths') || 0 });
     }
+  }
 
-    const numFlags = this._entities.filter(entity => entity.getProp('type') === 'flag' && entity.getProp('color') === this._playerEntity.getProp('color'));
+  updateFlagsText() {
+    const numFlags = this._entities.filter(entity => entity.getProp('type') === FLAG && entity.getProp('color') === this._playerEntity.getProp('color'));
     this.updateText('teamFlags', { amount: numFlags.length || 0 });
+  }
 
-    const players = this._entities.filter(entity => entity.getProp('type') === 'player')
+  updateTop5Text() {
+    const players = this._entities.filter(entity => entity.getProp('type') === PLAYER)
       .sort((a, b) => b.getProp('points') - a.getProp('points'));
 
     for (let i = 0; i < 5; i++) {
@@ -46,17 +50,6 @@ class Castle extends State {
         this.hideText(key);
       }
     }
-
-    if (this.shouldUpdatePing()) {
-      this.updateText('ping', { amount: `${this._ping} ms` });
-    }
-
-    if (this.shouldUpdatePacketLoss()) {
-      const packetLoss = this.calculatePacketLoss();
-      this.updateText('packetLoss', { amount: `${packetLoss.toFixed(2)}%` });
-    }
-
-    this.updateText('playersOnline', { amount: this._numPlayers });
   }
 }
 

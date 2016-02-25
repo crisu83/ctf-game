@@ -1,10 +1,9 @@
 import { is, Map } from 'immutable';
-import { forEach, get, last, now } from 'lodash';
+import { find, forEach, get, last, now } from 'lodash';
 import Phaser, { Physics, Keyboard, Tilemap, Group } from 'phaser';
 import { setState } from '../actions/game';
 import { createLocalPlayer, createEntity, PLAYER } from '../factories/entity';
 import { createLayer } from '../factories/layer';
-import { findEntityIndexById } from '../helpers/game';
 import RenderGroup from './groups/render';
 import Text from './text';
 import Entity from 'shared/game/entity';
@@ -276,40 +275,17 @@ class State extends Phaser.State {
   }
 
   /**
-   * Adds an entity to the game's entity pool.
-   * @param {Entity} entity
+   * Updates the user interface texts for the game.
    */
-  addEntity(entity) {
-    if (!entity instanceof Entity) {
-      throw new Error('Session entities must be instances of Entity.');
+  updateTexts() {
+    if (this.shouldUpdatePing()) {
+      this.updateText('ping', { amount: `${this._ping} ms` });
     }
 
-    if (entity.getProp('type') === PLAYER) {
-      this._numPlayers++;
+    if (this.shouldUpdatePacketLoss()) {
+      const packetLoss = this.calculatePacketLoss();
+      this.updateText('packetLoss', { amount: `${packetLoss.toFixed(2)}%` });
     }
-
-    this._entities.push(entity);
-  }
-
-  /**
-   * Returns an entity from the game's entity pool (creating it if it doesn't exist).
-   * @param {Object} props
-   * @returns {Entity}
-   */
-  getEntity(props) {
-    const index = findEntityIndexById(this._entities, props.id);
-
-    if (index !== -1) {
-      return this._entities[index];
-    }
-
-    const entity = createEntity(this, props);
-
-    if (entity) {
-      this.addEntity(entity);
-    }
-
-    return entity;
   }
 
   /**
@@ -344,23 +320,39 @@ class State extends Phaser.State {
   }
 
   /**
-   * Destroys a set of entities from the games entity pool.
-   * @param {Array} ids
+   * Adds an entity to the game's entity pool.
+   * @param {Entity} entity
    */
-  destroyEntities(ids) {
-    this._entities = this._entities.filter(entity => {
-      let isRemoved = ids.indexOf(entity.id) !== -1;
+  addEntity(entity) {
+    if (!entity instanceof Entity) {
+      throw new Error('Session entities must be instances of Entity.');
+    }
 
-      if (isRemoved) {
-        entity.destroy();
+    // TODO: Move to subclass
+    if (entity.getProp('type') === PLAYER) {
+      this._numPlayers++;
+    }
 
-        if (entity.getProp('type') === 'player') {
-          this._numPlayers--;
-        }
+    this._entities.push(entity);
+  }
+
+  /**
+   * Returns an entity from the game's entity pool (creating it if it doesn't exist).
+   * @param {Object} props
+   * @returns {Entity}
+   */
+  getEntity(props) {
+    let entity = find(this._entities, e => e.id === props.id);
+
+    if (!entity) {
+      entity = createEntity(this, props);
+
+      if (entity) {
+        this.addEntity(entity);
       }
+    }
 
-      return !isRemoved;
-    });
+    return entity;
   }
 
   /**

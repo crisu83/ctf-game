@@ -1,13 +1,12 @@
 /*eslint no-unused-vars: 0*/
 
 import shortid from 'shortid';
-import { forEach, get, now } from 'lodash';
+import { find, forEach, get, now } from 'lodash';
 import { logger } from '../helpers/vendor';
 import createStore from '../store';
 import { addEntity, removeEntity, advanceTime } from '../actions/game';
 import { createEntity } from '../factories/entity';
 import { createMap } from '../factories/map';
-import { findEntityIndexById } from '../helpers/game';
 import { DATA_PATH, GAME_TICK_RATE, GAME_SYNC_RATE } from '../constants';
 import Entity from 'shared/game/entity';
 
@@ -140,16 +139,14 @@ class Session {
    * @returns {Entity}
    */
   getEntity(props) {
-    const index = findEntityIndexById(this._entities, props.id);
+    let entity = find(this._entities, e => e.id === props.id);
 
-    if (index !== -1) {
-      return this._entities[index];
-    }
+    if (!entity) {
+      entity = createEntity(this, props);
 
-    const entity = createEntity(this, props);
-
-    if (entity) {
-      this.addEntity(entity);
+      if (entity) {
+        this.addEntity(entity);
+      }
     }
 
     return entity;
