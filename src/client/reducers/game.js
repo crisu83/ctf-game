@@ -1,4 +1,4 @@
-import { Map, fromJS } from 'immutable';
+import { Map, List, fromJS } from 'immutable';
 import { findEntityIndexById } from '../helpers/game';
 import {
   SET_STATE,
@@ -9,7 +9,9 @@ import {
   END_ATTACK
 } from '../actions/game';
 
-const initialState = Map();
+const initialState = Map({
+  entities: List()
+});
 
 /**
  *
@@ -17,9 +19,14 @@ const initialState = Map();
  * @param {Object} newState
  * @returns {Map}
  */
-export function setState(state, newState) {
-  // Server is always correct so we do NOT want to merge the states.
-  return fromJS(newState);
+export function setState(state, newState, playerId) {
+  const nextState = fromJS(newState);
+  if (!playerId) {
+    return nextState;
+  }
+  const playerIndex = findEntityIndexById(state.get('entities').toJS(), playerId);
+  const playerProps = state.getIn(['entities', playerIndex]).toJS();
+  return nextState.mergeIn(['entities', playerIndex, playerProps]);
 }
 
 /**
@@ -75,7 +82,7 @@ export function setIsAttacking(state, id, value) {
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case SET_STATE:
-      return setState(state, action.newState);
+      return setState(state, action.newState, action.playerId);
 
     case SET_POSITION:
       return setPosition(state, action.id, action.x, action.y, action.target);

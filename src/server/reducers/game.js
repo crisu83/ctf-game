@@ -1,7 +1,6 @@
 import { Map, List, fromJS } from 'immutable';
 import { isNumber } from 'lodash';
 import {
-  findEntityById,
   findEntityIndexById,
   findTeamIndexByPlayerId,
   calculateBaseSpawnPosition
@@ -192,7 +191,7 @@ export function killEntity(state, id, lastAttackerId) {
  */
 export function beginRevive(state, id) {
   const playerIndex = findEntityIndexById(state.get('entities').toJS(), id);
-  const playerProps = findEntityById(state.get('entities').toJS(), id);
+  const playerProps = state.getIn(['entities', playerIndex]);
   if (playerProps.team) {
     const teamIndex = findEntityIndexById(state.get('entities').toJS(), playerProps.team);
     const teamProps = state.getIn(['entities', teamIndex]).toJS();
@@ -322,7 +321,7 @@ const reducer = (state = initialState, action) => {
 
     case BEGIN_REVIVE:
       return beginRevive(state, action.id);
-    
+
     case END_REVIVE:
       return setIsReviving(state, action.id, false);
 

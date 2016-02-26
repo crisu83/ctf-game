@@ -1,4 +1,4 @@
-import { forEach, has } from 'lodash';
+import { has } from 'lodash';
 
 /**
  *
@@ -9,11 +9,11 @@ import { forEach, has } from 'lodash';
 export function findEntityIndexById(entities, id) {
   let result = -1;
 
-  forEach(entities, (entity, index) => {
-    if (entity.id === id) {
-      result = index;
+  for (let i = 0; i < entities.length; i++) {
+    if (entities[i].id === id) {
+      result = i;
     }
-  });
+  }
 
   return result;
 }

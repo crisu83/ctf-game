@@ -14,10 +14,11 @@ export const CONTEXT_SERVER = 'server';
 /**
  *
  * @param {Object} newState
+ * @param {string} playerId
  * @returns {{type: string, newState: Object, context: string}}
  */
-export function setState(newState) {
-  return { type: SET_STATE, newState, context: CONTEXT_CLIENT };
+export function setState(newState, playerId) {
+  return { type: SET_STATE, newState, playerId, context: CONTEXT_CLIENT };
 }
 
 /**

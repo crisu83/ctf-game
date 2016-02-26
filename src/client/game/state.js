@@ -218,7 +218,9 @@ class State extends Phaser.State {
    * @param {number} sequence
    */
   handleSetState(state, sequence) {
-    this._store.dispatch(setState(state));
+    if (this._playerEntity) {
+      this._store.dispatch(setState(state, this._playerEntity.getProp('id')));
+    }
     this._packetSequences.push(sequence);
   }
 
@@ -328,7 +330,6 @@ class State extends Phaser.State {
       throw new Error('Session entities must be instances of Entity.');
     }
 
-    // TODO: Move to subclass
     if (entity.getProp('type') === PLAYER) {
       this._numPlayers++;
     }

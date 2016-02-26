@@ -1,24 +1,6 @@
-import { forEach, isUndefined } from 'lodash';
+import { isUndefined } from 'lodash';
 import { chance } from './vendor';
 import { TEAM } from '../factories/entity';
-
-/**
- *
- * @param {Array} entities
- * @param {string} id
- * @returns {Object}
- */
-export function findEntityById(entities, id) {
-  let result = null;
-
-  forEach(entities, (entity) => {
-    if (entity.id === id) {
-      result = entity;
-    }
-  });
-
-  return result;
-}
 
 /**
  *
@@ -29,11 +11,11 @@ export function findEntityById(entities, id) {
 export function findEntityIndexById(entities, id) {
   let result = -1;
 
-  forEach(entities, (entity, index) => {
-    if (entity.id === id) {
-      result = index;
+  for (let i = 0; i < entities.length; i++) {
+    if (entities[i].id === id) {
+      result = i;
     }
-  });
+  }
 
   return result;
 }
@@ -46,15 +28,15 @@ export function findEntityIndexById(entities, id) {
 export function findWeakestTeamId(entities) {
   let leastPlayers, result = -1;
 
-  forEach(entities, entity => {
-    if (entity.type === TEAM) {
-      let teamSize = entity.players ? entity.players.length : 0;
+  for (let i = 0; i < entities.length; i++) {
+    if (entities[i].type === TEAM) {
+      let teamSize = entities[i].players ? entities[i].players.length : 0;
       if (isUndefined(leastPlayers) || teamSize < leastPlayers) {
         leastPlayers = teamSize;
-        result = entity.id;
+        result = entities[i].id;
       }
     }
-  });
+  }
 
   return result;
 }
@@ -68,15 +50,15 @@ export function findWeakestTeamId(entities) {
 export function findTeamIndexByPlayerId(entities, id) {
   let result = -1;
 
-  forEach(entities, (entity, index) => {
-    if (entity.type === TEAM) {
-      forEach(entity.players, playerId => {
-        if (playerId === id) {
-          result = index;
+  for (let i = 0; i < entities.length; i++) {
+    if (entities[i].type === TEAM && entities[i].players) {
+      for (let j = 0; j < entities[i].players.length; j++) {
+        if (entities[i].players[j] === id) {
+          result = i;
         }
-      });
+      }
     }
-  });
+  }
 
   return result;
 }
