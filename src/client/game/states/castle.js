@@ -17,7 +17,6 @@ class Castle extends State {
     this.updatePlayerTexts();
     this.updateFlagsText();
     this.updateTop5Text();
-    this.updateText('playersOnline', { amount: this._numPlayers });
   }
 
   updatePlayerTexts() {

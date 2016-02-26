@@ -288,6 +288,8 @@ class State extends Phaser.State {
       const packetLoss = this.calculatePacketLoss();
       this.updateText('packetLoss', { amount: `${packetLoss.toFixed(2)}%` });
     }
+
+    this.updateText('playersOnline', { amount: this._numPlayers });
   }
 
   /**
