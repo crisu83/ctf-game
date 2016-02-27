@@ -417,6 +417,14 @@ class State extends Phaser.State {
   get gameState() {
     return this._store.getState().game.toJS();
   }
+
+  /**
+   * Returns the entity for the local player.
+   * @returns {Entity}
+   */
+  get playerEntity() {
+    return this._playerEntity;
+  }
 }
 
 export default State;

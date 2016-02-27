@@ -24,15 +24,15 @@ class Castle extends State {
    *
    */
   updatePlayerTexts() {
-    if (this._playerEntity) {
+    if (this.playerEntity) {
       this.updateText(
         'playerName',
-        { name: this._playerEntity.getProp('name') },
-        { fill: this._playerEntity.getProp('hexColor') }
+        { name: this.playerEntity.getProp('name') },
+        { fill: this.playerEntity.getProp('hexColor') }
       );
-      this.updateText('playerPoints', { amount: this._playerEntity.getProp('points') || 0 });
-      this.updateText('playerKills', { amount: this._playerEntity.getProp('numKills') || 0 });
-      this.updateText('playerDeaths', { amount: this._playerEntity.getProp('numDeaths') || 0 });
+      this.updateText('playerPoints', { amount: this.playerEntity.getProp('points') || 0 });
+      this.updateText('playerKills', { amount: this.playerEntity.getProp('numKills') || 0 });
+      this.updateText('playerDeaths', { amount: this.playerEntity.getProp('numDeaths') || 0 });
     }
   }
 
