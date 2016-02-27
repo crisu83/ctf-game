@@ -1,12 +1,12 @@
 import { is, Map } from 'immutable';
-import { find, forEach, get, last, now } from 'lodash';
+import { forEach, get, last, now } from 'lodash';
 import Phaser, { Physics, Keyboard, Tilemap, Group } from 'phaser';
 import { setState } from '../actions/game';
 import { createLocalPlayer, createEntity, PLAYER } from '../factories/entity';
 import { createLayer } from '../factories/layer';
 import RenderGroup from './groups/render';
 import Text from './text';
-import Entity from 'shared/game/entity';
+import EntityManager from 'shared/managers/entity';
 
 const MUSIC_VOLUME = 0.01;
 const TILE_LAYER = 'tilelayer';
@@ -31,7 +31,7 @@ class State extends Phaser.State {
     this._gameData = gameData;
     this._playerEntity = null;
     this._music = null;
-    this._entities = [];
+    this._entities = new EntityManager(props => createEntity(this, props));
     this._root = null;
     this._groups = {};
     this._layers = {};
@@ -180,7 +180,7 @@ class State extends Phaser.State {
    */
   createPlayer() {
     this._playerEntity = createLocalPlayer(this, this._playerProps);
-    this.addEntity(this._playerEntity);
+    this._entities.addEntity(this._playerEntity);
   }
 
   /**
@@ -249,31 +249,8 @@ class State extends Phaser.State {
    */
   updateEntities() {
     const gameState = this.gameState;
-    const updatedEntityIds = [];
 
-    forEach(gameState.entities, props => {
-      let entity = this.getEntity(props);
-
-      if (entity) {
-        entity.update(props, this.dispatch.bind(this));
-      }
-
-      updatedEntityIds.push(props.id);
-    });
-
-    this._entities = this._entities.filter(entity => {
-      const found = updatedEntityIds.indexOf(entity.id) !== -1;
-
-      if (!found) {
-        if (entity.getProp('type') === PLAYER) {
-          this._numPlayers--;
-        }
-
-        entity.destroy();
-      }
-
-      return found;
-    });
+    this._entities.updateFromProps(gameState.entities, this.dispatch.bind(this));
   }
 
   /**
@@ -324,38 +301,10 @@ class State extends Phaser.State {
   }
 
   /**
-   * Adds an entity to the game's entity pool.
-   * @param {Entity} entity
+   *
    */
-  addEntity(entity) {
-    if (!entity instanceof Entity) {
-      throw new Error('Session entities must be instances of Entity.');
-    }
-
-    if (entity.getProp('type') === PLAYER) {
-      this._numPlayers++;
-    }
-
-    this._entities.push(entity);
-  }
-
-  /**
-   * Returns an entity from the game's entity pool (creating it if it doesn't exist).
-   * @param {Object} props
-   * @returns {Entity}
-   */
-  getEntity(props) {
-    let entity = find(this._entities, e => e.id === props.id);
-
-    if (!entity) {
-      entity = createEntity(this, props);
-
-      if (entity) {
-        this.addEntity(entity);
-      }
-    }
-
-    return entity;
+  updateNumPlayers() {
+    this._numPlayers = this._entities.filterByType(PLAYER).length;
   }
 
   /**

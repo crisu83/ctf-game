@@ -33,12 +33,12 @@ class Castle extends State {
   }
 
   updateFlagsText() {
-    const numFlags = this._entities.filter(entity => entity.getProp('type') === FLAG && entity.getProp('color') === this._playerEntity.getProp('color'));
+    const numFlags = this._entities.filterByType(entity => entity.getProp('type') === FLAG && entity.getProp('color') === this._playerEntity.getProp('color'));
     this.updateText('teamFlags', { amount: numFlags.length || 0 });
   }
 
   updateTop5Text() {
-    const players = this._entities.filter(entity => entity.getProp('type') === PLAYER)
+    const players = this._entities.filterByType(PLAYER)
       .sort((a, b) => b.getProp('points') - a.getProp('points'));
 
     for (let i = 0; i < 5; i++) {

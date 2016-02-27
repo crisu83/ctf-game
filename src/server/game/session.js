@@ -8,6 +8,7 @@ import { addEntity, removeEntity, advanceTime } from '../actions/game';
 import { createEntity } from '../factories/entity';
 import { createMap } from '../factories/map';
 import { DATA_PATH, GAME_TICK_RATE, GAME_SYNC_RATE } from '../constants';
+import EntityManager from 'shared/managers/entity';
 import Entity from 'shared/game/entity';
 
 // TODO: Separate game logic and generic game session logic into two different classes.
@@ -26,7 +27,7 @@ class Session {
     this._gameData = this.loadGameData();
     this._isRunning = false;
     this._lastTickAt = null;
-    this._entities = [];
+    this._entities = new EntityManager(props => createEntity(this, props));
     this._packetSequence = 0;
     this._lastSyncAt = null;
 
@@ -98,58 +99,8 @@ class Session {
    */
   updateEntities() {
     const gameState = this.gameState;
-    const updatedEntityIds = [];
 
-    forEach(gameState.entities, props => {
-      let entity = this.getEntity(props);
-
-      if (entity) {
-        entity.update(props, this.dispatch.bind(this));
-      }
-
-      updatedEntityIds.push(props.id);
-    });
-
-    this._entities = this._entities.filter(entity => {
-      const found = updatedEntityIds.indexOf(entity.id) !== -1;
-
-      if (!found) {
-        entity.destroy();
-      }
-
-      return found;
-    });
-  }
-
-  /**
-   * Adds an entity to the game's entity pool.
-   * @param {Entity} entity
-   */
-  addEntity(entity) {
-    if (!entity instanceof Entity) {
-      throw new Error('State entities must be instances of Entity.');
-    }
-
-    this._entities.push(entity);
-  }
-
-  /**
-   * Returns an entity from the game's entity pool (creating it if it doesn't exist).
-   * @param {Object} props
-   * @returns {Entity}
-   */
-  getEntity(props) {
-    let entity = find(this._entities, e => e.id === props.id);
-
-    if (!entity) {
-      entity = createEntity(this, props);
-
-      if (entity) {
-        this.addEntity(entity);
-      }
-    }
-
-    return entity;
+    this._entities.updateFromProps(gameState.entities, this.dispatch.bind(this));
   }
 
   /**
