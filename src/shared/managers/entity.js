@@ -14,7 +14,6 @@ class EntityManager {
   /**
    *
    * @param {Object} entityProps
-   * @param {EntityManager} entityManager
    * @param {function} dispatch
    * @returns {Array}
    */
