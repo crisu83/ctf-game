@@ -1,5 +1,3 @@
-import { find, forEach } from 'lodash';
-
 class Entity {
   /**
    *
@@ -18,10 +16,10 @@ class Entity {
   update(props, dispatch) {
     this._components.sort((a, b) => a.priority - b.priority);
 
-    forEach(this._components, component => {
-      component.update(props, dispatch);
-    });
-    
+    for (let i = 0; i < this._components.length; i++) {
+      this._components[i].update(props, dispatch);
+    }
+
     this._props = props;
   }
 
@@ -29,9 +27,9 @@ class Entity {
    *
    */
   destroy() {
-    forEach(this._components, component => {
-      component.destroy();
-    });
+    for (let i = 0; i < this._components.length; i++) {
+      this._components[i].destroy();
+    }
   }
 
   /**
@@ -49,7 +47,13 @@ class Entity {
    * @returns {Component}
    */
   getComponent(key) {
-    return find(this._components, component => component.key === key);
+    for (let i = 0; i < this._components.length; i++) {
+      if (this._components[i].key === key) {
+        return this._components[i];
+      }
+    }
+
+    return null;
   }
 
   /**
