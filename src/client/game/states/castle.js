@@ -40,8 +40,8 @@ class Castle extends State {
    *
    */
   updateFlagsText() {
-    const numFlags = this._entities.filterByType(entity =>
-      entity.getProp('type') === EntityTypes.FLAG && entity.getProp('color') === this._playerEntity.getProp('color'));
+    const numFlags = this._entities.filterEntities(entity =>
+      entity.getProp('type') === EntityTypes.FLAG && entity.getProp('color') === this.playerEntity.getProp('color'));
     this.updateText('teamFlags', { amount: numFlags.length || 0 });
   }
 
