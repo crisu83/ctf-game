@@ -1,6 +1,6 @@
 /*eslint no-unused-vars: 0*/
 
-const FRAME_RATE = 15;
+import { FRAME_RATE } from '../constants';
 
 /**
  *

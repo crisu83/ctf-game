@@ -11,24 +11,21 @@ import SoundComponent from '../game/components/sound';
 import AttackComponent from '../game/components/attack';
 import { createSprite } from './sprite';
 import { createNameTag } from './text';
-import { isEntityMoving, resolveActionAnimation } from '../helpers/game';
+import { resolveActionAnimation } from '../helpers/game';
 import {
-  CONTEXT_SERVER,
   setPosition,
   setVelocity,
+  resetVelocity,
   setAnimation,
   setFacing,
+  resetFacing,
   beginAttack,
   endAttack,
   damageEntity,
   tagFlag
 } from '../actions/game';
-
-export const PLAYER = 'player';
-export const FLAG = 'flag';
-export const TEAM = 'team';
-
-const SOUND_VOLUME = 0.03;
+import { ContextTypes, SOUND_VOLUME } from '../constants';
+import { EntityTypes, FacingDirections } from 'shared/constants';
 
 /**
  *
@@ -62,23 +59,21 @@ export function createLocalPlayer(state, props) {
 
     const velocity = sprint.isDown ? updateProps.runSpeed * 1.5 : updateProps.runSpeed;
 
-    // TODO: Add constants for facing directions to game/actions.
-
     if (cursors.left.isDown) {
       dispatch(setVelocity(updateProps.id, -velocity, 0));
-      dispatch(setFacing(updateProps.id, 'left'));
-    } else if (cursors.right.isDown) {
-      dispatch(setVelocity(updateProps.id, velocity, 0));
-      dispatch(setFacing(updateProps.id, 'right'));
+      dispatch(setFacing(updateProps.id, FacingDirections.LEFT));
     } else if (cursors.up.isDown) {
       dispatch(setVelocity(updateProps.id, 0, -velocity));
-      dispatch(setFacing(updateProps.id, 'up'));
+      dispatch(setFacing(updateProps.id, FacingDirections.UP));
+    } else if (cursors.right.isDown) {
+      dispatch(setVelocity(updateProps.id, velocity, 0));
+      dispatch(setFacing(updateProps.id, FacingDirections.RIGHT));
     } else if (cursors.down.isDown) {
       dispatch(setVelocity(updateProps.id, 0, velocity));
-      dispatch(setFacing(updateProps.id, 'down'));
-    } else if (!isEntityMoving(updateProps)) {
-      dispatch(setVelocity(updateProps.id, 0, 0));
-      dispatch(setFacing(updateProps.id, null));
+      dispatch(setFacing(updateProps.id, FacingDirections.DOWN));
+    } else {
+      dispatch(resetVelocity(updateProps.id));
+      dispatch(resetFacing(updateProps.id));
     }
   };
 
@@ -121,7 +116,7 @@ export function createLocalPlayer(state, props) {
 
     if (animation && animation !== currentAnimation) {
       knight.animations.play(animation);
-      dispatch(setAnimation(updateProps.id, animation, CONTEXT_SERVER));
+      dispatch(setAnimation(updateProps.id, animation));
     }
 
     if (updateProps.isDead && knight.alive) {
@@ -134,12 +129,12 @@ export function createLocalPlayer(state, props) {
       knight.revive();
     }
 
-    if (!updateProps.isDead && knight.x !== updateProps.x || knight.y !== updateProps.y) {
-      if (!updateProps.isReviving) {
-        dispatch(setPosition(updateProps.id, knight.x, knight.y, CONTEXT_SERVER));
-      } else {
+    if (knight.x !== updateProps.x || knight.y !== updateProps.y) {
+      if (updateProps.isReviving) {
         knight.x = updateProps.x;
         knight.y = updateProps.y;
+      } else if (!updateProps.isDead) {
+        dispatch(setPosition(updateProps.id, knight.x, knight.y, ContextTypes.SERVER));
       }
     }
   };
@@ -283,10 +278,10 @@ function createFlag(state, props) {
  */
 export function createEntity(state, props) {
   switch (props.type) {
-    case PLAYER:
+    case EntityTypes.PLAYER:
       return createRemotePlayer(state, props);
 
-    case FLAG:
+    case EntityTypes.FLAG:
       return createFlag(state, props);
 
     default:

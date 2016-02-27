@@ -2,14 +2,13 @@ import { is, Map } from 'immutable';
 import { forEach, get, last, now } from 'lodash';
 import Phaser, { Physics, Keyboard, Tilemap, Group } from 'phaser';
 import { setState } from '../actions/game';
-import { createLocalPlayer, createEntity, PLAYER } from '../factories/entity';
+import { createLocalPlayer, createEntity } from '../factories/entity';
 import { createLayer } from '../factories/layer';
 import RenderGroup from './groups/render';
 import Text from './text';
 import EntityManager from 'shared/managers/entity';
-
-const MUSIC_VOLUME = 0.01;
-const TILE_LAYER = 'tilelayer';
+import { MUSIC_VOLUME, TILE_LAYER } from '../constants';
+import { EntityTypes } from 'shared/constants';
 
 // Require for dynamic loading of assets provided by the server.
 const req = require.context('resources/assets', true, /\.(png|jpg|mp3|ogg|wav)$/);
@@ -36,7 +35,6 @@ class State extends Phaser.State {
     this._groups = {};
     this._layers = {};
     this._texts = {};
-    this._numPlayers = 0;
     this._ping = 0;
     this._pingSentAt = null;
     this._packetSequences = [];
@@ -266,7 +264,7 @@ class State extends Phaser.State {
       this.updateText('packetLoss', { amount: `${packetLoss.toFixed(2)}%` });
     }
 
-    this.updateText('playersOnline', { amount: this._numPlayers });
+    this.updateNumPlayers();
   }
 
   /**
@@ -304,7 +302,8 @@ class State extends Phaser.State {
    *
    */
   updateNumPlayers() {
-    this._numPlayers = this._entities.filterByType(PLAYER).length;
+    const numPlayers = this._entities.filterByType(EntityTypes.PLAYER).length;
+    this.updateText('playersOnline', { amount: numPlayers });
   }
 
   /**

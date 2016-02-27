@@ -3,7 +3,7 @@ import { forEach, pick } from 'lodash';
 import Session from '../session';
 import { addEntity, joinTeam, leaveTeam } from '../../actions/game';
 import { findWeakestTeamId } from '../../helpers/game';
-import { TEAM, FLAG } from '../../factories/entity';
+import { EntityTypes } from 'shared/constants';
 
 class Castle extends Session {
   /**
@@ -38,7 +38,7 @@ class Castle extends Session {
     forEach(teamColorProps, (props, index) => {
       this.dispatch(addEntity({
         ...props,
-        type: TEAM,
+        type: EntityTypes.TEAM,
         id: shortid.generate(),
         base: pick(baseObjects[index], ['x', 'y', 'width', 'height'])
       }));
@@ -55,7 +55,7 @@ class Castle extends Session {
       this.dispatch(addEntity({
         ...props,
         id: shortid.generate(),
-        type: FLAG
+        type: EntityTypes.FLAG
       }));
     });
   }

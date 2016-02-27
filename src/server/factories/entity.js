@@ -13,10 +13,7 @@ import {
   endRevive,
   givePoints
 } from '../actions/game';
-
-export const PLAYER = 'player';
-export const TEAM = 'team';
-export const FLAG = 'flag';
+import { EntityTypes } from 'shared/constants';
 
 /**
  *
@@ -37,7 +34,7 @@ function createPlayer(session, props) {
 
         setTimeout(() => {
           dispatch(endRevive(props.id));
-        }, 100);
+        }, 500);
       }, props.reviveDuration);
     }
   };
@@ -93,13 +90,13 @@ function createTeam(session, props) {
  */
 export function createEntity(session, props) {
   switch (props.type) {
-    case PLAYER:
+    case EntityTypes.PLAYER:
       return createPlayer(session, props);
 
-    case FLAG:
+    case EntityTypes.FLAG:
       return createFlag(session, props);
 
-    case TEAM:
+    case EntityTypes.TEAM:
       return createTeam(session, props);
 
     default:

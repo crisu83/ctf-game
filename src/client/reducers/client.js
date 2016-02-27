@@ -1,7 +1,7 @@
 /*eslint no-unused-vars: 0*/
 
 import { Map } from 'immutable';
-import { BEGIN_CONNECTION, END_CONNECTION, START_LOADING, STOP_LOADING } from '../actions/client';
+import { ClientActions } from '../constants';
 
 const initialState = Map({
   isConnected: false,
@@ -18,16 +18,16 @@ export function updateIsLoading(state, value) {
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case BEGIN_CONNECTION:
+    case ClientActions.BEGIN_CONNECTION:
       return updateIsConnected(state, true);
 
-    case END_CONNECTION:
+    case ClientActions.END_CONNECTION:
       return updateIsConnected(state, false);
 
-    case START_LOADING:
+    case ClientActions.START_LOADING:
       return updateIsLoading(state, true);
 
-    case STOP_LOADING:
+    case ClientActions.STOP_LOADING:
       return updateIsLoading(state, false);
 
     default:

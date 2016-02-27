@@ -1,24 +1,14 @@
-export const SET_STATE = 'game/SET_STATE';
-export const SET_POSITION = 'game/SET_POSITION';
-export const SET_VELOCITY = 'game/SET_VELOCITY';
-export const SET_ANIMATION = 'game/SET_ANIMATION';
-export const SET_FACING = 'game/SET_FACING';
-export const BEGIN_ATTACK = 'game/BEGIN_ATTACK';
-export const END_ATTACK = 'game/END_ATTACK';
-export const DAMAGE_ENTITY = 'game/DAMAGE_ENTITY';
-export const TAG_FLAG = 'game/TAG_FLAG';
-
-export const CONTEXT_CLIENT = 'client';
-export const CONTEXT_SERVER = 'server';
+import { ContextTypes } from '../constants';
+import { GameActions, FacingDirections } from 'shared/constants';
 
 /**
  *
  * @param {Object} newState
  * @param {string} playerId
- * @returns {{type: string, newState: Object, context: string}}
+ * @returns {{type: string, newState: Object, playerId: string}}
  */
 export function setState(newState, playerId) {
-  return { type: SET_STATE, newState, playerId, context: CONTEXT_CLIENT };
+  return { type: GameActions.SET_STATE, newState, playerId, context: ContextTypes.CLIENT };
 }
 
 /**
@@ -27,10 +17,10 @@ export function setState(newState, playerId) {
  * @param {number} x
  * @param {number} y
  * @param {string} context
- * @returns {{type: string, x: number, y: number, context: string}}
+ * @returns {{type: string, x: number, y: number}}
  */
 export function setPosition(id, x, y, context) {
-  return { type: SET_POSITION, id, x, y, context };
+  return { type: GameActions.SET_POSITION, id, x, y, context };
 }
 
 /**
@@ -41,18 +31,26 @@ export function setPosition(id, x, y, context) {
  * @returns {{type: string, x: number, y: number}}
  */
 export function setVelocity(id, vx, vy) {
-  return { type: SET_VELOCITY, id, vx, vy };
+  return { type: GameActions.SET_VELOCITY, id, vx, vy };
+}
+
+/**
+ *
+ * @param {string} id
+ * @returns {{type: string, x: number, y: number}}
+ */
+export function resetVelocity(id) {
+  return setVelocity(id, 0, 0);
 }
 
 /**
  *
  * @param {string} id
  * @param {string} animation
- * @param {string} context
- * @returns {{type: string, animation: string, context: string}}
+ * @returns {{type: string, animation: string}}
  */
-export function setAnimation(id, animation, context) {
-  return { type: SET_ANIMATION, id, animation, context };
+export function setAnimation(id, animation) {
+  return { type: GameActions.SET_ANIMATION, id, animation, context: ContextTypes.SERVER };
 }
 
 /**
@@ -62,7 +60,16 @@ export function setAnimation(id, animation, context) {
  * @returns {{type: string, id: string, facing: string}}
  */
 export function setFacing(id, facing) {
-  return { type: SET_FACING, id, facing };
+  return { type: GameActions.SET_FACING, id, facing };
+}
+
+/**
+ *
+ * @param {string} id
+ * @returns {{type: string, id: string, facing: string}}
+ */
+export function resetFacing(id) {
+  return setFacing(id, FacingDirections.NONE);
 }
 
 /**
@@ -71,7 +78,7 @@ export function setFacing(id, facing) {
  * @returns {{type: string, id: string}}
  */
 export function beginAttack(id) {
-  return { type: BEGIN_ATTACK, id };
+  return { type: GameActions.BEGIN_ATTACK, id };
 }
 
 /**
@@ -80,7 +87,7 @@ export function beginAttack(id) {
  * @returns {{type: string, id: string}}
  */
 export function endAttack(id) {
-  return { type: END_ATTACK, id };
+  return { type: GameActions.END_ATTACK, id };
 }
 
 /**
@@ -90,15 +97,15 @@ export function endAttack(id) {
  * @returns {{type: string, id: string, targetId: string}}
  */
 export function damageEntity(id, victimId) {
-  return { type: DAMAGE_ENTITY, id, victimId };
+  return { type: GameActions.DAMAGE_ENTITY, id, victimId };
 }
 
 /**
  *
  * @param {string} playerId
  * @param {string} flagId
- * @returns {{type: string, playerId: string, flagId: string, context: string}}
+ * @returns {{type: string, playerId: string, flagId: string}}
  */
 export function tagFlag(playerId, flagId) {
-  return { type: TAG_FLAG, playerId, flagId, context: CONTEXT_SERVER };
+  return { type: GameActions.TAG_FLAG, playerId, flagId, context: ContextTypes.SERVER };
 }

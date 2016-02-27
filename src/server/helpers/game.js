@@ -1,24 +1,5 @@
-import { isUndefined } from 'lodash';
 import { chance } from './vendor';
-import { TEAM } from '../factories/entity';
-
-/**
- *
- * @param {Array} entities
- * @param {string} id
- * @returns {number}
- */
-export function findEntityIndexById(entities, id) {
-  let result = -1;
-
-  for (let i = 0; i < entities.length; i++) {
-    if (entities[i].id === id) {
-      result = i;
-    }
-  }
-
-  return result;
-}
+import { EntityTypes } from 'shared/constants';
 
 /**
  *
@@ -26,12 +7,12 @@ export function findEntityIndexById(entities, id) {
  * @returns {string}
  */
 export function findWeakestTeamId(entities) {
-  let leastPlayers, result = -1;
+  let leastPlayers = -1, result = -1;
 
   for (let i = 0; i < entities.length; i++) {
-    if (entities[i].type === TEAM) {
+    if (entities[i].type === EntityTypes.TEAM) {
       let teamSize = entities[i].players ? entities[i].players.length : 0;
-      if (isUndefined(leastPlayers) || teamSize < leastPlayers) {
+      if (leastPlayers < 0 || teamSize < leastPlayers) {
         leastPlayers = teamSize;
         result = entities[i].id;
       }
@@ -51,7 +32,7 @@ export function findTeamIndexByPlayerId(entities, id) {
   let result = -1;
 
   for (let i = 0; i < entities.length; i++) {
-    if (entities[i].type === TEAM && entities[i].players) {
+    if (entities[i].type === EntityTypes.TEAM && entities[i].players) {
       for (let j = 0; j < entities[i].players.length; j++) {
         if (entities[i].players[j] === id) {
           result = i;

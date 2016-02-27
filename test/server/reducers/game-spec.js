@@ -15,7 +15,7 @@ import {
   advanceTime
 } from '../../../src/server/reducers/game';
 
-describe('game reducer', () => {
+describe('server game reducer', () => {
 
   describe('entity logic', () => {
 

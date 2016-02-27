@@ -1,29 +1,8 @@
 import { Map, List, fromJS } from 'immutable';
 import { isNumber } from 'lodash';
-import {
-  findEntityIndexById,
-  findTeamIndexByPlayerId,
-  calculateBaseSpawnPosition
-} from '../helpers/game';
-import {
-  ADD_ENTITY,
-  REMOVE_ENTITY,
-  JOIN_TEAM,
-  LEAVE_TEAM,
-  SET_POSITION,
-  SET_VELOCITY,
-  SET_ANIMATION,
-  SET_FACING,
-  BEGIN_ATTACK,
-  END_ATTACK,
-  DAMAGE_ENTITY,
-  KILL_ENTITY,
-  BEGIN_REVIVE,
-  END_REVIVE,
-  GIVE_POINTS,
-  TAG_FLAG,
-  ADVANCE_TIME
-} from '../actions/game';
+import { findEntityIndexById } from 'shared/helpers/game';
+import { findTeamIndexByPlayerId, calculateBaseSpawnPosition } from '../helpers/game';
+import { GameActions } from 'shared/constants';
 
 const initialState = Map({
   entities: List(),
@@ -107,9 +86,9 @@ export function setPosition(state, id, x, y) {
  */
 export function setVelocity(state, id, vx, vy) {
   const entityIndex = findEntityIndexById(state.get('entities').toJS(), id);
-  return state.setIn(['entities', entityIndex, 'vx'], vx)
-    .setIn(['entities', entityIndex, 'vy'], vy);
+  return state.setIn(['entities', entityIndex, 'vx'], vx).setIn(['entities', entityIndex, 'vy'], vy);
 }
+
 /**
  *
  * @param {Map} state
@@ -191,7 +170,7 @@ export function killEntity(state, id, lastAttackerId) {
  */
 export function beginRevive(state, id) {
   const playerIndex = findEntityIndexById(state.get('entities').toJS(), id);
-  const playerProps = state.getIn(['entities', playerIndex]);
+  const playerProps = state.getIn(['entities', playerIndex]).toJS();
   if (playerProps.team) {
     const teamIndex = findEntityIndexById(state.get('entities').toJS(), playerProps.team);
     const teamProps = state.getIn(['entities', teamIndex]).toJS();
@@ -283,55 +262,55 @@ export function advanceTime(state, time) {
  */
 const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case ADD_ENTITY:
+    case GameActions.ADD_ENTITY:
       return addEntity(state, action.entity);
 
-    case REMOVE_ENTITY:
+    case GameActions.REMOVE_ENTITY:
       return removeEntity(state, action.id);
 
-    case JOIN_TEAM:
+    case GameActions.JOIN_TEAM:
       return joinTeam(state, action.id, action.teamId);
 
-    case LEAVE_TEAM:
+    case GameActions.LEAVE_TEAM:
       return leaveTeam(state, action.id);
 
-    case SET_POSITION:
+    case GameActions.SET_POSITION:
       return setPosition(state, action.id, action.x, action.y);
 
-    case SET_VELOCITY:
+    case GameActions.SET_VELOCITY:
       return setVelocity(state, action.id, action.vx, action.vy);
 
-    case SET_ANIMATION:
+    case GameActions.SET_ANIMATION:
       return setAnimation(state, action.id, action.animation);
 
-    case SET_FACING:
+    case GameActions.SET_FACING:
       return setFacing(state, action.id, action.facing);
 
-    case BEGIN_ATTACK:
+    case GameActions.BEGIN_ATTACK:
       return setIsAttacking(state, action.id, true);
 
-    case END_ATTACK:
+    case GameActions.END_ATTACK:
       return setIsAttacking(state, action.id, false);
 
-    case DAMAGE_ENTITY:
+    case GameActions.DAMAGE_ENTITY:
       return damageEntity(state, action.id, action.victimId);
 
-    case KILL_ENTITY:
+    case GameActions.KILL_ENTITY:
       return killEntity(state, action.id, action.lastAttackerId);
 
-    case BEGIN_REVIVE:
+    case GameActions.BEGIN_REVIVE:
       return beginRevive(state, action.id);
 
-    case END_REVIVE:
+    case GameActions.END_REVIVE:
       return setIsReviving(state, action.id, false);
 
-    case GIVE_POINTS:
+    case GameActions.GIVE_POINTS:
       return givePoints(state, action.id, action.points);
 
-    case TAG_FLAG:
+    case GameActions.TAG_FLAG:
       return tagFlag(state, action.flagId, action.playerId);
 
-    case ADVANCE_TIME:
+    case GameActions.ADVANCE_TIME:
       return advanceTime(state, action.elapsed);
 
     default:

@@ -4,17 +4,14 @@ import {
   setState,
   setPosition,
   setVelocity,
-  setAnimation,
-  captureFlag
+  setAnimation
 } from '../../../src/client/reducers/game';
 
-describe('game reducer', () => {
+describe('client game reducer', () => {
 
   it('new state overrides the current state', () => {
     const state = Map({
       entities: List.of(
-        Map({id: '1', name: 'John'}),
-        Map({id: '2', name: 'Jane'}),
         Map({id: '3', name: 'Alex'})
       ),
       time: Map({

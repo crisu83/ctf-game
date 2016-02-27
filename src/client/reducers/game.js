@@ -1,13 +1,6 @@
 import { Map, List, fromJS } from 'immutable';
-import { findEntityIndexById } from '../helpers/game';
-import {
-  SET_STATE,
-  SET_POSITION,
-  SET_VELOCITY,
-  SET_ANIMATION,
-  BEGIN_ATTACK,
-  END_ATTACK
-} from '../actions/game';
+import { findEntityIndexById } from 'shared/helpers/game';
+import { GameActions } from 'shared/constants';
 
 const initialState = Map({
   entities: List()
@@ -24,9 +17,7 @@ export function setState(state, newState, playerId) {
   if (!playerId) {
     return nextState;
   }
-  const playerIndex = findEntityIndexById(state.get('entities').toJS(), playerId);
-  const playerProps = state.getIn(['entities', playerIndex]).toJS();
-  return nextState.mergeIn(['entities', playerIndex, playerProps]);
+  return nextState;
 }
 
 /**
@@ -81,22 +72,22 @@ export function setIsAttacking(state, id, value) {
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case SET_STATE:
+    case GameActions.SET_STATE:
       return setState(state, action.newState, action.playerId);
 
-    case SET_POSITION:
+    case GameActions.SET_POSITION:
       return setPosition(state, action.id, action.x, action.y, action.target);
 
-    case SET_VELOCITY:
+    case GameActions.SET_VELOCITY:
       return setVelocity(state, action.id, action.vx, action.vy);
 
-    case SET_ANIMATION:
+    case GameActions.SET_ANIMATION:
       return setAnimation(state, action.id, action.animation);
 
-    case BEGIN_ATTACK:
+    case GameActions.BEGIN_ATTACK:
       return setIsAttacking(state, action.id, true);
 
-    case END_ATTACK:
+    case GameActions.END_ATTACK:
       return setIsAttacking(state, action.id, false);
 
     default:
