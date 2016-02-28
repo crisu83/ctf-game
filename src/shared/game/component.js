@@ -41,19 +41,18 @@ class Component {
   /**
    *
    * @param {string} key
-   * @param {*} value
-   */
-  setProp(key, value) {
-    this._props[key] = value;
-  }
-
-  /**
-   *
-   * @param {string} key
    * @returns {*}
    */
   getProp(key) {
     return this._props[key];
+  }
+
+  /**
+   *
+   * @returns {Entity}
+   */
+  get entity() {
+    return this._entity;
   }
 
   /**

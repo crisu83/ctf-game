@@ -16,15 +16,14 @@
    */},{key:"getComponent",value:function getComponent(key){return this._entity.getComponent(key)} /**
    *
    * @param {string} key
-   * @param {*} value
-   */},{key:"setProp",value:function setProp(key,value){this._props[key]=value} /**
-   *
-   * @param {string} key
    * @returns {*}
    */},{key:"getProp",value:function getProp(key){return this._props[key]} /**
    *
+   * @returns {Entity}
+   */},{key:"entity",get:function get(){return this._entity} /**
+   *
    * @param {Entity} entity
-   */},{key:"entity",set:function set(entity){this._entity=entity} /**
+   */,set:function set(entity){this._entity=entity} /**
    *
    * @returns {string}
    */},{key:"key",get:function get(){return this._key} /**

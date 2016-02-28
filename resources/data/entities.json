@@ -6,8 +6,8 @@
     "group": "knights",
     "health": 100,
     "damage": 100,
-    "runSpeed": 500,
-    "attackCooldown": 500,
+    "runSpeed": 400,
+    "attackCooldown": 800,
     "attackRange": 20,
     "reviveDuration": 5000
   },
