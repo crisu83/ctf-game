@@ -16,7 +16,7 @@ function randomTip() {
     'Tell your friends to join for more fun'
   ];
 
-  const tipIndex = Math.round(Math.random() * tips.length);
+  const tipIndex = Math.round(Math.random() * (tips.length - 1));
 
   return tips[tipIndex];
 }
