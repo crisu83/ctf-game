@@ -41,27 +41,27 @@
       "y": -30
     },
     "top5_1": {
-      "text": "#1 {player} {points}",
+      "text": "#{place} {player} {points}",
       "x": 10,
       "y": -110
     },
     "top5_2": {
-      "text": "#2 {player} {points}",
+      "text": "#{place} {player} {points}",
       "x": 10,
       "y": -90
     },
     "top5_3": {
-      "text": "#3 {player} {points}",
+      "text": "#{place} {player} {points}",
       "x": 10,
       "y": -70
     },
     "top5_4": {
-      "text": "#4 {player} {points}",
+      "text": "#{place} {player} {points}",
       "x": 10,
       "y": -50
     },
     "top5_5": {
-      "text": "#5 {player} {points}",
+      "text": "#{place} {player} {points}",
       "x": 10,
       "y": -30
     }

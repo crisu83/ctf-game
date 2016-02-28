@@ -7,6 +7,9 @@ class Castle extends State {
    */
   create() {
     super.create();
+
+    // Disable auto-pause on losing focus.
+    this.game.stage.disableVisibilityChange = true;
   }
 
   /**
@@ -14,14 +17,14 @@ class Castle extends State {
    */
   updateTexts() {
     super.updateTexts();
-    
+
     this.updatePlayerTexts();
     this.updateFlagsText();
     this.updateTop5Text();
   }
 
   /**
-   *
+   * Updates the player texts for the game.
    */
   updatePlayerTexts() {
     if (this.playerEntity) {
@@ -37,7 +40,7 @@ class Castle extends State {
   }
 
   /**
-   *
+   * Updates the flags text for the game.
    */
   updateFlagsText() {
     const numFlags = this._entities.filterEntities(entity =>
@@ -46,16 +49,23 @@ class Castle extends State {
   }
 
   /**
-   *
+   * Updates the top 5 players texts for the game.
    */
   updateTop5Text() {
-    const players = this._entities.filterByType(EntityTypes.PLAYER)
-      .sort((a, b) => b.getProp('points') - a.getProp('points'));
+    const numSlots = 5;
+    const players = this._entities.filterByType(EntityTypes.PLAYER);
 
-    for (let i = 0; i < 5; i++) {
-      let key = `top5_${i + 1}`;
-      if (players[i]) {
-        this.updateText(key, { player: players[i].getProp('name'), points: players[i].getProp('points') || 0 });
+    players.sort((a, b) => (b.getProp('points') || 0) - (a.getProp('points') || 0));
+
+    for (let i = 0; i < numSlots; i++) {
+      const key = `top5_${i + 1}`;
+      const index = i - (numSlots - players.length);
+      if (index >= 0 && players[index]) {
+        this.updateText(key, {
+          place: index + 1,
+          player: players[index].getProp('name'),
+          points: players[index].getProp('points') || 0
+        });
       } else {
         this.hideText(key);
       }
