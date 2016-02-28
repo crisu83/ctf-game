@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { beginConnection, endConnection, startLoading, stopLoading } from '../actions/client';
-import { setState } from '../actions/game';
 import { createGame } from '../factories/game';
 import Status from './status';
 import Visibility from './visibility';
@@ -11,8 +10,7 @@ const LOAD_DELAY = 750;
 function mapStateToProps(state) {
   return {
     isConnected: state.client.get('isConnected'),
-    isLoading: state.client.get('isLoading'),
-    gameState: state.game.toJS()
+    isLoading: state.client.get('isLoading')
   };
 }
 
@@ -30,9 +28,6 @@ function mapDispatchToProps(dispatch) {
     },
     onStopLoading() {
       dispatch(stopLoading());
-    },
-    onSetState(state) {
-      dispatch(setState(state));
     }
   };
 }
@@ -40,8 +35,6 @@ function mapDispatchToProps(dispatch) {
 export class Game extends Component {
   constructor() {
     super();
-
-    this._game = null;
 
     this.handleConnect = this.handleConnect.bind(this);
     this.handleReady = this.handleReady.bind(this);
@@ -65,15 +58,8 @@ export class Game extends Component {
 
     console.log('READY (client_id: %s)', clientId, gameData, gameState, playerProps);
 
-    // Set the initial game state when the client is ready.
-    this.props.onSetState(gameState);
-
     setTimeout(() => {
-      if (this._game) {
-        this._game.destroy();
-      }
-
-      this._game = createGame(this.props.store, this.props.socket, gameData, playerProps);
+      createGame(this.props.store, this.props.socket, gameData, gameState, playerProps);
 
       this.props.onStopLoading();
     }, LOAD_DELAY);
@@ -84,6 +70,8 @@ export class Game extends Component {
 
     this.props.onStartLoading();
     this.props.onDisconnect();
+
+    document.location.reload();
   }
 
   render() {

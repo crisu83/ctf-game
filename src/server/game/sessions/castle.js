@@ -1,7 +1,7 @@
 import shortid from 'shortid';
 import { forEach, pick } from 'lodash';
 import Session from '../session';
-import { addEntity, joinTeam, leaveTeam } from '../../actions/game';
+import { addEntity, joinTeam, leaveTeam } from '../../actions/entity';
 import { findWeakestTeamId } from '../../helpers/game';
 import { EntityTypes } from 'shared/constants';
 
@@ -69,7 +69,7 @@ class Castle extends Session {
 
     const teamId = findWeakestTeamId(this.gameState.entities);
 
-    this.dispatch(joinTeam(props.id, teamId));
+    this.dispatch(joinTeam(teamId, props.id));
   }
 
   /**

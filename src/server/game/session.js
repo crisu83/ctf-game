@@ -3,15 +3,13 @@
 import shortid from 'shortid';
 import { find, forEach, get, now } from 'lodash';
 import { logger } from '../helpers/vendor';
-import createStore from '../store';
-import { addEntity, removeEntity, advanceTime } from '../actions/game';
+import { buildStore } from '../helpers/store';
+import { addEntity, removeEntity } from '../actions/entity';
+import { advanceElapsed } from '../actions/time';
 import { createEntity } from '../factories/entity';
 import { createMap } from '../factories/map';
 import { DATA_PATH, GAME_TICK_RATE, GAME_SYNC_RATE } from '../constants';
 import EntityManager from 'shared/managers/entity';
-import Entity from 'shared/game/entity';
-
-// TODO: Separate game logic and generic game session logic into two different classes.
 
 class Session {
   /**
@@ -23,7 +21,7 @@ class Session {
     this._name = name;
     this._io = io;
     this._id = shortid.generate();
-    this._store = createStore();
+    this._store = buildStore();
     this._gameData = this.loadGameData();
     this._isRunning = false;
     this._lastTickAt = null;
@@ -78,7 +76,7 @@ class Session {
       timeNow = now();
       timeElapsed = this._lastTickAt ? timeNow - this._lastTickAt : 0;
 
-      this._store.dispatch(advanceTime(timeElapsed));
+      this._store.dispatch(advanceElapsed(timeElapsed));
 
       this.update();
 
@@ -198,7 +196,12 @@ class Session {
    * @returns {Object}
    */
   get gameState() {
-    return this._store.getState().game.toJS();
+    const state = this._store.getState();
+
+    return {
+      entities: state.entities.toJS(),
+      time: state.time.toJS()
+    };
   }
 }
 

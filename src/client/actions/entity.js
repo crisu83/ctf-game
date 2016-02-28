@@ -1,5 +1,5 @@
 import { ContextTypes } from '../constants';
-import { GameActions, FacingDirections } from 'shared/constants';
+import { EntityActions, FacingDirections } from 'shared/constants';
 
 /**
  *
@@ -7,8 +7,8 @@ import { GameActions, FacingDirections } from 'shared/constants';
  * @param {string} playerId
  * @returns {{type: string, newState: Object, playerId: string}}
  */
-export function setState(newState, playerId) {
-  return { type: GameActions.SET_STATE, newState, playerId, context: ContextTypes.CLIENT };
+export function updateState(newState, playerId) {
+  return { type: EntityActions.UPDATE_STATE, newState, playerId, context: ContextTypes.CLIENT };
 }
 
 /**
@@ -20,7 +20,7 @@ export function setState(newState, playerId) {
  * @returns {{type: string, x: number, y: number}}
  */
 export function setPosition(id, x, y, context) {
-  return { type: GameActions.SET_POSITION, id, x, y, context };
+  return { type: EntityActions.SET_POSITION, id, x, y, context };
 }
 
 /**
@@ -31,7 +31,7 @@ export function setPosition(id, x, y, context) {
  * @returns {{type: string, x: number, y: number}}
  */
 export function setVelocity(id, vx, vy) {
-  return { type: GameActions.SET_VELOCITY, id, vx, vy };
+  return { type: EntityActions.SET_VELOCITY, id, vx, vy, context: ContextTypes.CLIENT };
 }
 
 /**
@@ -50,7 +50,7 @@ export function resetVelocity(id) {
  * @returns {{type: string, animation: string}}
  */
 export function setAnimation(id, animation) {
-  return { type: GameActions.SET_ANIMATION, id, animation, context: ContextTypes.SERVER };
+  return { type: EntityActions.SET_ANIMATION, id, animation, context: ContextTypes.SERVER };
 }
 
 /**
@@ -60,7 +60,7 @@ export function setAnimation(id, animation) {
  * @returns {{type: string, id: string, facing: string}}
  */
 export function setFacing(id, facing) {
-  return { type: GameActions.SET_FACING, id, facing };
+  return { type: EntityActions.SET_FACING, id, facing };
 }
 
 /**
@@ -78,7 +78,7 @@ export function resetFacing(id) {
  * @returns {{type: string, id: string}}
  */
 export function beginAttack(id) {
-  return { type: GameActions.BEGIN_ATTACK, id };
+  return { type: EntityActions.BEGIN_ATTACK, id, context: ContextTypes.CLIENT };
 }
 
 /**
@@ -87,7 +87,7 @@ export function beginAttack(id) {
  * @returns {{type: string, id: string}}
  */
 export function endAttack(id) {
-  return { type: GameActions.END_ATTACK, id };
+  return { type: EntityActions.END_ATTACK, id, context: ContextTypes.CLIENT };
 }
 
 /**
@@ -97,15 +97,15 @@ export function endAttack(id) {
  * @returns {{type: string, id: string, targetId: string}}
  */
 export function damageEntity(id, victimId) {
-  return { type: GameActions.DAMAGE_ENTITY, id, victimId };
+  return { type: EntityActions.DAMAGE_ENTITY, id, victimId, context: ContextTypes.SERVER };
 }
 
 /**
  *
- * @param {string} playerId
  * @param {string} flagId
+ * @param {string} playerId
  * @returns {{type: string, playerId: string, flagId: string}}
  */
-export function tagFlag(playerId, flagId) {
-  return { type: GameActions.TAG_FLAG, playerId, flagId, context: ContextTypes.SERVER };
+export function tagFlag(flagId, playerId) {
+  return { type: EntityActions.TAG_FLAG, flagId, playerId, context: ContextTypes.SERVER };
 }

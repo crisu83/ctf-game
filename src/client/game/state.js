@@ -1,7 +1,7 @@
 import { is, Map } from 'immutable';
 import { forEach, get, last, now } from 'lodash';
 import Phaser, { Physics, Keyboard, Tilemap, Group } from 'phaser';
-import { setState } from '../actions/game';
+import { updateState } from '../actions/entity';
 import { createLocalPlayer, createEntity } from '../factories/entity';
 import { createLayer } from '../factories/layer';
 import RenderGroup from './groups/render';
@@ -19,9 +19,10 @@ class State extends Phaser.State {
    * @param store
    * @param socket
    * @param {Object} gameData
+   * @param {Object} gameState
    * @param {Object} playerProps
    */
-  constructor(store, socket, gameData, playerProps) {
+  constructor(store, socket, gameData, gameState, playerProps) {
     super();
 
     this._store = store;
@@ -39,6 +40,8 @@ class State extends Phaser.State {
     this._pingSentAt = null;
     this._packetSequences = [];
     this._lastAction = null;
+
+    this.dispatch(updateState(gameState.entities, playerProps.id));
 
     this._socket.on('latency', this.handleLatency.bind(this));
     this._socket.on('set_state', this.handleSetState.bind(this));
@@ -216,8 +219,8 @@ class State extends Phaser.State {
    * @param {number} sequence
    */
   handleSetState(state, sequence) {
-    if (this._playerEntity) {
-      this._store.dispatch(setState(state, this._playerEntity.getProp('id')));
+    if (this.playerEntity) {
+      this._store.dispatch(updateState(state.entities, this.playerEntity.getProp('id')));
     }
     this._packetSequences.push(sequence);
   }
@@ -415,7 +418,11 @@ class State extends Phaser.State {
    * @returns {Object}
    */
   get gameState() {
-    return this._store.getState().game.toJS();
+    const state = this._store.getState();
+
+    return {
+      entities: state.entities.toJS()
+    };
   }
 
   /**

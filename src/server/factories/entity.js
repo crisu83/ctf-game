@@ -12,7 +12,7 @@ import {
   beginRevive,
   endRevive,
   givePoints
-} from '../actions/game';
+} from '../actions/entity';
 import { EntityTypes } from 'shared/constants';
 
 /**

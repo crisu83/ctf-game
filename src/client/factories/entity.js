@@ -23,7 +23,7 @@ import {
   endAttack,
   damageEntity,
   tagFlag
-} from '../actions/game';
+} from '../actions/entity';
 import { ContextTypes, SOUND_VOLUME } from '../constants';
 import { EntityTypes, FacingDirections } from 'shared/constants';
 
@@ -97,7 +97,7 @@ export function createLocalPlayer(state, props) {
     state.physics.arcade.collide(knight, wallLayer);
 
     state.physics.arcade.collide(knight, flagGroup, null/* collideCallback */, (knight, flag) => {
-      dispatch(tagFlag(updateProps.id, flag.name));
+      dispatch(tagFlag(flag.name, updateProps.id));
       return false; // allows passing through flags
     }/* processCallback */);
 
@@ -165,7 +165,7 @@ export function createLocalPlayer(state, props) {
           dispatch(damageEntity(updateProps.id, knight.name));
           return false; // allows passing through attacks
         });
-
+        
         attack.kill();
 
         this.attackPerformed();

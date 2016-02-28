@@ -4,12 +4,12 @@ import { render } from 'react-dom';
 import { Provider } from 'react-redux';
 import App from './components/app';
 import { GameContainer } from './components/game';
-import createStore from './store';
+import { buildStore } from './helpers/store';
 
 import './index.scss';
 
 const socket = io();
-const store = createStore(socket);
+const store = buildStore(socket);
 
 render(
   <Provider store={store}>
