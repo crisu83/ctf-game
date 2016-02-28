@@ -34,7 +34,7 @@ class Castle extends Session {
       { color: 'purple', hexColor: '#9c44b5' }
     ];
 
-    const baseObjects = this.getGameData('map.objects').filter(object => object.type === 'base');
+    const baseObjects = this.getGameData('map.objects').filter(object => object.type === EntityTypes.BASE);
 
     forEach(teamColorProps, (props, index) => {
       this.dispatch(addEntity({
@@ -50,13 +50,15 @@ class Castle extends Session {
    * Creates the flags for this session.
    */
   createFlags() {
-    const flagObjects = this.getGameData('map.objects').filter(object => object.type === 'flag');
+    const flagProps = this.getGameData('entities.flag');
+    const flagObjects = this.getGameData('map.objects').filter(object => object.type === EntityTypes.FLAG);
     
     forEach(flagObjects, props => {
       this.dispatch(addEntity({
         ...props,
-        id: shortid.generate(),
-        type: EntityTypes.FLAG
+        ...flagProps,
+        type: EntityTypes.FLAG,
+        id: shortid.generate()
       }));
     });
   }

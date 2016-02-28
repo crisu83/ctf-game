@@ -177,17 +177,17 @@ describe('server entity logic', () => {
 
     it('tags a flag and sets its color to the players color in the state', () => {
       const state = List.of(
-        Map({ type: 'player', id: '1', name: 'John', x: 100, y: 100, color: 'blue', team: '50' }),
+        Map({ type: 'player', id: '1', name: 'John', x: 100, y: 100, color: 'blue', hexColor: '#00f', team: '50' }),
         Map({ type: 'team', id: '50', color: 'blue' }),
         Map({ type: 'team', id: '51', color: 'green', numFlags: 1 }),
         Map({ type: 'flag', id: '99', x: 100, y: 100, color: 'green', team: '51' })
       );
       const nextState = onTagFlag(state, tagFlag('99', '1'));
       expect(nextState).to.equal(List.of(
-        Map({ type: 'player', id: '1', name: 'John', x: 100, y: 100, color: 'blue', team: '50' }),
+        Map({ type: 'player', id: '1', name: 'John', x: 100, y: 100, color: 'blue', hexColor: '#00f', team: '50' }),
         Map({ type: 'team', id: '50', color: 'blue', numFlags: 1 }),
         Map({ type: 'team', id: '51', color: 'green', numFlags: 0 }),
-        Map({ type: 'flag', id: '99', x: 100, y: 100, color: 'blue', team: '50' })
+        Map({ type: 'flag', id: '99', x: 100, y: 100, color: 'blue', hexColor: '#00f', team: '50' })
       ));
     });
 

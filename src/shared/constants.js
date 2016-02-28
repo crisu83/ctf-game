@@ -21,7 +21,8 @@ export const EntityActions = {
 export const EntityTypes = {
   PLAYER: 'player',
   FLAG: 'flag',
-  TEAM: 'team'
+  TEAM: 'team',
+  BASE: 'base'
 };
 
 export const FacingDirections = {
@@ -30,4 +31,12 @@ export const FacingDirections = {
   UP: 'up',
   DOWN: 'down',
   NONE: 'none'
+};
+
+export const LayerTypes = {
+  FLAGS: 'Flags',
+  BASES: 'Bases',
+  COLLISION: 'Collision',
+  WALLS: 'Walls',
+  GROUND: 'Ground'
 };

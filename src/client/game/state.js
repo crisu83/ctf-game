@@ -30,12 +30,13 @@ class State extends Phaser.State {
     this._socket = socket;
     this._playerProps = playerProps;
     this._gameData = gameData;
-    this._playerEntity = null;
+    this._player = null;
     this._music = null;
     this._states = new StateManager();
     this._entities = new EntityManager(props => createEntity(this, props));
     this._root = null;
     this._groups = {};
+    this._map = null;
     this._layers = {};
     this._texts = {};
     this._ping = 0;
@@ -155,13 +156,13 @@ class State extends Phaser.State {
    */
   createMap() {
     const mapData = this.getGameData('map');
-    const map = this.add.tilemap(mapData.key, mapData.image);
+    this._map = this.add.tilemap(mapData.key, mapData.image);
 
-    map.addTilesetImage(mapData.key, mapData.image);
+    this._map.addTilesetImage(mapData.key, mapData.image);
 
     forEach(mapData.layers, props => {
       if (props.type === TILE_LAYER) {
-        this.addLayer(props.name, createLayer(map, props));
+        this.addLayer(props.name, createLayer(this._map, props));
       }
     });
   }
@@ -182,8 +183,8 @@ class State extends Phaser.State {
    * Creates the local player entity.
    */
   createPlayer() {
-    this._playerEntity = createLocalPlayer(this, this._playerProps);
-    this._entities.addEntity(this._playerEntity);
+    this._player = createLocalPlayer(this, this._playerProps);
+    this._entities.addEntity(this._player);
   }
 
   /**
@@ -246,8 +247,8 @@ class State extends Phaser.State {
   updateState() {
     const state = this._states.getCurrentState();
 
-    if (state && this.playerEntity) {
-      this._store.dispatch(updateState(state.entities, this.playerEntity.props));
+    if (state && this.player) {
+      this._store.dispatch(updateState(state.entities, this.player.props));
     }
   }
 
@@ -428,6 +429,14 @@ class State extends Phaser.State {
   }
 
   /**
+   *
+   * @returns {Tilemap}
+   */
+  get map() {
+    return this._map;
+  }
+
+  /**
    * Returns the current state of this game.
    * @returns {Object}
    */
@@ -443,8 +452,8 @@ class State extends Phaser.State {
    * Returns the entity for the local player.
    * @returns {Entity}
    */
-  get playerEntity() {
-    return this._playerEntity;
+  get player() {
+    return this._player;
   }
 }
 

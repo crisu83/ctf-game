@@ -20,11 +20,6 @@
       "x": 10,
       "y": 70
     },
-    "teamFlags": {
-      "text": "Flags {amount} / 16",
-      "x": -10,
-      "y": 10
-    },
     "ping": {
       "text": "Ping {amount}",
       "x": -10,

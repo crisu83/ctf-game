@@ -96,6 +96,7 @@ export function onTagFlag(state, action) {
     return state;
   }
   return state.setIn([flagIndex, 'color'], playerColor)
+    .setIn([flagIndex, 'hexColor'], state.getIn([playerIndex, 'hexColor']))
     .setIn([flagIndex, 'team'], newTeamId)
     .updateIn([oldTeamIndex, 'numFlags'], value => value - 1)
     .updateIn([newTeamIndex, 'numFlags'], value => (value || 0) + 1);

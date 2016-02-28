@@ -8,6 +8,8 @@ export const FRAME_RATE = 15;
 
 export const TILE_LAYER = 'tilelayer';
 
+export const MINI_MAP_SCALE = 2;
+
 export const ClientActions = {
   BEGIN_CONNECTION: 'client/BEGIN_CONNECTION',
   END_CONNECTION: 'client/END_CONNECTION',

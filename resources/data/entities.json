@@ -14,6 +14,7 @@
   "flag": {
     "type": "flag",
     "color": "neutral",
+    "hexColor": "#444",
     "group": "flags"
   }
 }

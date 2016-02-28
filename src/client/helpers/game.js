@@ -9,10 +9,12 @@ export function randomTip() {
     'Use ARROW keys to move',
     'Hold down SHIFT to sprint',
     'Press SPACE to attack',
+    'Press M to mute the music',
     'Run over a flag to tag it',
     'Tag flags to receive more points',
     'Players are revived in their base',
-    'Tell your friends to join for more fun'
+    'Tell your friends to join for more fun',
+    'Use the mini-map to your advantage'
   ];
 
   const tipIndex = Math.round(Math.random() * (tips.length - 1));

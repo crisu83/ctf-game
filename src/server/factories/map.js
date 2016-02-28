@@ -40,6 +40,8 @@ export function createMap(key) {
     layers: json.layers,
     width: json.width * json.tilesets[0].tilewidth,
     height: json.height * json.tilesets[0].tileheight,
+    tileWidth: json.tilesets[0].tilewidth,
+    tileHeight: json.tilesets[0].tileheight,
     objects: objects
   };
 }
