@@ -79,7 +79,7 @@ describe('server entity logic', () => {
       ));
     });
 
-    it('revives an entity, marks it as alive and restores its health in the state', () => {
+    it('starts reviving an entity by restoring its health in the state', () => {
       const state = List.of(
         Map({ id: '1', name: 'John', currentHealth: -20, health: 100, isDead: true })
       );
@@ -89,7 +89,7 @@ describe('server entity logic', () => {
       ));
     });
 
-    it('sets an entity as not reviving in the state', () => {
+    it('revives an entity, marks it as not dead nor reviving in the state', () => {
       const state = List.of(
         Map({ id: '1', name: 'John', isReviving: true, isDead: true })
       );
