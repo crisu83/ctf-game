@@ -32,7 +32,7 @@ class State extends Phaser.State {
     this._gameData = gameData;
     this._playerEntity = null;
     this._music = null;
-    this._states = new StateManager([gameState]);
+    this._states = new StateManager();
     this._entities = new EntityManager(props => createEntity(this, props));
     this._root = null;
     this._groups = {};
