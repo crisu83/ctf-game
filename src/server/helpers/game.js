@@ -46,13 +46,17 @@ export function findTeamIndexByPlayerId(entities, id) {
 
 /**
  *
+ * @param {Object} teamProps
  * @param {Object} playerProps
- * @param {Object} baseProps
  * @returns {{x: number, y: number}}
  */
-export function calculateBaseSpawnPosition(playerProps, baseProps) {
-  return {
-    x: chance.integer({ min: baseProps.x, max: (baseProps.x + baseProps.width) - playerProps.width }),
-    y: chance.integer({ min: baseProps.y, max: (baseProps.y + baseProps.height) - playerProps.height })
-  };
+export function calculateTeamSpawnPosition(teamProps, playerProps) {
+  let x = 0, y = 0;
+
+  if (teamProps.base) {
+    x = chance.integer({ min: teamProps.base.x, max: (teamProps.base.x + teamProps.base.width) - playerProps.width });
+    y = chance.integer({ min: teamProps.base.y, max: (teamProps.base.y + teamProps.base.height) - playerProps.height });
+  }
+
+  return { x, y };
 }

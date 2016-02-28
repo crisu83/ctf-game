@@ -1,7 +1,7 @@
 import { List, fromJS } from 'immutable';
 import { onSetPosition, onSetFacing, onSetAnimation } from 'shared/handlers/entity';
 import { findEntityIndexById } from 'shared/helpers/game';
-import { findTeamIndexByPlayerId, calculateBaseSpawnPosition } from '../helpers/game';
+import { findTeamIndexByPlayerId, calculateTeamSpawnPosition } from '../helpers/game';
 import { EntityActions } from 'shared/constants';
 
 export function onAddEntity(state, action) {
@@ -42,18 +42,11 @@ export function onKillEntity(state, action) {
 }
 
 export function onBeginRevive(state, action) {
-  const { id } = action;
+  const { id, x, y } = action;
   const entities = state.toJS();
   const playerIndex = findEntityIndexById(entities, id);
-  const playerProps = state.get(playerIndex).toJS();
-  if (playerProps.team) {
-    const teamIndex = findEntityIndexById(entities, playerProps.team);
-    const teamProps = state.get(teamIndex).toJS();
-    const { x, y } = calculateBaseSpawnPosition(playerProps, teamProps.base);
-    state = onSetPosition(state, { ...action, x, y });
-  }
   const health = state.getIn([playerIndex, 'health']);
-  return setIsDead(setIsReviving(state, action, true), action, false)
+  return onSetPosition(setIsDead(setIsReviving(state, action, true), action, false), { ...action, x, y })
     .setIn([playerIndex, 'currentHealth'], health)
     .removeIn([playerIndex, 'lastAttackerId']);
 }
@@ -65,14 +58,9 @@ export function onEndRevive(state, action) {
 export function onJoinTeam(state, action) {
   const { teamId, playerId } = action;
   const entities = state.toJS();
-  const playerIndex = findEntityIndexById(entities, playerId);
   const teamIndex = findEntityIndexById(entities, teamId);
-  const playerProps = state.get(playerIndex).toJS();
+  const playerIndex = findEntityIndexById(entities, playerId);
   const teamProps = state.get(teamIndex).toJS();
-  if (teamProps.base) {
-    const { x, y } = calculateBaseSpawnPosition(playerProps, teamProps.base);
-    state = onSetPosition(state, { ...action, id: playerId, x, y });
-  }
   return state.updateIn([teamIndex, 'players'], List(), players => players.push(playerId))
     .setIn([playerIndex, 'team'], teamProps.id)
     .setIn([playerIndex, 'color'], teamProps.color)

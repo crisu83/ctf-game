@@ -81,11 +81,11 @@ describe('server entity logic', () => {
 
     it('starts reviving an entity by restoring its health in the state', () => {
       const state = List.of(
-        Map({ id: '1', name: 'John', currentHealth: -20, health: 100, isDead: true })
+        Map({ id: '1', name: 'John', x: 500, y: 500, currentHealth: -20, health: 100, isDead: true })
       );
-      const nextState = onBeginRevive(state, beginRevive('1'));
+      const nextState = onBeginRevive(state, beginRevive('1', 100, 100));
       expect(nextState).to.equal(List.of(
-        Map({ id: '1', name: 'John', currentHealth: 100, health: 100, isReviving: true, isDead: false }),
+        Map({ id: '1', name: 'John', x: 100, y: 100, currentHealth: 100, health: 100, isReviving: true, isDead: false }),
       ));
     });
 

@@ -12,8 +12,8 @@ import AttackComponent from '../game/components/attack';
 import { createSprite } from './sprite';
 import { createNameTag } from './text';
 import { resolveActionAnimation } from '../helpers/game';
+import { setPosition } from 'shared/actions/entity';
 import {
-  setPosition,
   setVelocity,
   resetVelocity,
   setAnimation,

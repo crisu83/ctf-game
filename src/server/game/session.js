@@ -159,6 +159,15 @@ class Session {
   }
 
   /**
+   * 
+   * @param {string} id
+   * @returns {Entity}
+   */
+  getEntity(id) {
+    return this._entities.getEntity(id);
+  }
+
+  /**
    * Returns data for this game.
    * @param {string} key
    * @returns {*}

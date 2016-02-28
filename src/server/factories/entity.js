@@ -13,6 +13,7 @@ import {
   endRevive,
   givePoints
 } from '../actions/entity';
+import { calculateTeamSpawnPosition } from '../helpers/game';
 import { EntityTypes } from 'shared/constants';
 
 /**
@@ -28,9 +29,12 @@ function createPlayer(session, props) {
     if (!props.isDead && props.currentHealth <= 0) {
       dispatch(killEntity(props.id, props.lastAttackerId));
 
+      const team = session.getEntity(props.team);
+      const { x, y } = calculateTeamSpawnPosition(team.props, props);
+      
       // Automatically revive the entity in a while
       setTimeout(() => {
-        dispatch(beginRevive(props.id));
+        dispatch(beginRevive(props.id, x, y));
 
         setTimeout(() => {
           dispatch(endRevive(props.id));

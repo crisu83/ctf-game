@@ -31,10 +31,12 @@ export function killEntity(id, lastAttackerId) {
 /**
  *
  * @param {string} id
+ * @param {number} x
+ * @param {number} y
  * @returns {{type: string, id: string}}
  */
-export function beginRevive(id) {
-  return { type: EntityActions.BEGIN_REVIVE, id };
+export function beginRevive(id, x, y) {
+  return { type: EntityActions.BEGIN_REVIVE, id, x, y };
 }
 
 /**
