@@ -6,6 +6,7 @@ import { createLocalPlayer, createEntity } from '../factories/entity';
 import { createLayer } from '../factories/layer';
 import RenderGroup from './groups/render';
 import Text from './text';
+import StateManager from '../managers/state';
 import EntityManager from 'shared/managers/entity';
 import { MUSIC_VOLUME, TILE_LAYER } from '../constants';
 import { EntityTypes } from 'shared/constants';
@@ -31,6 +32,7 @@ class State extends Phaser.State {
     this._gameData = gameData;
     this._playerEntity = null;
     this._music = null;
+    this._states = new StateManager([gameState]);
     this._entities = new EntityManager(props => createEntity(this, props));
     this._root = null;
     this._groups = {};
@@ -219,9 +221,7 @@ class State extends Phaser.State {
    * @param {number} sequence
    */
   handleSetState(state, sequence) {
-    if (this.playerEntity) {
-      this._store.dispatch(updateState(state.entities, this.playerEntity.props));
-    }
+    this._states.addState(state);
     this._packetSequences.push(sequence);
   }
 
@@ -237,11 +237,18 @@ class State extends Phaser.State {
    * Called when the game is updated.
    */
   update() {
+    this.updateState();
     this.updateEntities();
     this.updateTexts();
+    this.updateRender();
+  }
 
-    // Sort all the entities according to their y position so that those with a higher y position is rendered on top.
-    this._root.sort('y', Group.SORT_ASCENDING);
+  updateState() {
+    const state = this._states.getCurrentState();
+
+    if (state && this.playerEntity) {
+      this._store.dispatch(updateState(state.entities, this.playerEntity.props));
+    }
   }
 
   /**
@@ -251,7 +258,9 @@ class State extends Phaser.State {
   updateEntities() {
     const gameState = this.gameState;
 
-    this._entities.updateFromProps(gameState.entities, this.dispatch.bind(this));
+    if (gameState) {
+      this._entities.updateFromProps(gameState.entities, this.dispatch.bind(this));
+    }
   }
 
   /**
@@ -268,6 +277,11 @@ class State extends Phaser.State {
     }
 
     this.updateNumPlayers();
+  }
+
+  updateRender() {
+    // Sort all the entities according to their y position so that those with a higher y position is rendered on top.
+    this._root.sort('y', Group.SORT_ASCENDING);
   }
 
   /**

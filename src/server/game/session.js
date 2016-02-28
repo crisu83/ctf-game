@@ -209,7 +209,7 @@ class Session {
 
     return {
       entities: state.entities.toJS(),
-      time: state.time.toJS()
+      timestamp: now()
     };
   }
 }

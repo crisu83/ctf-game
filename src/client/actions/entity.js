@@ -60,7 +60,7 @@ export function setAnimation(id, animation) {
  * @returns {{type: string, id: string, facing: string}}
  */
 export function setFacing(id, facing) {
-  return { type: EntityActions.SET_FACING, id, facing };
+  return { type: EntityActions.SET_FACING, id, facing, context: ContextTypes.CLIENT };
 }
 
 /**

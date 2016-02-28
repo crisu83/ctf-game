@@ -3,7 +3,6 @@ import { Map, List } from 'immutable';
 import {
   setPosition,
   setAnimation,
-  setFacing,
   damageEntity,
   tagFlag
 } from '../../../src/client/actions/entity';
@@ -31,7 +30,6 @@ import {
 } from '../../../src/server/handlers/entity';
 import {
   onSetPosition,
-  onSetFacing,
   onSetAnimation
 } from '../../../src/shared/handlers/entity';
 
@@ -158,16 +156,6 @@ describe('server entity logic', () => {
       const nextState = onSetAnimation(state, setAnimation('1', 'runRight'));
       expect(nextState).to.equal(List.of(
         Map({ id: '1', name: 'John', animation: 'runRight' })
-      ));
-    });
-
-    it('sets player facing in the state', () => {
-      const state = List.of(
-        Map({ id: '1', name: 'John' })
-      );
-      const nextState = onSetFacing(state, setFacing('1', 'down'));
-      expect(nextState).to.equal(List.of(
-        Map({ id: '1', name: 'John', facing: 'down' }),
       ));
     });
 

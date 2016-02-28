@@ -4,6 +4,7 @@ import {
   updateState,
   setPosition,
   setVelocity,
+  setFacing,
   setAnimation,
   beginAttack,
   endAttack
@@ -11,6 +12,7 @@ import {
 import {
   onUpdateState,
   onSetVelocity,
+  onSetFacing,
   onBeginAttack,
   onEndAttack
 } from '../../../src/client/handlers/entity';
@@ -53,6 +55,16 @@ describe('client entity logic', () => {
       const nextState = onSetVelocity(state, setVelocity('2', 100, 0));
       expect(nextState).to.equal(List.of(
         Map({ id: '2', name: 'Jane', vx: 100, vy: 0 })
+      ));
+    });
+
+    it('sets player facing in the state', () => {
+      const state = List.of(
+        Map({ id: '1', name: 'John' })
+      );
+      const nextState = onSetFacing(state, setFacing('1', 'down'));
+      expect(nextState).to.equal(List.of(
+        Map({ id: '1', name: 'John', facing: 'down' }),
       ));
     });
 

@@ -1,6 +1,8 @@
 export const MUSIC_VOLUME = 0.01;
 export const SOUND_VOLUME = 0.03;
 
+export const CLIENT_LAG = 50;
+
 export const FRAME_RATE = 15;
 
 export const TILE_LAYER = 'tilelayer';

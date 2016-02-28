@@ -1,5 +1,5 @@
 import { List, fromJS } from 'immutable';
-import { onSetPosition, onSetFacing, onSetAnimation } from 'shared/handlers/entity';
+import { onSetPosition, onSetAnimation } from 'shared/handlers/entity';
 import { findEntityIndexById } from 'shared/helpers/game';
 import { findTeamIndexByPlayerId, calculateTeamSpawnPosition } from '../helpers/game';
 import { EntityActions } from 'shared/constants';
@@ -116,7 +116,6 @@ function setIsReviving(state, action, value) {
 export const handlers = {
   [EntityActions.SET_POSITION]: onSetPosition,
   [EntityActions.SET_ANIMATION]: onSetAnimation,
-  [EntityActions.SET_FACING]: onSetFacing,
   [EntityActions.ADD_ENTITY]: onAddEntity,
   [EntityActions.REMOVE_ENTITY]: onRemoveEntity,
   [EntityActions.DAMAGE_ENTITY]: onDamageEntity,
