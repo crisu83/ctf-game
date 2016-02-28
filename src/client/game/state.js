@@ -41,7 +41,7 @@ class State extends Phaser.State {
     this._packetSequences = [];
     this._lastAction = null;
 
-    this.dispatch(updateState(gameState.entities, playerProps.id));
+    this.dispatch(updateState(gameState.entities, playerProps));
 
     this._socket.on('latency', this.handleLatency.bind(this));
     this._socket.on('set_state', this.handleSetState.bind(this));
@@ -220,7 +220,7 @@ class State extends Phaser.State {
    */
   handleSetState(state, sequence) {
     if (this.playerEntity) {
-      this._store.dispatch(updateState(state.entities, this.playerEntity.getProp('id')));
+      this._store.dispatch(updateState(state.entities, this.playerEntity.props));
     }
     this._packetSequences.push(sequence);
   }

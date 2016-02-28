@@ -6,11 +6,10 @@ import { findEntityIndexById } from 'shared/helpers/game';
 import { EntityActions } from 'shared/constants';
 
 export function onUpdateState(state, action) {
-  const { newState, playerId } = action;
-  const nextState = fromJS(newState);
-  const playerIndex = findEntityIndexById(state.toJS(), playerId);
-  const playerProps = state.get(playerIndex) || Map();
-  return nextState.update(playerIndex, Map(), props => playerProps.merge(props));
+  const { newState, playerProps } = action;
+  const playerIndex = findEntityIndexById(state.toJS(), playerProps.id);
+  const prevProps = state.get(playerIndex) || Map();
+  return fromJS(newState).update(playerIndex, Map(), props => prevProps.merge(props));
 }
 
 export function onSetVelocity(state, action) {

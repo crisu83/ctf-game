@@ -59,15 +59,6 @@ class Entity {
   /**
    *
    * @param {string} key
-   * @param {*} value
-   */
-  setProp(key, value) {
-    this._props[key] = value;
-  }
-
-  /**
-   *
-   * @param {string} key
    * @returns {*}
    */
   getProp(key) {
@@ -80,6 +71,14 @@ class Entity {
    */
   get id() {
     return this.getProp('id');
+  }
+
+  /**
+   *
+   * @returns {Object}
+   */
+  get props() {
+    return this._props;
   }
 
   /**

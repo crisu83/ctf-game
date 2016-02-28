@@ -122,7 +122,7 @@ describe('server entity logic', () => {
       );
       const nextState = onLeaveTeam(state, leaveTeam('1'));
       expect(nextState).to.equal(List.of(
-        Map({ type: 'player', id: '1', name: 'John', x: 100, y: 100 }),
+        Map({ type: 'player', id: '1', name: 'John', x: 100, y: 100, team: '50', color: 'blue', hexColor: '#00f' }),
         Map({ type: 'team', id: '50', color: 'blue', hexColor: '#00f', players: List() }),
       ));
     });

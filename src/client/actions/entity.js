@@ -4,11 +4,11 @@ import { EntityActions, FacingDirections } from 'shared/constants';
 /**
  *
  * @param {Object} newState
- * @param {string} playerId
- * @returns {{type: string, newState: Object, playerId: string}}
+ * @param {Object} playerProps
+ * @returns {{type: string, newState: Object, playerProps: Object}}
  */
-export function updateState(newState, playerId) {
-  return { type: EntityActions.UPDATE_STATE, newState, playerId, context: ContextTypes.CLIENT };
+export function updateState(newState, playerProps) {
+  return { type: EntityActions.UPDATE_STATE, newState, playerProps, context: ContextTypes.CLIENT };
 }
 
 /**

@@ -82,12 +82,9 @@ export function onJoinTeam(state, action) {
 export function onLeaveTeam(state, action) {
   const { playerId } = action;
   const entities = state.toJS();
-  const playerIndex = findEntityIndexById(entities, playerId);
   const teamIndex = findTeamIndexByPlayerId(entities, playerId);
-  return state.updateIn([teamIndex, 'players'], players => players.filter(id => id !== playerId))
-    .removeIn([playerIndex, 'team'])
-    .removeIn([playerIndex, 'color'])
-    .removeIn([playerIndex, 'hexColor']);
+  // TODO: Figure out a way to remove the color, etc. from the player as well.
+  return state.updateIn([teamIndex, 'players'], players => players.filter(id => id !== playerId));
 }
 
 export function onGivePoints(state, action) {
