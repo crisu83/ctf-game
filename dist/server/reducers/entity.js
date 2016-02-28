@@ -1,0 +1,2 @@
+'use strict';Object.defineProperty(exports,'__esModule',{value:true});exports.entityReducer=undefined;var _immutable=require('immutable');var _store=require('../../shared/helpers/store');var _entity=require('../handlers/entity');var initialState=(0,_immutable.List)();var entityReducer=exports.entityReducer=(0,_store.createReducer)(initialState,_entity.handlers);
+//# sourceMappingURL=entity.js.map

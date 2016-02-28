@@ -1,2 +1,0 @@
-'use strict';Object.defineProperty(exports,'__esModule',{value:true});var _redux=require('redux');var _game=require('./reducers/game');var _game2=_interopRequireDefault(_game);function _interopRequireDefault(obj){return obj&&obj.__esModule?obj:{default:obj}}var rootReducer=(0,_redux.combineReducers)({game:_game2.default});exports.default=function(){return (0,_redux.createStore)(rootReducer)};
-//# sourceMappingURL=store.js.map

@@ -1,9 +1,8 @@
-'use strict';Object.defineProperty(exports,'__esModule',{value:true});var _createClass=function(){function defineProperties(target,props){for(var i=0;i<props.length;i++){var descriptor=props[i];descriptor.enumerable=descriptor.enumerable||false;descriptor.configurable=true;if('value' in descriptor)descriptor.writable=true;Object.defineProperty(target,descriptor.key,descriptor)}}return function(Constructor,protoProps,staticProps){if(protoProps)defineProperties(Constructor.prototype,protoProps);if(staticProps)defineProperties(Constructor,staticProps);return Constructor}}(); /*eslint no-unused-vars: 0*/var _shortid=require('shortid');var _shortid2=_interopRequireDefault(_shortid);var _lodash=require('lodash');var _vendor=require('../helpers/vendor');var _store=require('../store');var _store2=_interopRequireDefault(_store);var _game=require('../actions/game');var _entity=require('../factories/entity');var _map=require('../factories/map');var _game2=require('../helpers/game');var _constants=require('../constants');var _entity2=require('../../shared/game/entity');var _entity3=_interopRequireDefault(_entity2);function _interopRequireDefault(obj){return obj&&obj.__esModule?obj:{default:obj}}function _classCallCheck(instance,Constructor){if(!(instance instanceof Constructor)){throw new TypeError('Cannot call a class as a function')}} // TODO: Separate game logic and generic game session logic into two different classes.
-var Session=function(){ /**
+'use strict';Object.defineProperty(exports,'__esModule',{value:true});var _createClass=function(){function defineProperties(target,props){for(var i=0;i<props.length;i++){var descriptor=props[i];descriptor.enumerable=descriptor.enumerable||false;descriptor.configurable=true;if('value' in descriptor)descriptor.writable=true;Object.defineProperty(target,descriptor.key,descriptor)}}return function(Constructor,protoProps,staticProps){if(protoProps)defineProperties(Constructor.prototype,protoProps);if(staticProps)defineProperties(Constructor,staticProps);return Constructor}}(); /*eslint no-unused-vars: 0*/var _shortid=require('shortid');var _shortid2=_interopRequireDefault(_shortid);var _lodash=require('lodash');var _vendor=require('../helpers/vendor');var _store=require('../helpers/store');var _entity=require('../actions/entity');var _time=require('../actions/time');var _entity2=require('../factories/entity');var _map=require('../factories/map');var _constants=require('../constants');var _entity3=require('../../shared/managers/entity');var _entity4=_interopRequireDefault(_entity3);function _interopRequireDefault(obj){return obj&&obj.__esModule?obj:{default:obj}}function _classCallCheck(instance,Constructor){if(!(instance instanceof Constructor)){throw new TypeError('Cannot call a class as a function')}}var Session=function(){ /**
    * Creates a new game session.
    * @param {string} name
    * @param io
-   */function Session(name,io){_classCallCheck(this,Session);this._name=name;this._io=io;this._id=_shortid2.default.generate();this._store=(0,_store2.default)();this._gameData=this.loadGameData();this._isRunning=false;this._lastTickAt=null;this._entities=[];this._packetSequence=0;this._lastSyncAt=null; // Notify each client every time the state is changed.
+   */function Session(name,io){var _this=this;_classCallCheck(this,Session);this._name=name;this._io=io;this._id=_shortid2.default.generate();this._store=(0,_store.buildStore)();this._gameData=this.loadGameData();this._isRunning=false;this._lastTickAt=null;this._entities=new _entity4.default(function(props){return (0,_entity2.createEntity)(_this,props)});this._packetSequence=0;this._lastSyncAt=null; // Notify each client every time the state is changed.
 this._unsubscribeFromStore=this._store.subscribe(this.handleStateChange.bind(this));this.create()} /**
    * Loads the game data for this game session.
    * @returns {Object}
@@ -13,27 +12,20 @@ this._unsubscribeFromStore=this._store.subscribe(this.handleStateChange.bind(thi
    * Starts this session.
    */},{key:'start',value:function start(){this._isRunning=true;setInterval(this.tick.bind(this),1000/_constants.GAME_TICK_RATE);_vendor.logger.info('session.start (session_id: '+this._id+')')} /**
    * Called each time this session is updated.
-   */},{key:'tick',value:function tick(){var timeNow=undefined,timeElapsed=undefined;if(this._isRunning){timeNow=(0,_lodash.now)();timeElapsed=this._lastTickAt?timeNow-this._lastTickAt:0;this._store.dispatch((0,_game.advanceTime)(timeElapsed));this.update();this._lastTickAt=timeNow}} /**
+   */},{key:'tick',value:function tick(){var timeNow=undefined,timeElapsed=undefined;if(this._isRunning){timeNow=(0,_lodash.now)();timeElapsed=this._lastTickAt?timeNow-this._lastTickAt:0;this._store.dispatch((0,_time.advanceElapsed)(timeElapsed));this.update();this._lastTickAt=timeNow}} /**
    * Called each time this sessions should be updated.
    */},{key:'update',value:function update(){this.updateEntities()} /**
    * Updates the state for each entity in the session,
    * as well as creates new entities and destroys expired entities.
-   */},{key:'updateEntities',value:function updateEntities(){var _this=this;var gameState=this.gameState;var updatedEntityIds=[];(0,_lodash.forEach)(gameState.entities,function(props){var entity=_this.getEntity(props);if(entity){entity.update(props,_this.dispatch.bind(_this))}updatedEntityIds.push(props.id)});this._entities=this._entities.filter(function(entity){var found=updatedEntityIds.indexOf(entity.id)!==-1;if(!found){entity.destroy()}return found})} /**
-   * Adds an entity to the game's entity pool.
-   * @param {Entity} entity
-   */},{key:'addEntity',value:function addEntity(entity){if(!entity instanceof _entity3.default){throw new Error('State entities must be instances of Entity.')}this._entities.push(entity)} /**
-   * Returns an entity from the game's entity pool (creating it if it doesn't exist).
-   * @param {Object} props
-   * @returns {Entity}
-   */},{key:'getEntity',value:function getEntity(props){var index=(0,_game2.findEntityIndexById)(this._entities,props.id);if(index!==-1){return this._entities[index]}var entity=(0,_entity.createEntity)(this,props);if(entity){this.addEntity(entity)}return entity} /**
+   */},{key:'updateEntities',value:function updateEntities(){var gameState=this.gameState;this._entities.updateFromProps(gameState.entities,this.dispatch.bind(this))} /**
    * Ends this session.
    */},{key:'end',value:function end(){this._unsubscribeFromStore()} /**
    * Adds a player to this session.
    * @param {Object} props
-   */},{key:'addPlayer',value:function addPlayer(props){this.dispatch((0,_game.addEntity)(props))} /**
+   */},{key:'addPlayer',value:function addPlayer(props){this.dispatch((0,_entity.addEntity)(props))} /**
    * Removes a player from this session.
    * @param {string} id
-   */},{key:'removePlayer',value:function removePlayer(id){this.dispatch((0,_game.removeEntity)(id))} /**
+   */},{key:'removePlayer',value:function removePlayer(id){this.dispatch((0,_entity.removeEntity)(id))} /**
    * Called by clients to dispatch actions received from the browser.
    * @param {Object} action
    */},{key:'handleClientAction',value:function handleClientAction(action){this._store.dispatch(action)} /**
@@ -60,5 +52,5 @@ this._unsubscribeFromStore=this._store.subscribe(this.handleStateChange.bind(thi
    */},{key:'gameData',get:function get(){return this._gameData} /**
    * Returns the current state of this session.
    * @returns {Object}
-   */},{key:'gameState',get:function get(){return this._store.getState().game.toJS()}}]);return Session}();exports.default=Session;
+   */},{key:'gameState',get:function get(){var state=this._store.getState();return {entities:state.entities.toJS(),time:state.time.toJS()}}}]);return Session}();exports.default=Session;
 //# sourceMappingURL=session.js.map

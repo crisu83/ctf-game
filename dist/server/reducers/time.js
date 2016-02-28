@@ -1,0 +1,2 @@
+'use strict';Object.defineProperty(exports,'__esModule',{value:true});exports.timeReducer=undefined;var _immutable=require('immutable');var _store=require('../../shared/helpers/store');var _time=require('../handlers/time');var initialState=(0,_immutable.Map)();var timeReducer=exports.timeReducer=(0,_store.createReducer)(initialState,_time.handlers);
+//# sourceMappingURL=time.js.map
