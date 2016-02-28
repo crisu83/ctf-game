@@ -37,6 +37,10 @@ this._unsubscribeFromStore=this._store.subscribe(this.handleStateChange.bind(thi
    * Dispatches an action to the sessions store.
    * @param {Object} action
    */},{key:'dispatch',value:function dispatch(action){this._store.dispatch(action)} /**
+   * 
+   * @param {string} id
+   * @returns {Entity}
+   */},{key:'getEntity',value:function getEntity(id){return this._entities.getEntity(id)} /**
    * Returns data for this game.
    * @param {string} key
    * @returns {*}
@@ -52,5 +56,5 @@ this._unsubscribeFromStore=this._store.subscribe(this.handleStateChange.bind(thi
    */},{key:'gameData',get:function get(){return this._gameData} /**
    * Returns the current state of this session.
    * @returns {Object}
-   */},{key:'gameState',get:function get(){var state=this._store.getState();return {entities:state.entities.toJS(),time:state.time.toJS()}}}]);return Session}();exports.default=Session;
+   */},{key:'gameState',get:function get(){var state=this._store.getState();return {entities:state.entities.toJS(),timestamp:(0,_lodash.now)()}}}]);return Session}();exports.default=Session;
 //# sourceMappingURL=session.js.map

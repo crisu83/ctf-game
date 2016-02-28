@@ -14,8 +14,10 @@
  */function killEntity(id,lastAttackerId){return {type:_constants.EntityActions.KILL_ENTITY,id:id,lastAttackerId:lastAttackerId}} /**
  *
  * @param {string} id
+ * @param {number} x
+ * @param {number} y
  * @returns {{type: string, id: string}}
- */function beginRevive(id){return {type:_constants.EntityActions.BEGIN_REVIVE,id:id}} /**
+ */function beginRevive(id,x,y){return {type:_constants.EntityActions.BEGIN_REVIVE,id:id,x:x,y:y}} /**
  *
  * @param {string} id
  * @returns {{type: string, id: string}}
