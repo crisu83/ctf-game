@@ -17,15 +17,14 @@
    */},{key:'getComponent',value:function getComponent(key){for(var i=0;i<this._components.length;i++){if(this._components[i].key===key){return this._components[i]}}return null} /**
    *
    * @param {string} key
-   * @param {*} value
-   */},{key:'setProp',value:function setProp(key,value){this._props[key]=value} /**
-   *
-   * @param {string} key
    * @returns {*}
    */},{key:'getProp',value:function getProp(key){return this._props[key]} /**
    *
    * @returns {string}
    */},{key:'id',get:function get(){return this.getProp('id')} /**
+   *
+   * @returns {Object}
+   */},{key:'props',get:function get(){return this._props} /**
    *
    * @param {Array<Component>} components
    */},{key:'components',set:function set(components){this._components=components}}]);return Entity}();exports.default=Entity;
