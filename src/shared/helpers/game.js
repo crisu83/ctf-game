@@ -8,7 +8,7 @@ export function findEntityIndexById(entities, id) {
   let result = -1;
 
   for (let i = 0; i < entities.length; i++) {
-    if (entities[i].id === id) {
+    if (entities[i].id && entities[i].id === id) {
       result = i;
     }
   }
